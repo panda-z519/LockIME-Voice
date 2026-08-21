@@ -51,6 +51,11 @@ Mac に合うインストーラーをダウンロードします：
 - [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
 - [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
+SHA-256 チェックサム:
+
+- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
+- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+
 DMG を開き、**LockIME Voice** を Applications へドラッグします。プレビューは ad-hoc 署名で未公証のため、初回は右クリック → **Open**、または **System Settings ▸ Privacy & Security** で許可し、**Accessibility** と **Input Monitoring** を付与してください。
 
 ソースからのビルドも可能です：

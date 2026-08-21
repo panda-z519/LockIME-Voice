@@ -59,6 +59,11 @@
 - [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
 - [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
+SHA-256 校驗和：
+
+- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
+- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+
 開啟 DMG，將 **LockIME Voice** 拖入「應用程式」。由於預覽版只使用 ad-hoc 簽名且未公證，macOS 首次啟動時可能阻止開啟。請右鍵應用程式選擇「開啟」，或前往 **系統設定 ▸ 隱私權與安全性**允許開啟，再授予 **輔助使用**與**輸入監控**權限。
 
 也可以從原始碼建置：

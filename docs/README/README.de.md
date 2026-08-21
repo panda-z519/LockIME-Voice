@@ -51,6 +51,11 @@ Lade den passenden Installer:
 - [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
 - [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
+SHA-256-Pruefsummen:
+
+- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
+- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+
 Öffne das DMG und ziehe **LockIME Voice** nach Applications. Da die Vorschau ad-hoc signiert und nicht notarisiert ist, öffne die App beim ersten Mal per Rechtsklick → **Open** oder erlaube sie unter **System Settings ▸ Privacy & Security**. Erteile danach **Accessibility** und **Input Monitoring**.
 
 Alternativ aus dem Quellcode bauen:
