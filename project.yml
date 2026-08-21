@@ -1,4 +1,4 @@
-name: LockIME
+name: LockIMEVoice
 
 options:
   bundleIdPrefix: com.zhangsiqiang519
@@ -125,7 +125,7 @@ targets:
         CODE_SIGN_STYLE: Manual
 
 schemes:
-  LockIME:
+  LockIMEVoice:
     build:
       targets:
         LockIME: all

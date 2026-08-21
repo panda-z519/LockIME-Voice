@@ -1,4 +1,5 @@
-SCHEME      := LockIME
+SCHEME      := LockIMEVoice
+PROJECT     := LockIMEVoice.xcodeproj
 CONFIG      ?= Debug
 # We ship one app per architecture (no universal binaries — download size).
 # `make build ARCH=x86_64` cross-builds the Intel app (via the generic
@@ -33,7 +34,7 @@ gen:
 
 ## Build the app (Debug by default; ARCH=x86_64 for the Intel app)
 build: gen
-	$(XCB) -scheme $(SCHEME) -configuration $(CONFIG) \
+	$(XCB) -project $(PROJECT) -scheme $(SCHEME) -configuration $(CONFIG) \
 		-derivedDataPath $(DERIVED) -destination '$(DEST)' \
 		$(ARCHFLAGS) build $(PRETTY)
 
@@ -45,19 +46,19 @@ run: build
 
 ## Run the unit tests (hardware-touching suites skipped)
 test: gen
-	$(XCB) -scheme $(SCHEME) -configuration $(CONFIG) \
+	$(XCB) -project $(PROJECT) -scheme $(SCHEME) -configuration $(CONFIG) \
 		-derivedDataPath $(DERIVED) -destination '$(DEST)' test $(PRETTY)
 
 ## Run ALL tests including hardware suites (briefly switches the input source)
 test-hw: gen
 	@touch /tmp/lockime_hw_tests
-	@$(XCB) -scheme $(SCHEME) -configuration $(CONFIG) \
+	@$(XCB) -project $(PROJECT) -scheme $(SCHEME) -configuration $(CONFIG) \
 		-derivedDataPath $(DERIVED) -destination '$(DEST)' test $(PRETTY); \
 		status=$$?; rm -f /tmp/lockime_hw_tests; exit $$status
 
 ## Build an ad-hoc-signed Release archive
 archive: gen
-	$(XCB) -scheme $(SCHEME) -configuration Release \
+	$(XCB) -project $(PROJECT) -scheme $(SCHEME) -configuration Release \
 		-derivedDataPath $(DERIVED) -destination 'generic/platform=macOS' \
 		-archivePath build/LockIME-Voice.xcarchive archive $(PRETTY)
 
@@ -97,4 +98,4 @@ update-test-stop:
 
 ## Remove generated project and build artifacts
 clean:
-	rm -rf build LockIME.xcodeproj
+	rm -rf build LockIMEVoice.xcodeproj LockIME.xcodeproj

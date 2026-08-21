@@ -2,11 +2,11 @@
 
 <img src="docs/images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 **English** · [简体中文](docs/README/README.zh-CN.md) · [繁體中文](docs/README/README.zh-TW.md) · [日本語](docs/README/README.ja.md) · [Français](docs/README/README.fr.md) · [Deutsch](docs/README/README.de.md) · [Español](docs/README/README.es.md) · [Português](docs/README/README.pt.md) · [Русский](docs/README/README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -110,6 +110,27 @@ need to be granted again after rebuilding.
 - **Automation** — a `lockime-voice://` URL scheme lets other apps, scripts, and
   Shortcuts drive LockIME (see below).
 
+## Voice Input Workflow
+
+The voice input source is fully configurable; LockIME Voice does not hard-code
+Doubao, WeChat, or any other input method.
+
+1. Set the global default input source under **Settings ▸ App Rules**. This is
+   the source restored after voice input ends.
+2. Open **Settings ▸ Voice Input**, enable the workflow, and choose the
+   voice-capable input source.
+3. Record the exact shortcut used by that input method's own voice feature, then
+   choose the matching ending behavior: press again, hold to speak, or any key.
+4. Grant **Accessibility** and **Input Monitoring** when prompted.
+
+Pressing the configured shortcut pauses normal LockIME rules, switches to the
+voice input source, waits for macOS to confirm the switch, and sends the input
+method's shortcut. When voice input ends or the safety timeout fires, LockIME
+Voice restores the global default source and resumes normal enforcement.
+
+Test the workflow in TextEdit or another plain text field. Seeing the voice
+panel is not enough: recognized text must appear at the current cursor position.
+
 ## Comparison
 
 The two most widely-used alternatives to LockIME are
@@ -198,7 +219,7 @@ Requires Xcode 26+ (the app itself targets macOS 14+), and
 + [xcbeautify](https://github.com/cpisciotta/xcbeautify) (`brew install xcodegen xcbeautify`).
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -222,7 +243,7 @@ requirements for enabling signed distribution later.
 - **LockIMEKit** (static library) — pure, fully unit-tested logic using only system
   frameworks: lock engine, app monitor, rules, enhanced (Accessibility) observer,
   logging model, localization.
-- **LockIME** (app) — `@main`, SwiftUI UI, the design system, and the thin
+- **LockIME Voice** (app) — `@main`, SwiftUI UI, the design system, and the thin
   integration shims for Sparkle, KeyboardShortcuts, and PermissionFlow.
 
 ## License

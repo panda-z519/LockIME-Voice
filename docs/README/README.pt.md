@@ -2,11 +2,11 @@
 
 <img src="../images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · **Português** · [Русский](README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![Licença: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -70,6 +70,19 @@ Sem assinatura Developer ID ou notarização, talvez seja necessário conceder n
 - **Sem permissões do sistema para o bloqueio básico** — um modo aprimorado opcional, condicionado à permissão de Accessibility, libera regras mais finas por URL e por campo em foco.
 - **Automação** — um esquema de URL `lockime-voice://` permite que outros apps, scripts e o Shortcuts controlem o LockIME (veja abaixo).
 
+## Voice Input Workflow
+
+A fonte de entrada por voz é totalmente configurável; o LockIME Voice não fixa Doubao, WeChat nem qualquer outro método de entrada.
+
+1. Defina a fonte global padrão em **Settings ▸ App Rules**; ela será restaurada após a voz.
+2. Abra **Settings ▸ Voice Input**, ative o fluxo e escolha uma fonte compatível com voz.
+3. Grave o atalho de voz do próprio método e escolha o mesmo encerramento: pressionar novamente, manter pressionado ou qualquer tecla.
+4. Conceda **Accessibility** e **Input Monitoring** quando solicitado.
+
+O atalho pausa as regras normais, muda para a fonte de voz, aguarda a confirmação do macOS e envia o atalho interno. Ao terminar ou atingir o tempo de segurança, o LockIME Voice restaura a fonte global e retoma as regras.
+
+Teste no TextEdit ou em outro campo de texto simples. Mostrar o painel de voz não basta: o texto reconhecido precisa aparecer de fato no cursor.
+
 ## Comparison
 
 As duas alternativas ao LockIME mais usadas são o **[Input Source Pro](https://github.com/runjuu/InputSourcePro)** e o **[KeyboardHolder](https://github.com/leaves615/KeyboardHolder)**, ao lado de uma longa cauda de ferramentas menores de código aberto e de linha de comando. Todas elas *alternam* a fonte de entrada conforme você se move entre apps ou sites; o LockIME é construído em torno de um **bloqueio** contínuo que a reaplica no momento em que ela desvia — ao mesmo tempo em que qualquer regra ainda pode recorrer a uma *alternância* única.
@@ -132,7 +145,7 @@ O ícone do app é gerado programaticamente (sem ferramenta de design) — regen
 Requer Xcode 26+ (o app em si tem como alvo o macOS 14+), além de [XcodeGen](https://github.com/yonaskolb/XcodeGen) + [xcbeautify](https://github.com/cpisciotta/xcbeautify) (`brew install xcodegen xcbeautify`).
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -150,7 +163,7 @@ Este fork não possui pipeline público de binários. Os fluxos upstream de Deve
 ## Architecture
 
 - **LockIMEKit** (biblioteca estática) — lógica pura, totalmente coberta por testes unitários, usando apenas frameworks do sistema: motor de bloqueio, monitor de apps, regras, observador aprimorado (Accessibility), modelo de registro, localização.
-- **LockIME** (app) — `@main`, a interface SwiftUI, o sistema de design e as finas camadas de integração para Sparkle, KeyboardShortcuts e PermissionFlow.
+- **LockIME Voice** (app) — `@main`, a interface SwiftUI, o sistema de design e as finas camadas de integração para Sparkle, KeyboardShortcuts e PermissionFlow.
 
 ## License
 

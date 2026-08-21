@@ -17,7 +17,7 @@ back-ported patch branches. Pull the latest source and rebuild before reporting.
 privately so a fix can ship before the details are public.
 
 - **GitHub Security Advisories** — open a private report at
-  <https://github.com/zhangsiqiang519/LockIME/security/advisories/new>
+  <https://github.com/zhangsiqiang519/LockIME-Voice/security/advisories/new>
   (keeps the discussion and fix linked to the repo).
 
 When you report, please include as much as you can:

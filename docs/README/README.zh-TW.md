@@ -2,11 +2,11 @@
 
 <img src="../images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · **繁體中文** · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![授權條款: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -69,6 +69,19 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 - **超小體積**——整個應用程式打包成不到 3 MB 的 `.dmg`。
 - **核心鎖定無需系統權限**——可選的、由 Accessibility 把關的增強模式可解鎖更細緻的依 URL / 聚焦欄位規則。
 - **自動化**——`lockime-voice://` URL scheme 讓其他應用程式、指令稿與「捷徑」（Shortcuts）能驅動 LockIME（見下文）。
+
+## Voice Input Workflow
+
+語音輸入法完全可設定；LockIME Voice 不會寫死豆包、微信或其他輸入法。
+
+1. 在 **Settings ▸ App Rules** 設定全域預設輸入法，語音結束後會恢復它。
+2. 開啟 **Settings ▸ Voice Input**，啟用工作流程並選擇支援語音的輸入法。
+3. 錄入該輸入法本身的語音快速鍵，並選擇一致的結束行為：再次按下、按住說話或任意鍵結束。
+4. 依提示授予 **Accessibility** 與 **Input Monitoring** 權限。
+
+觸發快速鍵後，LockIME Voice 會暫停日常規則、切換語音輸入法、等待 macOS 確認切換，再送出輸入法內部快速鍵。語音結束或安全逾時後，它會恢復全域預設輸入法並繼續執行原有規則。
+
+請在 TextEdit 等一般文字欄位中驗證。只看到語音面板不算成功，辨識文字必須實際插入目前游標位置。
 
 ## Comparison
 
@@ -145,7 +158,7 @@ LockIME 遵循單一的設計系統（`Sources/LockIME/UI/DesignSystem.swift`）
 需要 Xcode 26+（應用程式本身以 macOS 14+ 為目標），以及 [XcodeGen](https://github.com/yonaskolb/XcodeGen) + [xcbeautify](https://github.com/cpisciotta/xcbeautify)（`brew install xcodegen xcbeautify`）。
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -163,7 +176,7 @@ Xcode 專案由 `project.yml` 產生，不納入版本控制。
 ## Architecture
 
 - **LockIMEKit**（靜態程式庫）——純粹的、經過完整單元測試的邏輯，僅使用系統框架：鎖定引擎、應用程式監視器、規則、增強（Accessibility）觀察器、記錄模型、在地化。
-- **LockIME**（應用程式）——`@main`、SwiftUI UI、設計系統，以及面向 Sparkle、KeyboardShortcuts 和 PermissionFlow 的輕量整合介面層。
+- **LockIME Voice**（應用程式）——`@main`、SwiftUI UI、設計系統，以及面向 Sparkle、KeyboardShortcuts 和 PermissionFlow 的輕量整合介面層。
 
 ## License
 

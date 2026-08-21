@@ -2,11 +2,11 @@
 
 <img src="../images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · **Русский**
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![Лицензия: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -70,6 +70,19 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 - **Базовая блокировка не требует системных разрешений** — дополнительный расширенный режим, защищённый разрешением Accessibility, открывает более тонкие правила для URL и поля с фокусом.
 - **Автоматизация** — URL-схема `lockime-voice://` позволяет другим приложениям, скриптам и Shortcuts управлять LockIME (см. ниже).
 
+## Voice Input Workflow
+
+Источник голосового ввода полностью настраивается; LockIME Voice не привязан к Doubao, WeChat или какому-либо другому методу ввода.
+
+1. Задайте глобальный источник по умолчанию в **Settings ▸ App Rules**; он восстановится после голосового ввода.
+2. Откройте **Settings ▸ Voice Input**, включите процесс и выберите источник с поддержкой голоса.
+3. Запишите внутреннее голосовое сочетание этого метода и выберите такой же способ завершения: повторное нажатие, удержание или любая клавиша.
+4. Предоставьте **Accessibility** и **Input Monitoring**, когда macOS запросит их.
+
+Сочетание приостанавливает обычные правила, переключает источник, ждёт подтверждения macOS и отправляет внутреннее сочетание. После завершения или защитного тайм-аута LockIME Voice восстанавливает глобальный источник и возобновляет правила.
+
+Проверьте работу в TextEdit или простом текстовом поле. Одного появления голосовой панели недостаточно: распознанный текст должен реально вставиться в позицию курсора.
+
 ## Comparison
 
 Две наиболее широко используемые альтернативы LockIME — это **[Input Source Pro](https://github.com/runjuu/InputSourcePro)** и **[KeyboardHolder](https://github.com/leaves615/KeyboardHolder)**, наряду с длинным хвостом из менее известных инструментов с открытым кодом и CLI. Все они *переключают* источник ввода, когда вы перемещаетесь между приложениями или сайтами; LockIME же построен вокруг непрерывной **блокировки**, которая повторно применяет его в тот же момент, когда он отклоняется, — при этом любое правило по-прежнему может свестись к однократному *переключению*.
@@ -132,7 +145,7 @@ LockIME следует единой системе дизайна (`Sources/Lock
 Требуются Xcode 26+ (само приложение нацелено на macOS 14+), а также [XcodeGen](https://github.com/yonaskolb/XcodeGen) + [xcbeautify](https://github.com/cpisciotta/xcbeautify) (`brew install xcodegen xcbeautify`).
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -150,7 +163,7 @@ make archive # ad-hoc-signed Release archive
 ## Architecture
 
 - **LockIMEKit** (статическая библиотека) — чистая, полностью покрытая модульными тестами логика, использующая только системные фреймворки: движок блокировки, монитор приложений, правила, расширенный (Accessibility) наблюдатель, модель журнала, локализация.
-- **LockIME** (приложение) — `@main`, интерфейс на SwiftUI, система дизайна и тонкие интеграционные прослойки для Sparkle, KeyboardShortcuts и PermissionFlow.
+- **LockIME Voice** (приложение) — `@main`, интерфейс на SwiftUI, система дизайна и тонкие интеграционные прослойки для Sparkle, KeyboardShortcuts и PermissionFlow.
 
 ## License
 

@@ -67,7 +67,7 @@ jobs:
       - name: Build & Test
         run: |
           set -o pipefail
-          xcodebuild -scheme LockIME -configuration Debug \
+          xcodebuild -project LockIMEVoice.xcodeproj -scheme LockIMEVoice -configuration Debug \
             -derivedDataPath build/DerivedData \
             -destination 'platform=macOS,arch=arm64' \
             -resultBundlePath build/TestResults.xcresult \
@@ -79,7 +79,7 @@ jobs:
         # suites already ran natively above, and Rosetta isn't on the runners.
         run: |
           set -o pipefail
-          xcodebuild -scheme LockIME -configuration Debug \
+          xcodebuild -project LockIMEVoice.xcodeproj -scheme LockIMEVoice -configuration Debug \
             -derivedDataPath build/DerivedData \
             -destination 'generic/platform=macOS' \
             ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO \

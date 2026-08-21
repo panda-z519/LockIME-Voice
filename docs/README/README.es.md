@@ -2,11 +2,11 @@
 
 <img src="../images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Español** · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![Licencia: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -69,6 +69,19 @@ Sin firma Developer ID ni notarización, puede ser necesario volver a conceder l
 - **Descarga diminuta** — toda la aplicación cabe en un `.dmg` de menos de 3 MB.
 - **Sin permisos del sistema para el bloqueo básico** — un modo mejorado opcional, protegido por Accessibility, desbloquea reglas más finas por URL y por campo con el foco.
 - **Automatización** — un esquema de URL `lockime-voice://` permite que otras aplicaciones, scripts y Shortcuts controlen LockIME (ver más abajo).
+
+## Voice Input Workflow
+
+La fuente de entrada por voz es totalmente configurable; LockIME Voice no fija Doubao, WeChat ni ningún otro método de entrada.
+
+1. Configura la fuente global predeterminada en **Settings ▸ App Rules**; se restaurará al terminar la voz.
+2. Abre **Settings ▸ Voice Input**, activa el flujo y elige una fuente compatible con voz.
+3. Graba el atajo de voz propio del método y selecciona el mismo final: pulsar otra vez, mantener pulsado o cualquier tecla.
+4. Concede **Accessibility** e **Input Monitoring** cuando se solicite.
+
+El atajo pausa las reglas normales, cambia a la fuente de voz, espera la confirmación de macOS y envía el atajo interno. Al terminar o vencer el tiempo de seguridad, LockIME Voice restaura la fuente global y reanuda las reglas.
+
+Prueba en TextEdit u otro campo de texto sencillo. Mostrar el panel de voz no basta: el texto reconocido debe aparecer realmente en el cursor.
 
 ## Comparison
 
@@ -151,7 +164,7 @@ El icono de la aplicación se genera por programa (sin herramienta de diseño) �
 Requiere Xcode 26+ (la propia aplicación apunta a macOS 14+), además de [XcodeGen](https://github.com/yonaskolb/XcodeGen) + [xcbeautify](https://github.com/cpisciotta/xcbeautify) (`brew install xcodegen xcbeautify`).
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -169,7 +182,7 @@ Este fork no tiene una canalización pública de binarios. Los flujos upstream d
 ## Architecture
 
 - **LockIMEKit** (biblioteca estática) — lógica pura, totalmente cubierta por pruebas unitarias, que solo usa frameworks del sistema: motor de bloqueo, monitor de aplicaciones, reglas, observador mejorado (Accessibility), modelo de registro, localización.
-- **LockIME** (aplicación) — `@main`, la interfaz SwiftUI, el sistema de diseño y las finas capas de integración para Sparkle, KeyboardShortcuts y PermissionFlow.
+- **LockIME Voice** (aplicación) — `@main`, la interfaz SwiftUI, el sistema de diseño y las finas capas de integración para Sparkle, KeyboardShortcuts y PermissionFlow.
 
 ## License
 

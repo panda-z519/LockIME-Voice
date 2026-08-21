@@ -11,7 +11,10 @@ struct ForkDistributionIsolationTests {
     @Test("app identity is independent from the upstream installation")
     func appIdentityIsIndependent() throws {
         let project = try Self.read("project.yml")
+        let makefile = try Self.read("Makefile")
 
+        #expect(project.contains("name: LockIMEVoice"))
+        #expect(project.contains("LockIMEVoice:"))
         #expect(project.contains("PRODUCT_NAME: LockIME Voice"))
         #expect(project.contains("PRODUCT_NAME: LockIME Voice Dev"))
         #expect(project.contains("PRODUCT_BUNDLE_IDENTIFIER: com.zhangsiqiang519.LockIMEVoice"))
@@ -19,6 +22,8 @@ struct ForkDistributionIsolationTests {
         #expect(project.contains("LOCKIME_URL_SCHEME: lockime-voice"))
         #expect(project.contains("LOCKIME_URL_SCHEME: lockime-voice-dev"))
         #expect(!project.contains("PWJ9VF7HHT"))
+        #expect(makefile.contains("SCHEME      := LockIMEVoice"))
+        #expect(makefile.contains("PROJECT     := LockIMEVoice.xcodeproj"))
     }
 
     @Test("normal builds cannot contact the upstream update feed")
@@ -40,11 +45,15 @@ struct ForkDistributionIsolationTests {
 
     @Test("user-facing repository links point to the maintained fork")
     func repositoryLinksPointToFork() throws {
-        let fork = "https://github.com/zhangsiqiang519/LockIME"
+        let fork = "https://github.com/zhangsiqiang519/LockIME-Voice"
+        let readme = try Self.read("README.md")
 
         #expect(try Self.read("Sources/LockIME/UI/AboutView.swift").contains(fork))
         #expect(try Self.read("Sources/LockIME/AppState.swift").contains(fork))
-        #expect(try Self.read("README.md").contains(fork))
+        #expect(readme.contains(fork))
+        #expect(readme.contains("# LockIME Voice"))
+        #expect(readme.contains("## Voice Input Workflow"))
+        #expect(readme.contains("Settings ▸ Voice Input"))
     }
 
     private static func read(_ relativePath: String) throws -> String {

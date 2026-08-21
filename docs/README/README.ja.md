@@ -2,11 +2,11 @@
 
 <img src="../images/appicon.png" alt="LockIME" width="128">
 
-# LockIME
+# LockIME Voice
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **日本語** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
 [![ライセンス: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
@@ -70,6 +70,19 @@ Developer ID 署名や公証がないため、再ビルド後に macOS 権限の
 - **コアのロックにシステム権限は不要**——オプションの Accessibility 権限付き拡張モードで、より細かい URL ごと / フォーカス中フィールドごとのルールが使えます。
 - **自動化**——`lockime-voice://` URL スキームにより、他のアプリ・スクリプト・ショートカットから LockIME を操作できます（下記参照）。
 
+## Voice Input Workflow
+
+音声入力ソースは完全に設定可能で、LockIME Voice が Doubao、WeChat、その他の入力方式を固定することはありません。
+
+1. **Settings ▸ App Rules** でグローバル既定入力ソースを設定します。音声入力終了後はここへ戻ります。
+2. **Settings ▸ Voice Input** を開き、ワークフローを有効にして音声対応入力ソースを選びます。
+3. 入力方式自身の音声ショートカットを記録し、再押下、長押し、任意キーのいずれか同じ終了動作を選びます。
+4. 求められたら **Accessibility** と **Input Monitoring** を許可します。
+
+ショートカットを押すと、LockIME Voice は通常ルールを一時停止し、音声入力ソースへ切り替え、macOS の切り替え確認後に内部ショートカットを送信します。終了または安全タイムアウト後、既定入力ソースを復元して通常ルールを再開します。
+
+TextEdit などの通常のテキスト欄で確認してください。音声パネルが出るだけでは不十分で、認識文字が現在のカーソル位置へ実際に入力される必要があります。
+
 ## Comparison
 
 LockIME に対する最も広く使われている代替ツールは **[Input Source Pro](https://github.com/runjuu/InputSourcePro)** と **[KeyboardHolder](https://github.com/leaves615/KeyboardHolder)** の 2 つで、加えてより小規模なオープンソース / CLI ツールが数多く存在します。いずれも、アプリやサイトを移動するたびに入力ソースを*切り替え*ます。LockIME は、入力ソースがずれた瞬間にそれを再適用する継続的な**ロック**を中心に設計されています——しかも、どのルールも一度きりの*切り替え*にフォールバックできます。
@@ -132,7 +145,7 @@ LockIME は単一のデザインシステム（`Sources/LockIME/UI/DesignSystem.
 Xcode 26+（アプリ自体のターゲットは macOS 14+）と、[XcodeGen](https://github.com/yonaskolb/XcodeGen) + [xcbeautify](https://github.com/cpisciotta/xcbeautify)（`brew install xcodegen xcbeautify`）が必要です。
 
 ```sh
-make gen     # generate LockIME.xcodeproj from project.yml
+make gen     # generate LockIMEVoice.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
@@ -150,7 +163,7 @@ Xcode プロジェクトは `project.yml` から生成され、リポジトリ�
 ## Architecture
 
 - **LockIMEKit**（静的ライブラリ）——システムフレームワークのみを使う、純粋で完全に単体テストされたロジック：ロックエンジン、アプリモニター、ルール、拡張（Accessibility）オブザーバー、ログモデル、ローカリゼーション。
-- **LockIME**（アプリ）——`@main`、SwiftUI の UI、デザインシステム、そして Sparkle・KeyboardShortcuts・PermissionFlow 向けの薄い統合シム。
+- **LockIME Voice**（アプリ）——`@main`、SwiftUI の UI、デザインシステム、そして Sparkle・KeyboardShortcuts・PermissionFlow 向けの薄い統合シム。
 
 ## License
 
