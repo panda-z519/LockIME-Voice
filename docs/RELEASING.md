@@ -1,9 +1,9 @@
 # Releasing LockIME Voice
 
-LockIME Voice currently ships as source code only. The repository has no Apple
-Developer membership, Developer ID certificate, notarization credentials,
-Sparkle signing key, public update feed, Homebrew cask, or binary publishing
-workflow.
+LockIME Voice `v0.1.0` ships manually built preview DMGs alongside the source.
+The repository has no Apple Developer membership, Developer ID certificate,
+notarization credentials, Sparkle signing key, public update feed, Homebrew
+cask, or automated binary publishing workflow.
 
 ## Current distribution boundary
 
@@ -11,15 +11,17 @@ workflow.
 - `make build` creates `LockIME Voice Dev.app`, ad-hoc signed for local use.
 - `make build CONFIG=Release` creates `LockIME Voice.app`, also ad-hoc signed.
 - `make dmg CONFIG=Release` packages that app without notarizing the image.
+- Preview DMGs for arm64 and x86_64 are uploaded manually to a GitHub
+  Pre-release with SHA-256 checksums.
 - Release and nightly publishing workflows are intentionally absent.
 - Normal Debug and Release builds do not start Sparkle or contain a production
   `SUFeedURL` / `SUPublicEDKey`.
 - `make update-test-*` remains a local-only loopback laboratory. It uses a
   throwaway update key and never contacts a production feed.
 
-Ad-hoc artifacts are development outputs, not public releases. Gatekeeper may
-block downloaded copies, and macOS can require Accessibility and Input
-Monitoring permissions again after each rebuild.
+Ad-hoc artifacts are preview outputs, not trusted Developer ID releases.
+Gatekeeper may block downloaded copies, and macOS can require Accessibility and
+Input Monitoring permissions again after each reinstall or rebuild.
 
 ## Local artifacts
 
@@ -35,6 +37,15 @@ Cross-build Intel on Apple silicon:
 
 ```sh
 make build CONFIG=Release ARCH=x86_64
+```
+
+Package each architecture immediately after its build, before the next build
+overwrites the shared Release product path:
+
+```sh
+scripts/make-dmg.sh \
+  'build/DerivedData/Build/Products/Release/LockIME Voice.app' \
+  'build/dmg/LockIME-Voice-0.1.0-<arch>.dmg'
 ```
 
 Before sharing any artifact, verify its identity and ad-hoc signature:

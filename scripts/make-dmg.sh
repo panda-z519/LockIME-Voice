@@ -35,9 +35,9 @@ rm -f "$OUT"
 # the host OS's DiskImages helper (a universal binary) — so mountability tracks
 # the host macOS version, never the contained app's CPU arch: the x86_64 image
 # mounts exactly the same. ULFO mounts on every macOS ≥ 10.11 (our floor is
-# 14.0). The .dmg is the manual-download convenience only — Sparkle updates ship
-# the zip (see docs/RELEASING.md) — and CI signs/notarizes/staples it afterward,
-# all compression-format-agnostic.
+# 14.0). The .dmg is a manually uploaded preview artifact; this fork has no
+# Sparkle feed or signing pipeline, so it remains ad-hoc signed and unnotarized
+# (see docs/RELEASING.md).
 hdiutil create \
 	-volname "$VOL" \
 	-srcfolder "$STAGE" \

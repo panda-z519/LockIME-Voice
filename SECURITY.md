@@ -2,14 +2,16 @@
 
 ## Supported versions
 
-LockIME Voice currently ships as source code only. Security fixes land on the
-latest `main` branch; there are no signed binary releases, automatic updates, or
-back-ported patch branches. Pull the latest source and rebuild before reporting.
+LockIME Voice ships source plus ad-hoc-signed preview installers. Security fixes
+land on the latest `main` branch; there are no Developer ID releases, automatic
+updates, or back-ported patch branches. Pull the latest source and rebuild before
+reporting an issue against an older preview.
 
 | Version              | Supported          |
 | -------------------- | ------------------ |
-| Latest `main` source | :white_check_mark: |
-| Older commits        | :x:                |
+| Latest `main` source  | :white_check_mark: |
+| Latest preview DMG    | :white_check_mark: |
+| Older commits/builds  | :x:                |
 
 ## Reporting a vulnerability
 

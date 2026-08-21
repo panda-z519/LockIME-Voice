@@ -14,9 +14,9 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. It currently ships as source code only: public binaries,
+> voice-input workflow. `v0.1.0` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
-> are not provided.
+> are not available.
 
 A macOS menu-bar app that **locks your keyboard input source**. Whenever you (or
 another app) switch input methods, LockIME immediately switches back to the locked
@@ -44,9 +44,42 @@ browser URL.
   </picture>
 </p>
 
+## Changes in LockIME Voice
+
+Compared with upstream LockIME, this fork adds and changes the following:
+
+- **Configurable voice input source** — no input method is hard-coded; Doubao,
+  WeChat, or another installed input source can be selected.
+- **One recorded shortcut** — the workflow and the selected input method use
+  the same recorded shortcut, including left/right modifiers and multi-key
+  combinations.
+- **Three voice behaviors** — press again to end, hold to speak, or press any
+  key to end, matching the selected input method's own setting.
+- **Rule-safe temporary override** — normal LockIME enforcement pauses while
+  voice input owns the source, preventing an immediate switch back to default.
+- **Default-source restore** — the restore target comes from the global default
+  in **App Rules**; there is no duplicate "daily input source" setting.
+- **Reliable repeated use** — source confirmation, stale-task cancellation,
+  safety timeout, synthetic-event filtering, and session shortcut snapshots
+  prevent missed or self-cancelled activations.
+- **Clearer menu ordering** — the global default source appears first and uses
+  a pin marker rather than a checkmark.
+
+![LockIME Voice input settings](docs/images/settings-voice-input-zh-CN.png)
+
 ## Install
 
-This fork currently builds an ad-hoc-signed local development app:
+Download the installer matching your Mac:
+
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+
+Open the DMG and drag **LockIME Voice** to Applications. Because this preview is
+ad-hoc signed and not notarized, macOS may block the first launch. Right-click
+the app and choose **Open**, or allow it under **System Settings ▸ Privacy &
+Security**, then grant **Accessibility** and **Input Monitoring**.
+
+To build from source instead:
 
 ```sh
 brew install xcodegen xcbeautify
@@ -54,8 +87,8 @@ make build
 open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Because the app is not Developer ID signed or notarized, macOS permissions may
-need to be granted again after rebuilding.
+Reinstalling or rebuilding an ad-hoc-signed app can require granting its macOS
+permissions again. Automatic updates are not available.
 
 ## Features
 
@@ -233,10 +266,9 @@ Hardware-touching integration tests (real TIS switching) are excluded from
 
 ## Releasing
 
-This fork has no public binary release pipeline. The upstream Developer ID,
-notarization, Sparkle, nightly, and Homebrew workflows are intentionally
-disabled. See [docs/RELEASING.md](docs/RELEASING.md) for the boundary and the
-requirements for enabling signed distribution later.
+Preview DMGs are built and uploaded manually. Developer ID, notarization,
+Sparkle, nightly, and Homebrew workflows remain disabled. See
+[docs/RELEASING.md](docs/RELEASING.md) for packaging and verification details.
 
 ## Architecture
 

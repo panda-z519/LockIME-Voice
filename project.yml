@@ -25,9 +25,9 @@ settings:
     DEAD_CODE_STRIPPING: YES
     GCC_WARN_UNINITIALIZED_AUTOS: YES
     CLANG_WARN_DOCUMENTATION_COMMENTS: NO
-    # Source-fork builds use a development version. There is no public binary
-    # release pipeline until Developer ID signing is configured.
-    MARKETING_VERSION: "0.0.0-development"
+    # Public preview packages are ad-hoc signed and unnotarized. The version is
+    # still explicit so installed builds and GitHub assets can be identified.
+    MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
     ONLY_ACTIVE_ARCH: YES
     # Single-arch by design — we ship one app per architecture, never a

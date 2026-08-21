@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. Derzeit wird nur Quellcode veröffentlicht; öffentliche Binärdateien, Developer-ID-Signierung, Notarisierung, Sparkle-Updates und Homebrew-Verteilung werden nicht angeboten.
+> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. `v0.1.0` bietet ad-hoc signierte Vorschau-Installer, jedoch keine Developer-ID-Signierung, Notarisierung, Sparkle-Updates oder Homebrew-Verteilung.
 
 Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann immer du (oder eine andere App) die Eingabemethode wechselst, schaltet LockIME sofort auf die gesperrte zurück — global, pro Vordergrund-App oder (mit dem optionalen erweiterten Modus) pro Browser-URL.
 
@@ -38,9 +38,22 @@ Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann i
   </picture>
 </p>
 
+## Changes in LockIME Voice
+
+Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequelle, einen gemeinsam aufgezeichneten Kurzbefehl mit Links-/Rechts-Modifikatoren, drei Beendigungsarten, eine temporäre regelsichere Eingabequellen-Übernahme, Wiederherstellung der globalen Standardquelle aus **App Rules**, zuverlässige Wiederholungen mit Timeout und Ereignisfilterung sowie eine zuerst angezeigte, mit einer Nadel markierte Standardquelle.
+
+![LockIME Voice Spracheingabe-Einstellungen](../images/settings-voice-input-zh-CN.png)
+
 ## Install
 
-Erstelle derzeit einen lokal ad-hoc signierten Build aus dem Quellcode:
+Lade den passenden Installer:
+
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+
+Öffne das DMG und ziehe **LockIME Voice** nach Applications. Da die Vorschau ad-hoc signiert und nicht notarisiert ist, öffne die App beim ersten Mal per Rechtsklick → **Open** oder erlaube sie unter **System Settings ▸ Privacy & Security**. Erteile danach **Accessibility** und **Input Monitoring**.
+
+Alternativ aus dem Quellcode bauen:
 
 ```sh
 brew install xcodegen xcbeautify
@@ -48,7 +61,7 @@ make build
 open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Ohne Developer-ID-Signierung oder Notarisierung müssen macOS-Berechtigungen nach einem neuen Build möglicherweise erneut erteilt werden.
+Nach einer Neuinstallation oder einem neuen Build können macOS-Berechtigungen erneut nötig sein. Automatische Updates sind nicht verfügbar.
 
 ## Features
 
@@ -177,7 +190,7 @@ Hardware-berührende Integrationstests (echtes TIS-Umschalten) sind von `make te
 
 ## Releasing
 
-Dieser Fork besitzt keine öffentliche Binär-Release-Pipeline. Die Upstream-Abläufe für Developer ID, Notarisierung, Sparkle, Nightly und Homebrew sind deaktiviert. Die aktuelle Grenze und die Voraussetzungen für eine spätere signierte Verteilung stehen in [docs/RELEASING.md](../RELEASING.md).
+Vorschau-DMGs werden manuell gebaut und hochgeladen. Developer ID, Notarisierung, Sparkle, Nightly und Homebrew bleiben deaktiviert. Details stehen in [docs/RELEASING.md](../RELEASING.md).
 
 ## Architecture
 

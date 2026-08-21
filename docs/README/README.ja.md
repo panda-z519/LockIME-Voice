@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。現在はソースコードのみを公開し、公開バイナリ、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布は提供しません。
+> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。`v0.1.0` は ad-hoc 署名のプレビューインストーラーを提供しますが、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布はありません。
 
 **キーボードの入力ソースをロックする** macOS メニューバーアプリ。あなた（または他のアプリ）が入力メソッドを切り替えるたびに、LockIME はロック中の入力ソースへ即座に切り戻します——グローバルに、最前面のアプリごとに、あるいは（オプションの拡張モードでは）ブラウザの URL ごとに。
 
@@ -38,9 +38,22 @@
   </picture>
 </p>
 
+## Changes in LockIME Voice
+
+Upstream と比べ、このフォークは設定可能な音声入力ソース、左右修飾キー対応の単一記録ショートカット、3 種類の終了動作、ルールと競合しない一時的な入力ソース所有、**App Rules** のグローバル既定値への復元、タイムアウトとイベントフィルターによる繰り返し利用、既定ソースを先頭に表示するピン表示を追加します。
+
+![LockIME Voice 音声入力設定](../images/settings-voice-input-zh-CN.png)
+
 ## Install
 
-現在はソースからローカルの ad-hoc 署名ビルドを作成します：
+Mac に合うインストーラーをダウンロードします：
+
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+
+DMG を開き、**LockIME Voice** を Applications へドラッグします。プレビューは ad-hoc 署名で未公証のため、初回は右クリック → **Open**、または **System Settings ▸ Privacy & Security** で許可し、**Accessibility** と **Input Monitoring** を付与してください。
+
+ソースからのビルドも可能です：
 
 ```sh
 brew install xcodegen xcbeautify
@@ -48,7 +61,7 @@ make build
 open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Developer ID 署名や公証がないため、再ビルド後に macOS 権限の再許可が必要になる場合があります。
+再インストールや再ビルド後は権限の再許可が必要になる場合があります。自動更新はありません。
 
 ## Features
 
@@ -158,7 +171,7 @@ Xcode プロジェクトは `project.yml` から生成され、リポジトリ�
 
 ## Releasing
 
-このフォークには公開バイナリのリリースパイプラインがありません。上流の Developer ID、公証、Sparkle、nightly、Homebrew の各ワークフローは無効化されています。現在の境界と、将来署名付き配布を有効にする条件は [docs/RELEASING.md](../RELEASING.md) を参照してください。
+プレビュー DMG は手動でビルドしてアップロードします。Developer ID、公証、Sparkle、nightly、Homebrew は無効のままです。詳細は [docs/RELEASING.md](../RELEASING.md) を参照してください。
 
 ## Architecture
 

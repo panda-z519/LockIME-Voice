@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。目前仅发布源码，不提供公共二进制、Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
+> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.0` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
 
 一款 macOS 菜单栏应用，用于**锁定你的键盘输入源**。每当你（或其他应用）切换输入法时，LockIME 会立即切回被锁定的那个——可以是全局的、按前台应用区分的，或者（在可选的增强模式下）按浏览器 URL 区分的。
 
@@ -38,9 +38,30 @@
   </picture>
 </p>
 
+## Changes in LockIME Voice
+
+相比上游 LockIME，本分支包含以下具体改动：
+
+- **语音输入法可配置**——不写死任何输入法，可选择豆包、微信或其他已安装输入法。
+- **只录入一次快捷键**——工作流和输入法内部语音功能共用同一个快捷键，支持左右修饰键和多键组合。
+- **三种语音行为**——再次按下结束、按住说话、任意键结束，与输入法自身设置保持一致。
+- **临时接管输入法**——语音期间暂停普通锁定规则，避免刚切到语音输入法就被切回默认输入法。
+- **恢复全局默认输入法**——恢复目标直接取自 **App Rules** 的全局默认规则，不再重复设置“日常输入法”。
+- **连续使用更可靠**——增加输入法确认、过期任务取消、安全超时、合成事件过滤和会话快捷键快照。
+- **菜单更清晰**——全局默认输入法排在最前，并用图钉代替对勾标记。
+
+![LockIME Voice 语音输入设置](../images/settings-voice-input-zh-CN.png)
+
 ## Install
 
-当前请从源码构建本地 ad-hoc 签名版本：
+下载与你的 Mac 匹配的安装包：
+
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+
+打开 DMG，把 **LockIME Voice** 拖入“应用程序”。由于预览版仅使用 ad-hoc 签名且没有公证，macOS 首次启动时可能阻止打开。请右键应用选择“打开”，或前往 **系统设置 ▸ 隐私与安全性**允许打开，然后授予 **辅助功能**和**输入监控**权限。
+
+也可以从源码构建：
 
 ```sh
 brew install xcodegen xcbeautify
@@ -48,7 +69,7 @@ make build
 open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-由于应用没有 Developer ID 签名或公证，重新构建后可能需要再次授予 macOS 权限。
+重新安装或构建 ad-hoc 签名应用后，可能需要再次授予 macOS 权限。目前不支持自动更新。
 
 ## Features
 
@@ -167,7 +188,7 @@ Xcode 项目由 `project.yml` 生成，不纳入版本控制。
 
 ## Releasing
 
-此分支没有公共二进制发布流水线。原项目的 Developer ID、公证、Sparkle、每夜构建和 Homebrew 发布流程已停用。参见 [docs/RELEASING.md](../RELEASING.md) 了解当前边界以及将来启用签名发布所需的条件。
+预览 DMG 目前由维护者手动构建和上传。Developer ID、公证、Sparkle、每夜构建和 Homebrew 流程仍保持停用。参见 [docs/RELEASING.md](../RELEASING.md) 了解打包与校验方式。
 
 ## Architecture
 

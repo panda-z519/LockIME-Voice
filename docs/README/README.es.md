@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. Por ahora solo publica código fuente; no ofrece binarios públicos, firma Developer ID, notarización, actualizaciones Sparkle ni distribución Homebrew.
+> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.0` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
 
 Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada de teclado**. Cada vez que tú (u otra aplicación) cambias el método de entrada, LockIME vuelve inmediatamente al bloqueado — globalmente, por aplicación en primer plano, o (con el modo mejorado opcional) por URL del navegador.
 
@@ -38,9 +38,22 @@ Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada
   </picture>
 </p>
 
+## Changes in LockIME Voice
+
+Frente al proyecto upstream, este fork añade una fuente de voz configurable, un único atajo grabado con modificadores izquierdo/derecho, tres formas de finalizar, control temporal compatible con las reglas, restauración del valor global de **App Rules**, sesiones repetibles con timeout y filtrado de eventos, y la fuente predeterminada primero con un icono de chincheta.
+
+![Ajustes de entrada por voz de LockIME Voice](../images/settings-voice-input-zh-CN.png)
+
 ## Install
 
-Por ahora, compila desde el código una aplicación local con firma ad-hoc:
+Descarga el instalador correspondiente:
+
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+
+Abre el DMG y arrastra **LockIME Voice** a Applications. Como la versión preliminar tiene firma ad-hoc y no está notarizada, usa clic derecho → **Open** o autorízala en **System Settings ▸ Privacy & Security**. Después concede **Accessibility** e **Input Monitoring**.
+
+También puedes compilar desde el código:
 
 ```sh
 brew install xcodegen xcbeautify
@@ -48,7 +61,7 @@ make build
 open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Sin firma Developer ID ni notarización, puede ser necesario volver a conceder los permisos de macOS después de recompilar.
+Tras reinstalar o recompilar puede ser necesario volver a conceder permisos. No hay actualizaciones automáticas.
 
 ## Features
 
@@ -177,7 +190,7 @@ Las pruebas de integración que tocan hardware (cambio real de TIS) están exclu
 
 ## Releasing
 
-Este fork no tiene una canalización pública de binarios. Los flujos upstream de Developer ID, notarización, Sparkle, nightly y Homebrew están desactivados. Consulta [docs/RELEASING.md](../RELEASING.md) para conocer el límite actual y los requisitos para habilitar una distribución firmada más adelante.
+Los DMG preliminares se compilan y suben manualmente. Developer ID, notarización, Sparkle, nightly y Homebrew siguen desactivados. Consulta [docs/RELEASING.md](../RELEASING.md).
 
 ## Architecture
 
