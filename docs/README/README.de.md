@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. `v0.1.0` bietet ad-hoc signierte Vorschau-Installer, jedoch keine Developer-ID-Signierung, Notarisierung, Sparkle-Updates oder Homebrew-Verteilung.
+> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. `v0.1.1` bietet ad-hoc signierte Vorschau-Installer, jedoch keine Developer-ID-Signierung, Notarisierung, Sparkle-Updates oder Homebrew-Verteilung.
 
 Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann immer du (oder eine andere App) die Eingabemethode wechselst, schaltet LockIME sofort auf die gesperrte zurück — global, pro Vordergrund-App oder (mit dem optionalen erweiterten Modus) pro Browser-URL.
 
@@ -48,8 +48,8 @@ Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequ
 
 Lade den passenden Installer:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 Öffne das DMG und ziehe **LockIME Voice** nach Applications. Da die Vorschau ad-hoc signiert und nicht notarisiert ist, öffne die App beim ersten Mal per Rechtsklick → **Open** oder erlaube sie unter **System Settings ▸ Privacy & Security**. Erteile danach **Accessibility** und **Input Monitoring**.
 
@@ -91,6 +91,12 @@ Die Spracheingabequelle ist vollständig konfigurierbar; LockIME Voice legt wede
 2. Öffne **Settings ▸ Voice Input**, aktiviere den Ablauf und wähle eine sprachfähige Quelle.
 3. Zeichne den internen Sprachkurzbefehl dieser Eingabemethode auf und wähle dasselbe Ende: erneut drücken, halten oder beliebige Taste.
 4. Erteile bei Aufforderung **Accessibility** und **Input Monitoring**.
+
+Wenn die Spracheingabequelle der globalen Standardquelle entspricht, behandelt
+LockIME Voice sie als Direktmodus: Es ist kein LockIME-Kurzbefehl erforderlich,
+und der eigene Sprachkurzbefehl der Eingabemethode bleibt der Auslöser.
+Konfigurieren Sie diesen Kurzbefehl in der Eingabemethode, bevor Sie den
+Direktmodus verwenden.
 
 Der Kurzbefehl pausiert normale Regeln, wechselt zur Sprachquelle, wartet auf die macOS-Bestätigung und sendet dann den internen Kurzbefehl. Nach Ende oder Sicherheits-Timeout stellt LockIME Voice die globale Standardquelle wieder her und setzt die Regeln fort.
 

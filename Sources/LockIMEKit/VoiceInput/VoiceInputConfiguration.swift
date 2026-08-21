@@ -19,6 +19,12 @@ public enum VoiceInputBehavior: String, Codable, Sendable, CaseIterable, Identif
     }
 }
 
+public enum VoiceInputWorkflowMode: Equatable, Sendable {
+    case disabled
+    case direct
+    case bridged
+}
+
 public struct VoiceInputCapabilities: Codable, Sendable, Equatable {
     public var supportsHoldToSpeak: Bool
     public var supportsAnyKeyTermination: Bool
@@ -101,6 +107,14 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
 
     public static let `default` = VoiceInputConfiguration()
 
+    public func workflowMode(defaultSourceID: InputSourceID?) -> VoiceInputWorkflowMode {
+        guard isEnabled else { return .disabled }
+        guard let voiceSourceID, let defaultSourceID, voiceSourceID == defaultSourceID else {
+            return .bridged
+        }
+        return .direct
+    }
+
     public static func hasRequiredSystemPermissions(
         inputMonitoringGranted: Bool,
         eventPostingGranted: Bool
@@ -109,17 +123,27 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
     }
 
     public func shortcutForMonitoring(
+        defaultSourceID: InputSourceID?,
+        installedSources: [InputSource],
         hasInputMonitoringAccess: Bool,
         hasEventPostingAccess: Bool
     ) -> VoiceShortcut? {
-        guard isEnabled, Self.hasRequiredSystemPermissions(
+        guard workflowMode(defaultSourceID: defaultSourceID) == .bridged,
+              validationErrors(
+                  defaultSourceID: defaultSourceID,
+                  installedSources: installedSources
+              ).isEmpty,
+              Self.hasRequiredSystemPermissions(
             inputMonitoringGranted: hasInputMonitoringAccess,
             eventPostingGranted: hasEventPostingAccess
         ) else { return nil }
         return voiceShortcut
     }
 
-    public func validationErrors(installedSources: [InputSource]) -> [VoiceInputValidationError] {
+    public func validationErrors(
+        defaultSourceID: InputSourceID?,
+        installedSources: [InputSource]
+    ) -> [VoiceInputValidationError] {
         guard isEnabled else { return [] }
         let installed = Set(installedSources.map(\.id))
         var errors: [VoiceInputValidationError] = []
@@ -128,7 +152,16 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         } else {
             errors.append(.missingVoiceSource)
         }
-        if voiceShortcut == nil { errors.append(.missingVoiceShortcut) }
+        if workflowMode(defaultSourceID: defaultSourceID) == .bridged, voiceShortcut == nil {
+            errors.append(.missingVoiceShortcut)
+        }
+        if let defaultSourceID {
+            if !installed.contains(defaultSourceID) {
+                errors.append(.defaultSourceUnavailable(defaultSourceID))
+            }
+        } else {
+            errors.append(.missingDefaultSource)
+        }
         return errors
     }
 

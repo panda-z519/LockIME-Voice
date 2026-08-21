@@ -14,7 +14,7 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. `v0.1.0` provides ad-hoc-signed preview installers, but
+> voice-input workflow. `v0.1.1` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
 > are not available.
 
@@ -71,8 +71,8 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 Download the installer matching your Mac:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 Open the DMG and drag **LockIME Voice** to Applications. Because this preview is
 ad-hoc signed and not notarized, macOS may block the first launch. Right-click
@@ -155,6 +155,11 @@ Doubao, WeChat, or any other input method.
 3. Record the exact shortcut used by that input method's own voice feature, then
    choose the matching ending behavior: press again, hold to speak, or any key.
 4. Grant **Accessibility** and **Input Monitoring** when prompted.
+
+If the voice input source is the same as the global default source, LockIME
+Voice treats it as direct mode: no LockIME shortcut is required, and the input
+method's own voice shortcut remains the trigger. Configure that shortcut inside
+the input method before using direct mode.
 
 Pressing the configured shortcut pauses normal LockIME rules, switches to the
 voice input source, waits for macOS to confirm the switch, and sends the input

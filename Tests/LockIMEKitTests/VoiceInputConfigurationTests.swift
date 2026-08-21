@@ -10,47 +10,105 @@ struct VoiceInputConfigurationTests {
     @Test("disabled configuration is valid without sources or shortcuts")
     func disabledConfigurationIsValid() {
         let config = VoiceInputConfiguration(isEnabled: false)
-        #expect(config.validationErrors(installedSources: []).isEmpty)
+        #expect(config.validationErrors(defaultSourceID: nil, installedSources: []).isEmpty)
     }
 
     @Test("enabled configuration requires voice source and voice shortcut")
     func enabledConfigurationRequiresCoreFields() {
         let config = VoiceInputConfiguration(isEnabled: true)
-        #expect(config.validationErrors(installedSources: []) == [
+        #expect(config.validationErrors(defaultSourceID: nil, installedSources: []) == [
             .missingVoiceSource,
-            .missingVoiceShortcut
+            .missingVoiceShortcut,
+            .missingDefaultSource
         ])
+    }
+
+    @Test("workflow mode distinguishes disabled direct and bridged operation")
+    func workflowModeUsesDefaultAndVoiceSources() {
+        #expect(VoiceInputConfiguration(isEnabled: false).workflowMode(defaultSourceID: voice) == .disabled)
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice
+        ).workflowMode(defaultSourceID: voice) == .direct)
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice
+        ).workflowMode(defaultSourceID: "daily.source") == .bridged)
+    }
+
+    @Test("direct mode requires no shortcut and installs no workflow monitor")
+    func directModeRequiresNoShortcutOrMonitor() {
+        let config = VoiceInputConfiguration(isEnabled: true, voiceSourceID: voice)
+        let sources: [InputSource] = [.stub(voice.rawValue)]
+
+        #expect(config.validationErrors(defaultSourceID: voice, installedSources: sources).isEmpty)
+        #expect(config.shortcutForMonitoring(
+            defaultSourceID: voice,
+            installedSources: sources,
+            hasInputMonitoringAccess: true,
+            hasEventPostingAccess: true
+        ) == nil)
+    }
+
+    @Test("invalid or removed sources prevent global shortcut monitoring")
+    func unavailableSourcesPreventMonitoring() {
+        let config = VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice,
+            voiceShortcut: VoiceShortcut(keyCode: 61, modifiers: [.option])
+        )
+
+        #expect(config.shortcutForMonitoring(
+            defaultSourceID: "daily.source",
+            installedSources: [.stub("daily.source")],
+            hasInputMonitoringAccess: true,
+            hasEventPostingAccess: true
+        ) == nil)
     }
 
     @Test("monitoring requires enabled configuration and both keyboard permissions")
     func monitoringRequiresEnabledConfigurationAndKeyboardPermissions() {
         let shortcut = VoiceShortcut(keyCode: 61, modifiers: [.option])
+        let daily: InputSourceID = "daily.source"
+        let sources: [InputSource] = [.stub(daily.rawValue), .stub(voice.rawValue)]
 
         #expect(VoiceInputConfiguration(
             isEnabled: false,
+            voiceSourceID: voice,
             voiceShortcut: shortcut
         ).shortcutForMonitoring(
+            defaultSourceID: daily,
+            installedSources: sources,
             hasInputMonitoringAccess: true,
             hasEventPostingAccess: true
         ) == nil)
         #expect(VoiceInputConfiguration(
             isEnabled: true,
+            voiceSourceID: voice,
             voiceShortcut: shortcut
         ).shortcutForMonitoring(
+            defaultSourceID: daily,
+            installedSources: sources,
             hasInputMonitoringAccess: false,
             hasEventPostingAccess: true
         ) == nil)
         #expect(VoiceInputConfiguration(
             isEnabled: true,
+            voiceSourceID: voice,
             voiceShortcut: shortcut
         ).shortcutForMonitoring(
+            defaultSourceID: daily,
+            installedSources: sources,
             hasInputMonitoringAccess: true,
             hasEventPostingAccess: false
         ) == nil)
         #expect(VoiceInputConfiguration(
             isEnabled: true,
+            voiceSourceID: voice,
             voiceShortcut: shortcut
         ).shortcutForMonitoring(
+            defaultSourceID: daily,
+            installedSources: sources,
             hasInputMonitoringAccess: true,
             hasEventPostingAccess: true
         ) == shortcut)
@@ -79,8 +137,10 @@ struct VoiceInputConfigurationTests {
             voiceSourceID: voice,
             voiceShortcut: VoiceShortcut(keyCode: 49, modifiers: [.control])
         )
-        #expect(config.validationErrors(installedSources: []) == [
-            .voiceSourceUnavailable(voice)
+        let daily: InputSourceID = "daily.source"
+        #expect(config.validationErrors(defaultSourceID: daily, installedSources: []) == [
+            .voiceSourceUnavailable(voice),
+            .defaultSourceUnavailable(daily)
         ])
     }
 
@@ -188,7 +248,11 @@ struct VoiceInputConfigurationTests {
         let encoded = try JSONEncoder().encode(legacy)
         let decoded = try JSONDecoder().decode(VoiceInputConfiguration.self, from: encoded)
         #expect(decoded.voiceShortcut == legacy.workflowShortcut)
-        #expect(decoded.validationErrors(installedSources: [.stub(voice.rawValue)]).isEmpty)
+        let daily: InputSourceID = "daily.source"
+        #expect(decoded.validationErrors(
+            defaultSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        ).isEmpty)
     }
 }
 

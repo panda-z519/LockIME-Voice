@@ -39,6 +39,81 @@ struct VoiceInputCoordinatorTests {
         #expect(sender.events == [.tap(shortcut), .tap(shortcut)])
     }
 
+    @Test("direct mode performs no switch and sends no synthetic shortcut")
+    func directModeIsNoOp() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+        let config = VoiceInputConfiguration(isEnabled: true, voiceSourceID: voice)
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: voice,
+            installedSources: [.stub(voice.rawValue)]
+        )
+
+        #expect(coordinator.state == .idle)
+        #expect(engine.beginCount == 0)
+        #expect(engine.switches.isEmpty)
+        #expect(sender.events.isEmpty)
+    }
+
+    @Test("restore failure retries the latest valid default source")
+    func restoreFailureUsesFallbackDefault() throws {
+        let fallback: InputSourceID = "fallback.source"
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(
+            overrideEngine: engine,
+            sender: sender,
+            fallbackRestoreSourceID: { fallback }
+        )
+        let config = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue), .stub(fallback.rawValue)]
+        )
+        engine.failedSourceIDs.insert(daily)
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: fallback,
+            installedSources: [.stub(voice.rawValue), .stub(fallback.rawValue)]
+        )
+
+        #expect(coordinator.state == .idle)
+        #expect(engine.switches == [voice, daily, fallback])
+        #expect(engine.endCount == 1)
+    }
+
+    @Test("state changes are reported to the host")
+    func stateChangesAreReported() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+        let config = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
+        var states: [VoiceInputSessionState] = []
+        coordinator.onStateChange = { states.append($0) }
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        )
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        )
+
+        #expect(states.contains(.preparingVoice))
+        #expect(states.contains(.voiceActive))
+        #expect(states.last == .idle)
+    }
+
     @Test("workflow waits until the voice source is current before sending shortcut")
     func workflowWaitsForVoiceSourceBeforeSendingShortcut() throws {
         let engine = RecordingVoiceOverrideEngine()
@@ -564,6 +639,7 @@ struct VoiceInputCoordinatorTests {
         let engine = RecordingVoiceOverrideEngine()
         let sender = RecordingShortcutEventSender()
         let shortcut = VoiceShortcut(keyCode: 61, modifiers: [.option])
+        let changedDefault: InputSourceID = "changed.default"
         let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
         let initial = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
         let cleared = VoiceInputConfiguration(
@@ -580,8 +656,12 @@ struct VoiceInputCoordinatorTests {
         )
         try coordinator.handleWorkflowShortcutPressed(
             config: cleared,
-            restoreSourceID: daily,
-            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+            restoreSourceID: changedDefault,
+            installedSources: [
+                .stub(daily.rawValue),
+                .stub(voice.rawValue),
+                .stub(changedDefault.rawValue)
+            ]
         )
 
         #expect(coordinator.state == .idle)
@@ -608,6 +688,7 @@ final class RecordingVoiceOverrideEngine: VoiceInputSourceOverriding {
     private(set) var endCount = 0
     private(set) var switches: [InputSourceID] = []
     var switchResult = true
+    var failedSourceIDs: Set<InputSourceID> = []
     var currentSourceID: InputSourceID?
     var updatesCurrentSourceOnSwitch = true
     private var nextToken = 0
@@ -628,10 +709,11 @@ final class RecordingVoiceOverrideEngine: VoiceInputSourceOverriding {
 
     func temporaryOverrideSwitch(to id: InputSourceID) -> Bool {
         switches.append(id)
-        if switchResult, updatesCurrentSourceOnSwitch {
+        let result = switchResult && !failedSourceIDs.contains(id)
+        if result, updatesCurrentSourceOnSwitch {
             currentSourceID = id
         }
-        return switchResult
+        return result
     }
 
     func endTemporaryInputSourceOverride(_ token: TemporaryInputSourceOverrideToken) {

@@ -46,6 +46,7 @@ public final class VoiceInputCoordinator {
 
     private let overrideEngine: any VoiceInputSourceOverriding
     private let sender: any ShortcutEventSending
+    private let fallbackRestoreSourceID: @MainActor () -> InputSourceID?
     private let timeoutScheduler: any VoiceTimeoutScheduling
     private let eventMonitor: (any ShortcutEventMonitoring)?
     private let sourceActivationDelay: TimeInterval
@@ -57,27 +58,30 @@ public final class VoiceInputCoordinator {
     private var sessionShortcut: VoiceShortcut?
     private var sessionBehavior: VoiceInputBehavior?
 
-    public private(set) var state: VoiceInputSessionState = .idle
+    public private(set) var state: VoiceInputSessionState = .idle {
+        didSet {
+            guard state != oldValue else { return }
+            onStateChange?(state)
+        }
+    }
     public var onSessionCleanup: (@MainActor () -> Void)?
+    public var onStateChange: (@MainActor (VoiceInputSessionState) -> Void)?
 
     public var isSessionInProgress: Bool {
-        switch state {
-        case .preparingVoice, .voiceActive, .endingVoice, .restoringDefaultInput:
-            true
-        case .idle, .failed:
-            false
-        }
+        state.isInProgress
     }
 
     public init(
         overrideEngine: any VoiceInputSourceOverriding,
         sender: any ShortcutEventSending,
+        fallbackRestoreSourceID: @escaping @MainActor () -> InputSourceID? = { nil },
         timeoutScheduler: any VoiceTimeoutScheduling = TaskVoiceTimeoutScheduler(),
         eventMonitor: (any ShortcutEventMonitoring)? = nil,
         sourceActivationDelay: TimeInterval = 0
     ) {
         self.overrideEngine = overrideEngine
         self.sender = sender
+        self.fallbackRestoreSourceID = fallbackRestoreSourceID
         self.timeoutScheduler = timeoutScheduler
         self.eventMonitor = eventMonitor
         self.sourceActivationDelay = sourceActivationDelay
@@ -88,9 +92,9 @@ public final class VoiceInputCoordinator {
         restoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
-        guard config.isEnabled else { return }
         switch state {
         case .idle:
+            guard config.workflowMode(defaultSourceID: restoreSourceID) == .bridged else { return }
             try start(
                 config: config,
                 restoreSourceID: restoreSourceID,
@@ -98,6 +102,10 @@ public final class VoiceInputCoordinator {
             )
         case .failed, .endingVoice, .restoringDefaultInput:
             cleanupOverride()
+            guard config.workflowMode(defaultSourceID: restoreSourceID) == .bridged else {
+                state = .idle
+                return
+            }
             try start(
                 config: config,
                 restoreSourceID: restoreSourceID,
@@ -146,15 +154,10 @@ public final class VoiceInputCoordinator {
         restoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
-        var errors = config.validationErrors(installedSources: installedSources)
-        let installed = Set(installedSources.map(\.id))
-        if let restoreSourceID {
-            if !installed.contains(restoreSourceID) {
-                errors.append(.defaultSourceUnavailable(restoreSourceID))
-            }
-        } else {
-            errors.append(.missingDefaultSource)
-        }
+        let errors = config.validationErrors(
+            defaultSourceID: restoreSourceID,
+            installedSources: installedSources
+        )
         guard errors.isEmpty else {
             state = .failed(.validationFailed(errors))
             throw VoiceInputCoordinatorError.validationFailed(errors)
@@ -303,6 +306,16 @@ public final class VoiceInputCoordinator {
             "Restoring input source: \(restoreSourceID.rawValue, privacy: .public) reason=\(reason.rawValue, privacy: .public)"
         )
         guard overrideEngine.temporaryOverrideSwitch(to: restoreSourceID) else {
+            if let fallbackSourceID = fallbackRestoreSourceID(),
+               fallbackSourceID != restoreSourceID,
+               overrideEngine.temporaryOverrideSwitch(to: fallbackSourceID) {
+                Self.log.notice(
+                    "Restore source unavailable; restored latest default: \(fallbackSourceID.rawValue, privacy: .public)"
+                )
+                cleanupOverride()
+                state = .idle
+                return
+            }
             state = .failed(.restoreDefaultFailed(restoreSourceID))
             cleanupOverride()
             throw VoiceInputCoordinatorError.restoreDefaultFailed(restoreSourceID)

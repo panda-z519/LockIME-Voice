@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.0` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
+> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.1` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
 
 一款 macOS 選單列應用程式，用於**鎖定你的鍵盤輸入法**。每當你（或其他應用程式）切換輸入法時，LockIME 會立即切回被鎖定的那個——可以是全域的、依最前方應用程式區分的，或者（在可選的增強模式下）依瀏覽器 URL 區分的。
 
@@ -56,8 +56,8 @@
 
 下載與你的 Mac 相符的安裝包：
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 開啟 DMG，將 **LockIME Voice** 拖入「應用程式」。由於預覽版只使用 ad-hoc 簽名且未公證，macOS 首次啟動時可能阻止開啟。請右鍵應用程式選擇「開啟」，或前往 **系統設定 ▸ 隱私權與安全性**允許開啟，再授予 **輔助使用**與**輸入監控**權限。
 
@@ -99,6 +99,9 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 2. 開啟 **Settings ▸ Voice Input**，啟用工作流程並選擇支援語音的輸入法。
 3. 錄入該輸入法本身的語音快速鍵，並選擇一致的結束行為：再次按下、按住說話或任意鍵結束。
 4. 依提示授予 **Accessibility** 與 **Input Monitoring** 權限。
+
+如果語音輸入法與全域預設輸入法相同，LockIME Voice 會進入直通模式：無需設定
+LockIME 快捷鍵，直接使用輸入法自身的語音快速鍵觸發。使用直通模式前，請先在該輸入法內部設定好語音快速鍵。
 
 觸發快速鍵後，LockIME Voice 會暫停日常規則、切換語音輸入法、等待 macOS 確認切換，再送出輸入法內部快速鍵。語音結束或安全逾時後，它會恢復全域預設輸入法並繼續執行原有規則。
 

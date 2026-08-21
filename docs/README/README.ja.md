@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。`v0.1.0` は ad-hoc 署名のプレビューインストーラーを提供しますが、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布はありません。
+> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。`v0.1.1` は ad-hoc 署名のプレビューインストーラーを提供しますが、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布はありません。
 
 **キーボードの入力ソースをロックする** macOS メニューバーアプリ。あなた（または他のアプリ）が入力メソッドを切り替えるたびに、LockIME はロック中の入力ソースへ即座に切り戻します——グローバルに、最前面のアプリごとに、あるいは（オプションの拡張モードでは）ブラウザの URL ごとに。
 
@@ -48,8 +48,8 @@ Upstream と比べ、このフォークは設定可能な音声入力ソース�
 
 Mac に合うインストーラーをダウンロードします：
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 DMG を開き、**LockIME Voice** を Applications へドラッグします。プレビューは ad-hoc 署名で未公証のため、初回は右クリック → **Open**、または **System Settings ▸ Privacy & Security** で許可し、**Accessibility** と **Input Monitoring** を付与してください。
 
@@ -91,6 +91,8 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 2. **Settings ▸ Voice Input** を開き、ワークフローを有効にして音声対応入力ソースを選びます。
 3. 入力方式自身の音声ショートカットを記録し、再押下、長押し、任意キーのいずれか同じ終了動作を選びます。
 4. 求められたら **Accessibility** と **Input Monitoring** を許可します。
+
+音声入力ソースがグローバル既定入力ソースと同じ場合、LockIME Voice はダイレクトモードとして扱います。LockIME のショートカットは不要で、入力方式自身の音声ショートカットをそのまま使います。ダイレクトモードを使う前に、その入力方式内で音声ショートカットを設定してください。
 
 ショートカットを押すと、LockIME Voice は通常ルールを一時停止し、音声入力ソースへ切り替え、macOS の切り替え確認後に内部ショートカットを送信します。終了または安全タイムアウト後、既定入力ソースを復元して通常ルールを再開します。
 

@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork source LockIME Voice.** Ce dérivé GPL-3.0 ajoute le workflow de saisie vocale configurable. `v0.1.0` fournit des installateurs de préversion signés ad-hoc, sans Developer ID, notarisation, Sparkle ni Homebrew.
+> **Fork source LockIME Voice.** Ce dérivé GPL-3.0 ajoute le workflow de saisie vocale configurable. `v0.1.1` fournit des installateurs de préversion signés ad-hoc, sans Developer ID, notarisation, Sparkle ni Homebrew.
 
 Une application de barre de menus macOS qui **verrouille votre source de saisie clavier**. Chaque fois que vous (ou une autre application) changez de méthode de saisie, LockIME rebascule immédiatement vers celle qui est verrouillée — globalement, par application au premier plan, ou (avec le mode renforcé optionnel) par URL de navigateur.
 
@@ -48,8 +48,8 @@ Par rapport à l'upstream, ce fork ajoute une source vocale configurable, un rac
 
 Téléchargez l'installateur correspondant :
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 Ouvrez le DMG et glissez **LockIME Voice** dans Applications. La préversion étant signée ad-hoc et non notariée, utilisez clic droit → **Open** ou autorisez-la dans **System Settings ▸ Privacy & Security**, puis accordez **Accessibility** et **Input Monitoring**.
 
@@ -91,6 +91,11 @@ La source de saisie vocale est entièrement configurable ; LockIME Voice n'impos
 2. Ouvrez **Settings ▸ Voice Input**, activez le workflow et choisissez une source compatible avec la voix.
 3. Enregistrez le raccourci vocal propre à cette méthode et choisissez le même mode de fin : nouvel appui, maintien ou touche quelconque.
 4. Accordez **Accessibility** et **Input Monitoring** lorsque macOS le demande.
+
+Si la source vocale est identique à la source globale par défaut, LockIME Voice
+la traite en mode direct : aucun raccourci LockIME n'est requis, et le raccourci
+vocal propre à la méthode reste le déclencheur. Configurez ce raccourci dans la
+méthode de saisie avant d'utiliser le mode direct.
 
 Le raccourci suspend les règles normales, bascule vers la source vocale, attend la confirmation de macOS puis envoie le raccourci interne. À la fin ou au délai de sécurité, LockIME Voice restaure la source globale et reprend les règles.
 

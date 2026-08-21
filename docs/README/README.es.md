@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.0` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
+> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.1` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
 
 Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada de teclado**. Cada vez que tú (u otra aplicación) cambias el método de entrada, LockIME vuelve inmediatamente al bloqueado — globalmente, por aplicación en primer plano, o (con el modo mejorado opcional) por URL del navegador.
 
@@ -48,8 +48,8 @@ Frente al proyecto upstream, este fork añade una fuente de voz configurable, un
 
 Descarga el instalador correspondiente:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.0/LockIME-Voice-0.1.0-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
 
 Abre el DMG y arrastra **LockIME Voice** a Applications. Como la versión preliminar tiene firma ad-hoc y no está notarizada, usa clic derecho → **Open** o autorízala en **System Settings ▸ Privacy & Security**. Después concede **Accessibility** e **Input Monitoring**.
 
@@ -91,6 +91,11 @@ La fuente de entrada por voz es totalmente configurable; LockIME Voice no fija D
 2. Abre **Settings ▸ Voice Input**, activa el flujo y elige una fuente compatible con voz.
 3. Graba el atajo de voz propio del método y selecciona el mismo final: pulsar otra vez, mantener pulsado o cualquier tecla.
 4. Concede **Accessibility** e **Input Monitoring** cuando se solicite.
+
+Si la fuente de voz es la misma que la fuente global predeterminada, LockIME
+Voice la trata como modo directo: no se requiere un atajo de LockIME, y el atajo
+de voz propio del método sigue siendo el disparador. Configura ese atajo dentro
+del método de entrada antes de usar el modo directo.
 
 El atajo pausa las reglas normales, cambia a la fuente de voz, espera la confirmación de macOS y envía el atajo interno. Al terminar o vencer el tiempo de seguridad, LockIME Voice restaura la fuente global y reanuda las reglas.
 

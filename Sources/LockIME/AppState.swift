@@ -32,6 +32,8 @@ final class AppState {
             eventPostingGranted: eventPostingGranted
         )
     }
+    private(set) var voiceInputSessionInProgress = false
+    private(set) var voiceInputRuntimeError: VoiceInputCoordinatorError?
 
     /// Whether the `lockime-voice://` URL-scheme API is allowed to act. **Off by
     /// default** — the user must opt in (Settings ▸ General ▸ Automation) before
@@ -189,6 +191,7 @@ final class AppState {
 
     func setVoiceInputConfig(_ config: VoiceInputConfiguration) {
         voiceInputConfig = config
+        voiceInputRuntimeError = nil
         do {
             let data = try JSONEncoder().encode(config)
             UserDefaults.standard.set(data, forKey: Self.voiceInputConfigKey)
@@ -259,12 +262,31 @@ final class AppState {
         let voiceInputCoordinator = VoiceInputCoordinator(
             overrideEngine: engine,
             sender: CGShortcutEventSender(),
+            fallbackRestoreSourceID: { [weak self] in
+                guard let self,
+                      let id = self.config.defaultSourceID,
+                      self.availableSources.contains(where: { $0.id == id })
+                else { return nil }
+                return id
+            },
             eventMonitor: CGShortcutEventMonitor(),
             sourceActivationDelay: 0.3
         )
         voiceInputCoordinator.onSessionCleanup = { [weak self] in
             Task { @MainActor [weak self] in
                 self?.applyPendingVoiceWorkflowMonitorRefresh()
+            }
+        }
+        voiceInputCoordinator.onStateChange = { [weak self] sessionState in
+            guard let self else { return }
+            self.voiceInputSessionInProgress = sessionState.isInProgress
+            switch sessionState {
+            case .preparingVoice:
+                self.voiceInputRuntimeError = nil
+            case .failed(let error):
+                self.voiceInputRuntimeError = error
+            default:
+                break
             }
         }
         self.voiceInputCoordinator = voiceInputCoordinator
@@ -297,7 +319,10 @@ final class AppState {
         // Keep the tray switcher and Settings pickers in sync when the user
         // adds or removes an input source in System Settings while we run.
         engine.onSelectableSourcesChange = { [weak self] sources in
-            self?.availableSources = sources
+            guard let self else { return }
+            self.availableSources = sources
+            self.voiceInputRuntimeError = nil
+            self.refreshVoiceWorkflowShortcutMonitor()
         }
         engine.start()
 
@@ -378,6 +403,7 @@ final class AppState {
         voiceWorkflowShortcutMonitor = nil
         voiceWorkflowMonitorRefreshPending = false
         voiceInputCoordinator = nil
+        voiceInputSessionInProgress = false
         purgeTask?.cancel()
         purgeTask = nil
         accessibilityWatcher.stop()
@@ -823,6 +849,7 @@ final class AppState {
                 installedSources: availableSources
             )
         } catch {
+            voiceInputRuntimeError = error as? VoiceInputCoordinatorError
             Self.log.error("Voice input workflow press failed: \(String(describing: error), privacy: .public)")
         }
     }
@@ -835,6 +862,7 @@ final class AppState {
                 config: voiceInputConfig
             )
         } catch {
+            voiceInputRuntimeError = error as? VoiceInputCoordinatorError
             Self.log.error("Voice input workflow release failed: \(String(describing: error), privacy: .public)")
         }
     }
@@ -858,6 +886,8 @@ final class AppState {
     private func applyVoiceWorkflowShortcutMonitorRefresh() {
         guard let voiceWorkflowShortcutMonitor else { return }
         let monitoredShortcut = voiceInputConfig.shortcutForMonitoring(
+            defaultSourceID: config.defaultSourceID,
+            installedSources: availableSources,
             hasInputMonitoringAccess: inputMonitoringGranted,
             hasEventPostingAccess: eventPostingGranted
         )
@@ -893,15 +923,21 @@ final class AppState {
     }
 
     func refreshSources() {
-        if let engine { availableSources = engine.selectableSources() }
+        if let engine {
+            availableSources = engine.selectableSources()
+            voiceInputRuntimeError = nil
+            refreshVoiceWorkflowShortcutMonitor()
+        }
     }
 
     /// Persist + re-apply the config. `reason` attributes any resulting forced
     /// switch in the activation log: a config edit (the default) vs the master
     /// lock being engaged (menu toggle / lock-to-source / hotkey cycling).
     private func commit(reason: ActivationReason = .configChanged) {
+        voiceInputRuntimeError = nil
         engine?.apply(config, reason: reason)
         store.save(config)
+        refreshVoiceWorkflowShortcutMonitor()
     }
 
     // MARK: - Backup (export / import)
