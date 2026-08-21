@@ -12,6 +12,7 @@ struct ForkDistributionIsolationTests {
     func appIdentityIsIndependent() throws {
         let project = try Self.read("project.yml")
         let makefile = try Self.read("Makefile")
+        let ci = try Self.read(".github/workflows/ci.yml")
 
         #expect(project.contains("name: LockIMEVoice"))
         #expect(project.contains("LockIMEVoice:"))
@@ -24,6 +25,9 @@ struct ForkDistributionIsolationTests {
         #expect(!project.contains("PWJ9VF7HHT"))
         #expect(makefile.contains("SCHEME      := LockIMEVoice"))
         #expect(makefile.contains("PROJECT     := LockIMEVoice.xcodeproj"))
+        #expect(ci.contains("workflow_dispatch:"))
+        #expect(ci.contains("runs-on: macos-26"))
+        #expect(!ci.contains("blacksmith-6vcpu-macos-latest"))
     }
 
     @Test("normal builds cannot contact the upstream update feed")

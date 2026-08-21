@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -46,7 +47,7 @@ jobs:
     name: Build & Test
     needs: gate
     if: needs.gate.outputs.run == 'true'
-    runs-on: blacksmith-6vcpu-macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
 
