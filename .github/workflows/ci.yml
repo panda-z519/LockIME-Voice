@@ -74,8 +74,8 @@ jobs:
             test | xcbeautify
 
       - name: Cross-build x86_64
-        # We ship a separate Intel app (see build-publish.yml); make sure a PR
-        # can't land code that only compiles for arm64. Build-only — the
+        # Keep the source fork buildable on Intel; make sure a PR can't land
+        # code that only compiles for arm64. Build-only — the
         # suites already ran natively above, and Rosetta isn't on the runners.
         run: |
           set -o pipefail

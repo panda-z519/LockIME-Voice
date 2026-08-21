@@ -70,7 +70,7 @@ public enum URLRuleList {
     /// order) or invalid (a non-permutation — a stale drag-start snapshot whose id
     /// set no longer matches the live rules). Rules are relinked to the **live**
     /// objects by id rather than carrying `ordered`'s snapshotted bindings, so a
-    /// content edit that landed mid-drag (e.g. a `lockime://set-url-rule`) survives
+    /// content edit that landed mid-drag (e.g. a `lockime-voice://set-url-rule`) survives
     /// the reorder instead of being clobbered by the drag-start snapshot.
     public static func reordered(_ rules: [URLRule], by ordered: [URLRule]) -> [URLRule]? {
         let byID = Dictionary(rules.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })

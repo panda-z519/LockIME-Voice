@@ -9,8 +9,8 @@ public final class LogStore {
 
     private static let log = Logger(subsystem: LogSubsystem.current, category: "LogStore")
     static func defaultDirectory(for bundleIdentifier: String?) -> URL {
-        if bundleIdentifier == "com.oomol.LockIME" {
-            return URL.applicationSupportDirectory.appending(path: "LockIME", directoryHint: .isDirectory)
+        if bundleIdentifier == "com.zhangsiqiang519.LockIMEVoice" {
+            return URL.applicationSupportDirectory.appending(path: "LockIME Voice", directoryHint: .isDirectory)
         }
         if let bundleID = bundleIdentifier, !bundleID.isEmpty {
             return URL.applicationSupportDirectory.appending(path: bundleID, directoryHint: .isDirectory)
@@ -73,7 +73,7 @@ public final class LogStore {
     }
 
     /// The activation entries within the retention window, newest first — the
-    /// same set the Activation Log pane shows. Used by the `lockime://list-log`
+    /// same set the Activation Log pane shows. Used by the `lockime-voice://list-log`
     /// query. `limit` caps the returned count (most recent kept) when set.
     public func recent(
         now: Date = .now,

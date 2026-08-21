@@ -3,7 +3,7 @@ import Foundation
 import LockIMEKit
 import OSLog
 
-/// Executes a parsed `lockime://` URL-scheme command against the live `AppState`
+/// Executes a parsed `lockime-voice://` URL-scheme command against the live `AppState`
 /// and reports the outcome through the optional x-callback-url targets.
 ///
 /// All control logic that can be tested without AppKit lives in the kit
@@ -341,9 +341,9 @@ final class URLCommandHandler {
         }
     }
 
-    /// The app's own registered URL scheme(s) — `lockime` (Release) / `lockime-dev`
-    /// (Debug) — read from the running bundle, lowercased. A reflected callback is
-    /// refused from re-entering these (see `CallbackURLPolicy`).
+    /// The app's own registered URL scheme(s) — `lockime-voice` (Release) /
+    /// `lockime-voice-dev` (Debug) — read from the running bundle, lowercased. A
+    /// reflected callback is refused from re-entering these (see `CallbackURLPolicy`).
     private static let ownSchemes: Set<String> = {
         let types = Bundle.main.object(forInfoDictionaryKey: "CFBundleURLTypes") as? [[String: Any]] ?? []
         let schemes = types.flatMap { ($0["CFBundleURLSchemes"] as? [String]) ?? [] }

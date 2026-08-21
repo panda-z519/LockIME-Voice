@@ -610,16 +610,16 @@
         "zh-Hant": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } }
       }
     },
-    "When on, other apps and scripts can control LockIME with `lockime://` URL commands." : {
+    "When on, other apps and scripts can control LockIME with `lockime-voice://` URL commands." : {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Wenn aktiviert, können andere Apps und Skripte LockIME mit `lockime://`-URL-Befehlen steuern." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado, otras apps y scripts pueden controlar LockIME con comandos URL `lockime://`." } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Une fois activé, les autres apps et scripts peuvent contrôler LockIME avec des commandes URL `lockime://`." } },
-        "ja": { "stringUnit": { "state": "translated", "value": "オンにすると、他のアプリやスクリプトが `lockime://` URL コマンドで LockIME を操作できます。" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Quando ativado, outros apps e scripts podem controlar o LockIME com comandos URL `lockime://`." } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Когда включено, другие приложения и скрипты могут управлять LockIME с помощью URL-команд `lockime://`." } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "开启后，其他应用和脚本可以通过 `lockime://` URL 命令控制 LockIME。" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "開啟後，其他應用程式與指令稿可以透過 `lockime://` URL 指令控制 LockIME。" } }
+        "de": { "stringUnit": { "state": "translated", "value": "Wenn aktiviert, können andere Apps und Skripte LockIME mit `lockime-voice://`-URL-Befehlen steuern." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado, otras apps y scripts pueden controlar LockIME con comandos URL `lockime-voice://`." } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Une fois activé, les autres apps et scripts peuvent contrôler LockIME avec des commandes URL `lockime-voice://`." } },
+        "ja": { "stringUnit": { "state": "translated", "value": "オンにすると、他のアプリやスクリプトが `lockime-voice://` URL コマンドで LockIME を操作できます。" } },
+        "pt": { "stringUnit": { "state": "translated", "value": "Quando ativado, outros apps e scripts podem controlar o LockIME com comandos URL `lockime-voice://`." } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Когда включено, другие приложения и скрипты могут управлять LockIME с помощью URL-команд `lockime-voice://`." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "开启后，其他应用和脚本可以通过 `lockime-voice://` URL 命令控制 LockIME。" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "開啟後，其他應用程式與指令稿可以透過 `lockime-voice://` URL 指令控制 LockIME。" } }
       }
     },
     "Switch to": {
@@ -2702,54 +2702,54 @@
         }
       }
     },
-    "About LockIME": {
+    "About LockIME Voice": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "关于 LockIME"
+            "value": "关于 LockIME Voice"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "關於 LockIME"
+            "value": "關於 LockIME Voice"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "LockIME について"
+            "value": "LockIME Voice について"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "À propos de LockIME"
+            "value": "À propos de LockIME Voice"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Über LockIME"
+            "value": "Über LockIME Voice"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acerca de LockIME"
+            "value": "Acerca de LockIME Voice"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sobre o LockIME"
+            "value": "Sobre o LockIME Voice"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "О программе LockIME"
+            "value": "О программе LockIME Voice"
           }
         }
       }

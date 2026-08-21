@@ -249,7 +249,7 @@ public final class LockController {
         // `.switchOnce` URL rule) must not change the source while a secure/
         // password field holds focus. The standing lock is still cleared above,
         // so this only declines the switch, never leaves a stale lock. (The
-        // explicit `lockime://switch-source` API — `commandSwitch` — is a
+        // explicit `lockime-voice://switch-source` API — `commandSwitch` — is a
         // deliberate external command and is intentionally *not* gated.)
         if !revertsInSecureInput, isSecureInputEnabled() { return }
         guard let current = provider.currentSourceID() else { return }
@@ -258,7 +258,7 @@ public final class LockController {
     }
 
     /// Perform a **transient** switch for an external command (the
-    /// `lockime://switch-source` URL API), independent of the standing lock.
+    /// `lockime-voice://switch-source` URL API), independent of the standing lock.
     ///
     /// Unlike `switchOnce`, this does **not** clear or adopt the lock `target` or
     /// its context. It also **clears** the suppression window (`settleUntil = 0`)

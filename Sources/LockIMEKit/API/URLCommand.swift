@@ -188,14 +188,14 @@ public enum URLCommandError: Equatable, Sendable, Error {
 
 // MARK: - Parser
 
-/// Pure parsing of a `lockime://` URL into a typed, validated command. The
+/// Pure parsing of a `lockime-voice://` URL into a typed, validated command. The
 /// concrete scheme string is irrelevant here — LaunchServices only delivers URLs
 /// whose scheme the app registered (`lockime`, plus `lockime-dev` for Debug), so
 /// the parser keys off the command token and parameters alone.
 ///
 /// Two URL shapes are accepted, both case-insensitive on the command token:
-/// - bare:        `lockime://<command>?<params>`
-/// - x-callback:  `lockime://x-callback-url/<command>?<params>`
+/// - bare:        `lockime-voice://<command>?<params>`
+/// - x-callback:  `lockime-voice://x-callback-url/<command>?<params>`
 ///
 /// Parameter *names* are matched case-insensitively; parameter *values*
 /// (bundle IDs, source IDs, host patterns) are preserved verbatim.
@@ -242,7 +242,7 @@ public enum URLCommandParser {
     }
 
     /// The command identifier: the host, or the first path segment when the host
-    /// is the `x-callback-url` sentinel (or absent, e.g. `lockime:///status`).
+    /// is the `x-callback-url` sentinel (or absent, e.g. `lockime-voice:///status`).
     private static func commandToken(from components: URLComponents) -> String? {
         let host = components.host?.lowercased()
         if let host, host != "x-callback-url", !host.isEmpty {
@@ -542,7 +542,7 @@ public enum CallbackURLBuilder {
 /// for LockIME to open. The callback is **reflected** — LockIME opens whatever URL
 /// the caller put in the query — so an unrestricted open turns the app into a
 /// confused-deputy: a web origin that can only get the browser to prompt for a
-/// `lockime://` URL could otherwise launder an open of a `file://` URL (launching
+/// `lockime-voice://` URL could otherwise launder an open of a `file://` URL (launching
 /// a local file/app it cannot reach directly) through LockIME's process.
 ///
 /// The x-callback-url round-trip back into the *caller's own* app scheme is the

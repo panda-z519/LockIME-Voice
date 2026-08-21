@@ -8,7 +8,7 @@ struct AboutView: View {
     @Environment(\.openURL) private var openURL
     @State private var showingAcknowledgements = false
 
-    private static let repoURL = URL(string: "https://github.com/oomol-lab/LockIME")!
+    private static let repoURL = URL(string: "https://github.com/zhangsiqiang519/LockIME")!
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +22,7 @@ struct AboutView: View {
                 .padding(.top, 28)
                 .padding(.bottom, 14)
 
-            Text(verbatim: "LockIME")
+            Text(verbatim: "LockIME Voice")
                 .font(DS.Font.appName)
 
             Text("Version \(Bundle.main.shortVersion) (\(Bundle.main.buildVersion))")

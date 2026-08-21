@@ -115,7 +115,7 @@ struct URLRuleListTests {
     func reorderRelinksToLive() {
         let a = rule("a.com", us), b = rule("b.com", us)
         // A drag-start snapshot of b carrying a STALE binding; the live b was rebound
-        // (e.g. a `lockime://set-url-rule` landed mid-drag). The reorder must keep the
+        // (e.g. a `lockime-voice://set-url-rule` landed mid-drag). The reorder must keep the
         // live binding, not the snapshot's.
         let staleB = URLRule(id: b.id, hostPattern: "b.com", lockedSourceID: us, action: .lock, matchType: .domainSuffix)
         let liveB = URLRule(id: b.id, hostPattern: "b.com", lockedSourceID: pinyin, action: .switchOnce, matchType: .domain)

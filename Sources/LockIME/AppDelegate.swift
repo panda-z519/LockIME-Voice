@@ -6,7 +6,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
 
-    /// Dispatches incoming `lockime://` URLs. Created lazily off `appState` so it
+    /// Dispatches incoming `lockime-voice://` URLs. Created lazily off `appState` so it
     /// shares the one live state the engine and UI are bound to.
     private lazy var urlHandler = URLCommandHandler(state: appState)
 
@@ -70,7 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// hidden we stay alive: the lock engine keeps running and relaunching reopens
     /// Settings (see `applicationShouldHandleReopen`). Every *wanted* exit still
     /// goes through —
-    /// an explicit Quit / `lockime://quit` (`terminationRequested`), a Sparkle
+    /// an explicit Quit / `lockime-voice://quit` (`terminationRequested`), a Sparkle
     /// install-and-relaunch, and a logout/restart/shutdown (the
     /// `kAEQuitApplication` Apple Event).
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -91,7 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    /// Handle `lockime://` (and the Debug `lockime-dev://`) URL-scheme commands.
+    /// Handle `lockime-voice://` (and the Debug `lockime-voice-dev://`) URL-scheme commands.
     /// LaunchServices delivers only the schemes the app registered in its
     /// `CFBundleURLTypes`, so each URL is one of ours; the parser keys off the
     /// command token, not the scheme. Multiple URLs may arrive in one event.

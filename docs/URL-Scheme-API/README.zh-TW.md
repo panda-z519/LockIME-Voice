@@ -2,7 +2,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · **繁體中文** · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-LockIME 提供一個 `lockime://` URL scheme，讓其他應用程式、指令稿、「捷徑」（Shortcuts）、
+LockIME 提供一個 `lockime-voice://` URL scheme，讓其他應用程式、指令稿、「捷徑」（Shortcuts）、
 Stream Deck、Alfred/Raycast、AppleScript——任何能開啟 URL 的東西——都能驅動它：
 開啟或關閉它、重新指定輸入法、管理規則，並讀回狀態。
 
@@ -14,7 +14,7 @@ Stream Deck、Alfred/Raycast、AppleScript——任何能開啟 URL 的東西—
 > 每個指令都會回傳 `api_disabled` 錯誤，且不會有任何動作。
 
 > **安全提示。** 一旦啟用，指令執行時**不會逐一出現確認提示**——任何
-> 能開啟 `lockime://` URL 的程序（包括一個網頁）都能驅動 LockIME。每個指令都可逆，
+> 能開啟 `lockime-voice://` URL 的程序（包括一個網頁）都能驅動 LockIME。每個指令都可逆，
 > 而且都不會碰你的檔案；惡意呼叫者最多只能切換你的輸入法鎖定或編輯規則。
 > 不使用時，請讓 API 保持關閉。
 
@@ -25,8 +25,8 @@ Stream Deck、Alfred/Raycast、AppleScript——任何能開啟 URL 的東西—
 接受兩種等效的形式：
 
 ```
-lockime://<command>?<param>=<value>&<param>=<value>
-lockime://x-callback-url/<command>?<param>=<value>&…
+lockime-voice://<command>?<param>=<value>&<param>=<value>
+lockime-voice://x-callback-url/<command>?<param>=<value>&…
 ```
 
 - **指令權杖**（`<command>`）不分大小寫。
@@ -39,8 +39,8 @@ lockime://x-callback-url/<command>?<param>=<value>&…
 `x-callback-url/` 前綴是給 x-callback-url 工具用的可選糖衣語法；
 下方的回呼參數在裸形式上同樣有效。
 
-> **Development builds.** LockIME 的 Debug 建置會註冊 `lockime-dev://`
-> 而非 `lockime://`，所以本地建置永遠不會劫持已安裝
+> **Development builds.** LockIME 的 Debug 建置會註冊 `lockime-voice-dev://`
+> 而非 `lockime-voice://`，所以本地建置永遠不會劫持已安裝
 > 正式版的 scheme。其餘一切完全相同。
 
 ---
@@ -62,7 +62,7 @@ lockime://x-callback-url/<command>?<param>=<value>&…
 往返範例——索取狀態並把它收回你自己的應用程式：
 
 ```
-lockime://status?x-success=myapp%3A%2F%2Fgot-status
+lockime-voice://status?x-success=myapp%3A%2F%2Fgot-status
 ```
 
 成功時 LockIME 會開啟：
@@ -227,32 +227,32 @@ LockIME 刻意**不提供任何開啟其 UI 的指令**（Settings、About、更
 **Shell / `open(1)`**
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-default-source?id=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
 # url-regex 會比對整個 URL——請把模式 percent-encode（此處為：github\.com/.*/pull）
-open "lockime://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
-open "lockime://set-launch-at-login?enabled=on"
+open "lockime-voice://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
+open "lockime-voice://set-launch-at-login?enabled=on"
 ```
 
 **AppleScript**
 
 ```applescript
-open location "lockime://toggle-lock"
+open location "lockime-voice://toggle-lock"
 ```
 
 **Shortcuts (macOS)**
 
-新增一個 **Open URLs** 動作搭配 `lockime://lock`，或用 **Get Contents of URL**
+新增一個 **Open URLs** 動作搭配 `lockime-voice://lock`，或用 **Get Contents of URL**
 加上 x-callback-url 形式來讀回狀態。
 
 **Read status from a script**（使用一個回呼接收端應用程式/URL）：
 
 ```sh
-open "lockime://status?x-success=myreceiver%3A%2F%2Fstatus"
+open "lockime-voice://status?x-success=myreceiver%3A%2F%2Fstatus"
 ```
 
 ---

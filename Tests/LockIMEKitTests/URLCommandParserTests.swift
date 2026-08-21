@@ -3,7 +3,7 @@ import Testing
 
 @testable import LockIMEKit
 
-/// Tests for the `lockime://` URL-scheme command parser and callback builder.
+/// Tests for the `lockime-voice://` URL-scheme command parser and callback builder.
 @Suite("URLCommandParser")
 struct URLCommandParserTests {
     private let abc: InputSourceID = "com.apple.keylayout.ABC"
@@ -31,140 +31,140 @@ struct URLCommandParserTests {
 
     @Test("master-lock verbs and aliases parse")
     func masterLock() {
-        #expect(command("lockime://lock") == .lock)
-        #expect(command("lockime://unlock") == .unlock)
-        #expect(command("lockime://toggle-lock") == .toggleLock)
-        #expect(command("lockime://toggle") == .toggleLock)
+        #expect(command("lockime-voice://lock") == .lock)
+        #expect(command("lockime-voice://unlock") == .unlock)
+        #expect(command("lockime-voice://toggle-lock") == .toggleLock)
+        #expect(command("lockime-voice://toggle") == .toggleLock)
     }
 
     @Test("the removed set-locking command (and its alias) is rejected as unknown")
     func setLockingRemoved() {
         // The "Enable locking" sub-toggle is gone — one state only. The old
         // verbs must fail loudly instead of silently doing something else.
-        #expect(failure("lockime://set-locking?enabled=true") == .unknownCommand("set-locking"))
-        #expect(failure("lockime://locking?enabled=off") == .unknownCommand("locking"))
+        #expect(failure("lockime-voice://set-locking?enabled=true") == .unknownCommand("set-locking"))
+        #expect(failure("lockime-voice://locking?enabled=off") == .unknownCommand("locking"))
     }
 
     @Test("the command token is case-insensitive")
     func caseInsensitiveToken() {
-        #expect(command("lockime://LOCK") == .lock)
-        #expect(command("lockime://Toggle-Lock") == .toggleLock)
+        #expect(command("lockime-voice://LOCK") == .lock)
+        #expect(command("lockime-voice://Toggle-Lock") == .toggleLock)
     }
 
     // MARK: Global source targeting
 
     @Test("lock-to-source accepts id, name, and the source alias")
     func lockToSource() {
-        #expect(command("lockime://lock-to-source?id=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
-        #expect(command("lockime://lock-to-source?source=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
-        #expect(command("lockime://lock-to-source?name=ABC") == .lockToSource(.name("ABC")))
-        #expect(command("lockime://lock-to-source?source-name=ABC") == .lockToSource(.name("ABC")))
+        #expect(command("lockime-voice://lock-to-source?id=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
+        #expect(command("lockime-voice://lock-to-source?source=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
+        #expect(command("lockime-voice://lock-to-source?name=ABC") == .lockToSource(.name("ABC")))
+        #expect(command("lockime-voice://lock-to-source?source-name=ABC") == .lockToSource(.name("ABC")))
     }
 
     @Test("lock-to-source without a source is a missing-parameter error")
     func lockToSourceMissing() {
-        #expect(failure("lockime://lock-to-source") == .missingParameter("id"))
+        #expect(failure("lockime-voice://lock-to-source") == .missingParameter("id"))
     }
 
     @Test("set-default-source parses the source, the optional action, and the clear path")
     func setDefaultSourceClear() {
         // No selector clears the default; the action defaults to lock (back-compat).
-        #expect(command("lockime://set-default-source") == .setDefaultSource(source: nil, action: .lock))
-        #expect(command("lockime://set-default-source?id=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-default-source") == .setDefaultSource(source: nil, action: .lock))
+        #expect(command("lockime-voice://set-default-source?id=com.apple.keylayout.ABC")
             == .setDefaultSource(source: .id(abc), action: .lock))
         // An explicit switch action rides alongside the source.
-        #expect(command("lockime://set-default-source?id=com.apple.keylayout.ABC&action=switch")
+        #expect(command("lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=switch")
             == .setDefaultSource(source: .id(abc), action: .switchOnce))
-        #expect(command("lockime://set-default-source?id=com.apple.keylayout.ABC&action=lock")
+        #expect(command("lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=lock")
             == .setDefaultSource(source: .id(abc), action: .lock))
         // The action is parsed even on the clear path (the executor ignores it there).
-        #expect(command("lockime://set-default-source?action=switch")
+        #expect(command("lockime-voice://set-default-source?action=switch")
             == .setDefaultSource(source: nil, action: .switchOnce))
         // An unrecognized action is a parameter error.
-        #expect(failure("lockime://set-default-source?id=com.apple.keylayout.ABC&action=hop")
+        #expect(failure("lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=hop")
             == .invalidParameter(name: "action", value: "hop"))
     }
 
     @Test("cycle-source parses direction and its aliases")
     func cycleSource() {
-        #expect(command("lockime://cycle-source?direction=next") == .cycleSource(.next))
-        #expect(command("lockime://cycle-source?direction=previous") == .cycleSource(.previous))
-        #expect(command("lockime://cycle-source?direction=prev") == .cycleSource(.previous))
-        #expect(failure("lockime://cycle-source") == .missingParameter("direction"))
-        #expect(failure("lockime://cycle-source?direction=sideways") == .invalidParameter(name: "direction", value: "sideways"))
+        #expect(command("lockime-voice://cycle-source?direction=next") == .cycleSource(.next))
+        #expect(command("lockime-voice://cycle-source?direction=previous") == .cycleSource(.previous))
+        #expect(command("lockime-voice://cycle-source?direction=prev") == .cycleSource(.previous))
+        #expect(failure("lockime-voice://cycle-source") == .missingParameter("direction"))
+        #expect(failure("lockime-voice://cycle-source?direction=sideways") == .invalidParameter(name: "direction", value: "sideways"))
     }
 
     @Test("switch-source requires a source")
     func switchSource() {
-        #expect(command("lockime://switch-source?id=com.apple.keylayout.ABC") == .switchSource(.id(abc)))
-        #expect(failure("lockime://switch-source") == .missingParameter("id"))
+        #expect(command("lockime-voice://switch-source?id=com.apple.keylayout.ABC") == .switchSource(.id(abc)))
+        #expect(failure("lockime-voice://switch-source") == .missingParameter("id"))
     }
 
     // MARK: App rules
 
     @Test("set-app-rule maps every mode keyword")
     func setAppRuleModes() {
-        #expect(command("lockime://set-app-rule?bundle=com.foo.Bar&mode=lock&source=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=lock&source=com.apple.keylayout.ABC")
             == .setAppRule(bundleID: "com.foo.Bar", mode: .locked, source: .id(abc)))
-        #expect(command("lockime://set-app-rule?bundle=com.foo.Bar&mode=switch&source=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=switch&source=com.apple.keylayout.ABC")
             == .setAppRule(bundleID: "com.foo.Bar", mode: .switched, source: .id(abc)))
-        #expect(command("lockime://set-app-rule?bundle=com.foo.Bar&mode=ignore")
+        #expect(command("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=ignore")
             == .setAppRule(bundleID: "com.foo.Bar", mode: .ignored, source: nil))
-        #expect(command("lockime://set-app-rule?bundle=com.foo.Bar&mode=default")
+        #expect(command("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=default")
             == .setAppRule(bundleID: "com.foo.Bar", mode: .useDefault, source: nil))
     }
 
     @Test("set-app-rule defaults to lock mode and then needs a source")
     func setAppRuleDefaultMode() {
-        #expect(command("lockime://set-app-rule?bundle=com.foo.Bar&source=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-app-rule?bundle=com.foo.Bar&source=com.apple.keylayout.ABC")
             == .setAppRule(bundleID: "com.foo.Bar", mode: .locked, source: .id(abc)))
-        #expect(failure("lockime://set-app-rule?bundle=com.foo.Bar") == .missingParameter("source"))
-        #expect(failure("lockime://set-app-rule?bundle=com.foo.Bar&mode=lock") == .missingParameter("source"))
+        #expect(failure("lockime-voice://set-app-rule?bundle=com.foo.Bar") == .missingParameter("source"))
+        #expect(failure("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=lock") == .missingParameter("source"))
     }
 
     @Test("set-app-rule rejects an unknown mode and a missing bundle")
     func setAppRuleErrors() {
-        #expect(failure("lockime://set-app-rule?bundle=com.foo.Bar&mode=spin")
+        #expect(failure("lockime-voice://set-app-rule?bundle=com.foo.Bar&mode=spin")
             == .invalidParameter(name: "mode", value: "spin"))
-        #expect(failure("lockime://set-app-rule?mode=ignore") == .missingParameter("bundle"))
+        #expect(failure("lockime-voice://set-app-rule?mode=ignore") == .missingParameter("bundle"))
     }
 
     @Test("remove / cycle / clear app-rule commands parse")
     func appRuleManagement() {
-        #expect(command("lockime://remove-app-rule?bundle=com.foo.Bar") == .removeAppRule(bundleID: "com.foo.Bar"))
-        #expect(failure("lockime://remove-app-rule") == .missingParameter("bundle"))
-        #expect(command("lockime://cycle-app-source?direction=next")
+        #expect(command("lockime-voice://remove-app-rule?bundle=com.foo.Bar") == .removeAppRule(bundleID: "com.foo.Bar"))
+        #expect(failure("lockime-voice://remove-app-rule") == .missingParameter("bundle"))
+        #expect(command("lockime-voice://cycle-app-source?direction=next")
             == .cycleAppSource(bundleID: nil, direction: .next))
-        #expect(command("lockime://cycle-app-source?direction=next&bundle=com.foo.Bar")
+        #expect(command("lockime-voice://cycle-app-source?direction=next&bundle=com.foo.Bar")
             == .cycleAppSource(bundleID: "com.foo.Bar", direction: .next))
-        #expect(command("lockime://remove-frontmost-app-rule") == .removeFrontmostAppRule)
-        #expect(command("lockime://clear-app-rules") == .clearAppRules)
+        #expect(command("lockime-voice://remove-frontmost-app-rule") == .removeFrontmostAppRule)
+        #expect(command("lockime-voice://clear-app-rules") == .clearAppRules)
     }
 
     // MARK: Enhanced mode + URL rules
 
     @Test("set-enhanced-mode parses the tri-state flag")
     func enhancedModeFlag() {
-        #expect(command("lockime://set-enhanced-mode?enabled=true") == .setEnhancedMode(.on))
-        #expect(command("lockime://set-enhanced-mode?enabled=on") == .setEnhancedMode(.on))
-        #expect(command("lockime://set-enhanced-mode?enabled=1") == .setEnhancedMode(.on))
-        #expect(command("lockime://set-enhanced-mode?enabled=false") == .setEnhancedMode(.off))
-        #expect(command("lockime://set-enhanced-mode?enabled=toggle") == .setEnhancedMode(.toggle))
-        #expect(failure("lockime://set-enhanced-mode") == .missingParameter("enabled"))
-        #expect(failure("lockime://set-enhanced-mode?enabled=maybe") == .invalidParameter(name: "enabled", value: "maybe"))
+        #expect(command("lockime-voice://set-enhanced-mode?enabled=true") == .setEnhancedMode(.on))
+        #expect(command("lockime-voice://set-enhanced-mode?enabled=on") == .setEnhancedMode(.on))
+        #expect(command("lockime-voice://set-enhanced-mode?enabled=1") == .setEnhancedMode(.on))
+        #expect(command("lockime-voice://set-enhanced-mode?enabled=false") == .setEnhancedMode(.off))
+        #expect(command("lockime-voice://set-enhanced-mode?enabled=toggle") == .setEnhancedMode(.toggle))
+        #expect(failure("lockime-voice://set-enhanced-mode") == .missingParameter("enabled"))
+        #expect(failure("lockime-voice://set-enhanced-mode?enabled=maybe") == .invalidParameter(name: "enabled", value: "maybe"))
     }
 
     @Test("set-url-rule parses host, source, action, and an optional id")
     func setURLRule() {
         // Without an explicit match-type, the rule defaults to domain-suffix (the
         // original behavior), so a caller written before this feature is unchanged.
-        #expect(command("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC")
             == .setURLRule(id: nil, host: "github.com", source: .id(abc), action: .lock, matchType: .domainSuffix))
-        #expect(command("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch")
+        #expect(command("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch")
             == .setURLRule(id: nil, host: "github.com", source: .id(abc), action: .switchOnce, matchType: .domainSuffix))
 
         let uuid = UUID()
-        #expect(command("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&id=\(uuid.uuidString)")
+        #expect(command("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&id=\(uuid.uuidString)")
             == .setURLRule(id: uuid, host: "github.com", source: .id(abc), action: .lock, matchType: .domainSuffix))
     }
 
@@ -172,27 +172,27 @@ struct URLCommandParserTests {
     func setURLRuleMatchType() {
         func parsed(_ url: String) -> URLCommand? { command(url) }
         // Canonical tokens.
-        #expect(parsed("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain")
+        #expect(parsed("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain")
             == .setURLRule(id: nil, host: "github.com", source: .id(abc), action: .lock, matchType: .domain))
-        #expect(parsed("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain-keyword")
+        #expect(parsed("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain-keyword")
             == .setURLRule(id: nil, host: "github.com", source: .id(abc), action: .lock, matchType: .domainKeyword))
         // Aliases (keyword / regex) and the `pattern` alias for the pattern param.
-        #expect(parsed("lockime://set-url-rule?pattern=google&source=com.apple.keylayout.ABC&match-type=keyword")
+        #expect(parsed("lockime-voice://set-url-rule?pattern=google&source=com.apple.keylayout.ABC&match-type=keyword")
             == .setURLRule(id: nil, host: "google", source: .id(abc), action: .lock, matchType: .domainKeyword))
-        #expect(parsed("lockime://set-url-rule?pattern=%2Fpull%2F&source=com.apple.keylayout.ABC&match-type=regex")
+        #expect(parsed("lockime-voice://set-url-rule?pattern=%2Fpull%2F&source=com.apple.keylayout.ABC&match-type=regex")
             == .setURLRule(id: nil, host: "/pull/", source: .id(abc), action: .lock, matchType: .urlRegex))
     }
 
     @Test("set-url-rule rejects a bad match-type and an uncompilable regex")
     func setURLRuleMatchTypeErrors() {
-        #expect(failure("lockime://set-url-rule?host=x.com&source=com.apple.keylayout.ABC&match-type=bogus")
+        #expect(failure("lockime-voice://set-url-rule?host=x.com&source=com.apple.keylayout.ABC&match-type=bogus")
             == .invalidParameter(name: "match-type", value: "bogus"))
         // A regex rule whose pattern doesn't compile is rejected at parse time (it
         // would otherwise silently match nothing). The pattern rides in `host`.
-        #expect(failure("lockime://set-url-rule?host=%5Bunclosed&source=com.apple.keylayout.ABC&match-type=regex")
+        #expect(failure("lockime-voice://set-url-rule?host=%5Bunclosed&source=com.apple.keylayout.ABC&match-type=regex")
             == .invalidParameter(name: "host", value: "[unclosed"))
         // A valid regex with the same brackets balanced parses fine.
-        #expect(command("lockime://set-url-rule?host=%5Ba-z%5D&source=com.apple.keylayout.ABC&match-type=regex")
+        #expect(command("lockime-voice://set-url-rule?host=%5Ba-z%5D&source=com.apple.keylayout.ABC&match-type=regex")
             == .setURLRule(id: nil, host: "[a-z]", source: .id(abc), action: .lock, matchType: .urlRegex))
     }
 
@@ -200,90 +200,90 @@ struct URLCommandParserTests {
     func setURLRulePatternParamHandling() {
         // A whitespace-only pattern normalizes to empty and would persist a dead
         // rule; reject it as missing, naming the param the caller actually sent.
-        #expect(failure("lockime://set-url-rule?host=%20%20&source=com.apple.keylayout.ABC")
+        #expect(failure("lockime-voice://set-url-rule?host=%20%20&source=com.apple.keylayout.ABC")
             == .missingParameter("host"))
-        #expect(failure("lockime://set-url-rule?pattern=%20%20&source=com.apple.keylayout.ABC")
+        #expect(failure("lockime-voice://set-url-rule?pattern=%20%20&source=com.apple.keylayout.ABC")
             == .missingParameter("pattern"))
         // When both are given, `host` wins (back-compat); surrounding space is trimmed.
-        #expect(command("lockime://set-url-rule?host=%20github.com%20&pattern=ignored.com&source=com.apple.keylayout.ABC")
+        #expect(command("lockime-voice://set-url-rule?host=%20github.com%20&pattern=ignored.com&source=com.apple.keylayout.ABC")
             == .setURLRule(id: nil, host: "github.com", source: .id(abc), action: .lock, matchType: .domainSuffix))
         // An uncompilable regex sent via the `pattern` alias is reported against
         // `pattern` — the param the caller used — not the historical `host`.
-        #expect(failure("lockime://set-url-rule?pattern=%5Bunclosed&source=com.apple.keylayout.ABC&match-type=regex")
+        #expect(failure("lockime-voice://set-url-rule?pattern=%5Bunclosed&source=com.apple.keylayout.ABC&match-type=regex")
             == .invalidParameter(name: "pattern", value: "[unclosed"))
     }
 
     @Test("set-url-rule reports missing host/source and invalid id/action")
     func setURLRuleErrors() {
-        #expect(failure("lockime://set-url-rule?source=com.apple.keylayout.ABC") == .missingParameter("host"))
-        #expect(failure("lockime://set-url-rule?host=github.com") == .missingParameter("source"))
+        #expect(failure("lockime-voice://set-url-rule?source=com.apple.keylayout.ABC") == .missingParameter("host"))
+        #expect(failure("lockime-voice://set-url-rule?host=github.com") == .missingParameter("source"))
         // `id` is the rule UUID here, NOT a source selector: it must not satisfy
         // the required source (the bare-`id` collision the review caught).
-        #expect(failure("lockime://set-url-rule?host=github.com&id=\(UUID().uuidString)") == .missingParameter("source"))
-        #expect(failure("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=hop")
+        #expect(failure("lockime-voice://set-url-rule?host=github.com&id=\(UUID().uuidString)") == .missingParameter("source"))
+        #expect(failure("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=hop")
             == .invalidParameter(name: "action", value: "hop"))
-        #expect(failure("lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&id=not-a-uuid")
+        #expect(failure("lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&id=not-a-uuid")
             == .invalidParameter(name: "id", value: "not-a-uuid"))
     }
 
     @Test("remove-url-rule accepts an id or a host, else errors")
     func removeURLRule() {
         let uuid = UUID()
-        #expect(command("lockime://remove-url-rule?id=\(uuid.uuidString)") == .removeURLRule(.id(uuid)))
-        #expect(command("lockime://remove-url-rule?host=github.com") == .removeURLRule(.host("github.com")))
-        #expect(failure("lockime://remove-url-rule") == .missingParameter("id"))
-        #expect(failure("lockime://remove-url-rule?id=nope") == .invalidParameter(name: "id", value: "nope"))
-        #expect(command("lockime://clear-url-rules") == .clearURLRules)
+        #expect(command("lockime-voice://remove-url-rule?id=\(uuid.uuidString)") == .removeURLRule(.id(uuid)))
+        #expect(command("lockime-voice://remove-url-rule?host=github.com") == .removeURLRule(.host("github.com")))
+        #expect(failure("lockime-voice://remove-url-rule") == .missingParameter("id"))
+        #expect(failure("lockime-voice://remove-url-rule?id=nope") == .invalidParameter(name: "id", value: "nope"))
+        #expect(command("lockime-voice://clear-url-rules") == .clearURLRules)
     }
 
     // MARK: App / windows
 
     @Test("quit parses")
     func quitParses() {
-        #expect(command("lockime://quit") == .quit)
+        #expect(command("lockime-voice://quit") == .quit)
     }
 
     @Test("set-language resolves exact codes, lenient aliases, and the system sentinel")
     func setLanguage() {
-        #expect(command("lockime://set-language?code=en") == .setLanguage(.english))
-        #expect(command("lockime://set-language?code=zh-Hans") == .setLanguage(.simplifiedChinese))
-        #expect(command("lockime://set-language?code=zh-CN") == .setLanguage(.simplifiedChinese))
-        #expect(command("lockime://set-language?code=zh-TW") == .setLanguage(.traditionalChinese))
-        #expect(command("lockime://set-language?code=fr-CA") == .setLanguage(.french))
+        #expect(command("lockime-voice://set-language?code=en") == .setLanguage(.english))
+        #expect(command("lockime-voice://set-language?code=zh-Hans") == .setLanguage(.simplifiedChinese))
+        #expect(command("lockime-voice://set-language?code=zh-CN") == .setLanguage(.simplifiedChinese))
+        #expect(command("lockime-voice://set-language?code=zh-TW") == .setLanguage(.traditionalChinese))
+        #expect(command("lockime-voice://set-language?code=fr-CA") == .setLanguage(.french))
         // The sentinel clears the override (follow the system language).
-        #expect(command("lockime://set-language?code=system") == .setLanguage(nil))
-        #expect(command("lockime://set-language?code=auto") == .setLanguage(nil))
-        #expect(failure("lockime://set-language?code=xx") == .invalidParameter(name: "code", value: "xx"))
-        #expect(failure("lockime://set-language") == .missingParameter("code"))
+        #expect(command("lockime-voice://set-language?code=system") == .setLanguage(nil))
+        #expect(command("lockime-voice://set-language?code=auto") == .setLanguage(nil))
+        #expect(failure("lockime-voice://set-language?code=xx") == .invalidParameter(name: "code", value: "xx"))
+        #expect(failure("lockime-voice://set-language") == .missingParameter("code"))
     }
 
     @Test("set-launch-at-login parses the tri-state flag")
     func launchAtLogin() {
-        #expect(command("lockime://set-launch-at-login?enabled=on") == .setLaunchAtLogin(.on))
-        #expect(command("lockime://set-launch-at-login?enabled=off") == .setLaunchAtLogin(.off))
-        #expect(command("lockime://set-launch-at-login?enabled=toggle") == .setLaunchAtLogin(.toggle))
-        #expect(command("lockime://launch-at-login?enabled=true") == .setLaunchAtLogin(.on))
-        #expect(failure("lockime://set-launch-at-login") == .missingParameter("enabled"))
+        #expect(command("lockime-voice://set-launch-at-login?enabled=on") == .setLaunchAtLogin(.on))
+        #expect(command("lockime-voice://set-launch-at-login?enabled=off") == .setLaunchAtLogin(.off))
+        #expect(command("lockime-voice://set-launch-at-login?enabled=toggle") == .setLaunchAtLogin(.toggle))
+        #expect(command("lockime-voice://launch-at-login?enabled=true") == .setLaunchAtLogin(.on))
+        #expect(failure("lockime-voice://set-launch-at-login") == .missingParameter("enabled"))
     }
 
     // MARK: Queries
 
     @Test("query commands and their aliases parse")
     func queries() {
-        #expect(command("lockime://status") == .status)
-        #expect(command("lockime://current-source") == .currentSource)
-        #expect(command("lockime://list-sources") == .listSources)
-        #expect(command("lockime://sources") == .listSources)
-        #expect(command("lockime://list-app-rules") == .listAppRules)
-        #expect(command("lockime://app-rules") == .listAppRules)
-        #expect(command("lockime://list-url-rules") == .listURLRules)
-        #expect(command("lockime://list-log") == .listLog)
-        #expect(command("lockime://log") == .listLog)
-        #expect(command("lockime://recent-activations") == .listLog)
-        #expect(command("lockime://get-config") == .getConfig)
-        #expect(command("lockime://config") == .getConfig)
-        #expect(command("lockime://version") == .version)
-        #expect(command("lockime://ping") == .ping)
+        #expect(command("lockime-voice://status") == .status)
+        #expect(command("lockime-voice://current-source") == .currentSource)
+        #expect(command("lockime-voice://list-sources") == .listSources)
+        #expect(command("lockime-voice://sources") == .listSources)
+        #expect(command("lockime-voice://list-app-rules") == .listAppRules)
+        #expect(command("lockime-voice://app-rules") == .listAppRules)
+        #expect(command("lockime-voice://list-url-rules") == .listURLRules)
+        #expect(command("lockime-voice://list-log") == .listLog)
+        #expect(command("lockime-voice://log") == .listLog)
+        #expect(command("lockime-voice://recent-activations") == .listLog)
+        #expect(command("lockime-voice://get-config") == .getConfig)
+        #expect(command("lockime-voice://config") == .getConfig)
+        #expect(command("lockime-voice://version") == .version)
+        #expect(command("lockime-voice://ping") == .ping)
     }
 
     @Test("isQuery flags only the read commands")
@@ -301,24 +301,24 @@ struct URLCommandParserTests {
 
     @Test("an unknown command and an empty command are reported")
     func unknownCommands() {
-        #expect(failure("lockime://frobnicate") == .unknownCommand("frobnicate"))
-        #expect(failure("lockime://") == .notACommand)
+        #expect(failure("lockime-voice://frobnicate") == .unknownCommand("frobnicate"))
+        #expect(failure("lockime-voice://") == .notACommand)
     }
 
     @Test("directional aliases up/down/forward/back resolve")
     func directionAliases() {
-        #expect(command("lockime://cycle-source?direction=down") == .cycleSource(.next))
-        #expect(command("lockime://cycle-source?direction=forward") == .cycleSource(.next))
-        #expect(command("lockime://cycle-source?direction=up") == .cycleSource(.previous))
-        #expect(command("lockime://cycle-source?direction=back") == .cycleSource(.previous))
+        #expect(command("lockime-voice://cycle-source?direction=down") == .cycleSource(.next))
+        #expect(command("lockime-voice://cycle-source?direction=forward") == .cycleSource(.next))
+        #expect(command("lockime-voice://cycle-source?direction=up") == .cycleSource(.previous))
+        #expect(command("lockime-voice://cycle-source?direction=back") == .cycleSource(.previous))
     }
 
     @Test("the x-callback-url path form selects the command")
     func xCallbackPathForm() {
-        #expect(command("lockime://x-callback-url/status") == .status)
-        #expect(command("lockime://x-callback-url/lock") == .lock)
+        #expect(command("lockime-voice://x-callback-url/status") == .status)
+        #expect(command("lockime-voice://x-callback-url/lock") == .lock)
         // Triple-slash (empty host) also falls back to the path.
-        #expect(command("lockime:///status") == .status)
+        #expect(command("lockime-voice:///status") == .status)
     }
 
     // MARK: Callback target extraction
@@ -327,7 +327,7 @@ struct URLCommandParserTests {
     func callbackTargets() {
         let success = "myapp%3A%2F%2Fok"   // myapp://ok
         let error = "myapp%3A%2F%2Ffail"   // myapp://fail
-        let string = "lockime://status?x-source=Shortcuts&x-success=\(success)&x-error=\(error)"
+        let string = "lockime-voice://status?x-source=Shortcuts&x-success=\(success)&x-error=\(error)"
         guard case .success(let parsed) = parse(string) else {
             Issue.record("expected a parsed command")
             return
@@ -340,7 +340,7 @@ struct URLCommandParserTests {
 
     @Test("callbackTargets(from:) works even when the command is invalid")
     func callbackTargetsOnFailure() {
-        let url = URL(string: "lockime://frobnicate?x-error=myapp%3A%2F%2Ffail")!
+        let url = URL(string: "lockime-voice://frobnicate?x-error=myapp%3A%2F%2Ffail")!
         let targets = URLCommandParser.callbackTargets(from: url)
         #expect(targets.error == URL(string: "myapp://fail"))
         #expect(targets.success == nil)
@@ -348,9 +348,9 @@ struct URLCommandParserTests {
 
     @Test("parameter names are matched case-insensitively, values preserved")
     func caseInsensitiveParamNames() {
-        #expect(command("lockime://lock-to-source?ID=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
+        #expect(command("lockime-voice://lock-to-source?ID=com.apple.keylayout.ABC") == .lockToSource(.id(abc)))
         // A bundle value keeps its original case.
-        #expect(command("lockime://remove-app-rule?Bundle=Com.Foo.Bar") == .removeAppRule(bundleID: "Com.Foo.Bar"))
+        #expect(command("lockime-voice://remove-app-rule?Bundle=Com.Foo.Bar") == .removeAppRule(bundleID: "Com.Foo.Bar"))
     }
 }
 
@@ -397,7 +397,7 @@ struct CallbackURLBuilderTests {
 /// Tests for the reflected-callback scheme safety policy.
 @Suite("CallbackURLPolicy")
 struct CallbackURLPolicyTests {
-    private let own: Set<String> = ["lockime", "lockime-dev"]
+    private let own: Set<String> = ["lockime-voice", "lockime-voice-dev"]
 
     @Test("allows the caller's own app scheme and http(s) callbacks (the round-trip is the feature)")
     func allowsSafe() {
@@ -414,9 +414,9 @@ struct CallbackURLPolicyTests {
 
     @Test("blocks the app's own scheme(s) — a callback can never re-enter the API")
     func blocksOwnScheme() {
-        #expect(!CallbackURLPolicy.allows(URL(string: "lockime://clear-app-rules")!, ownSchemes: own))
-        #expect(!CallbackURLPolicy.allows(URL(string: "lockime-dev://quit")!, ownSchemes: own))
-        #expect(!CallbackURLPolicy.allows(URL(string: "LOCKIME://quit")!, ownSchemes: own)) // case-insensitive
+        #expect(!CallbackURLPolicy.allows(URL(string: "lockime-voice://clear-app-rules")!, ownSchemes: own))
+        #expect(!CallbackURLPolicy.allows(URL(string: "lockime-voice-dev://quit")!, ownSchemes: own))
+        #expect(!CallbackURLPolicy.allows(URL(string: "LOCKIME-VOICE://quit")!, ownSchemes: own)) // case-insensitive
     }
 
     @Test("refuses a schemeless callback — nothing safe to open")

@@ -8,7 +8,7 @@
 # updates still open immediately, so we don't trade away urgent patches.
 version: 2
 updates:
-  # GitHub Actions pinned across ci / nightly / release / build-publish.
+  # GitHub Actions used by the build/test CI workflow.
   # `directory: "/"` scans .github/workflows/; local reusable-workflow
   # `uses: ./...` references are ignored automatically.
   - package-ecosystem: "github-actions"

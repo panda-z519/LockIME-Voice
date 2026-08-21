@@ -6,13 +6,14 @@
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **日本語** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![最新リリース](https://img.shields.io/github/v/release/oomol-lab/LockIME?sort=semver&color=3A5BD9)](https://github.com/oomol-lab/LockIME/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/oomol-lab/LockIME/ci.yml?branch=main&label=CI)](https://github.com/oomol-lab/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
 [![ライセンス: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
+
+> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。現在はソースコードのみを公開し、公開バイナリ、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布は提供しません。
 
 **キーボードの入力ソースをロックする** macOS メニューバーアプリ。あなた（または他のアプリ）が入力メソッドを切り替えるたびに、LockIME はロック中の入力ソースへ即座に切り戻します——グローバルに、最前面のアプリごとに、あるいは（オプションの拡張モードでは）ブラウザの URL ごとに。
 
@@ -39,13 +40,15 @@
 
 ## Install
 
-[Homebrew](https://brew.sh) でインストールできます（cask がお使いの Mac のアーキテクチャに合ったビルドを自動的に選択します）：
+現在はソースからローカルの ad-hoc 署名ビルドを作成します：
 
 ```sh
-brew install --cask oomol-lab/tap/lockime
+brew install xcodegen xcbeautify
+make build
+open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-または、[最新リリース](https://github.com/oomol-lab/LockIME/releases/latest)からお使いの Mac に合った `.dmg`（Apple silicon は `-arm64`、Intel は `-x86_64`）をダウンロードしてください。いずれの方法でも、アプリは Sparkle により自動的に最新の状態に保たれます。
+Developer ID 署名や公証がないため、再ビルド後に macOS 権限の再許可が必要になる場合があります。
 
 ## Features
 
@@ -63,10 +66,9 @@ brew install --cask oomol-lab/tap/lockime
 - **ライブ言語切り替え**——9 言語を再起動なしで即座に切り替え：English、简体中文、繁體中文、日本語、Français、Deutsch、Español、Português、Русский。
 - **24 時間の作動ログ**——何が、なぜ、どれだけの時間切り替えられたかを確認できます。
 - **設定のバックアップ**——アプリごと・URL ごとのルールを `.lockime` ファイルに書き出し、また読み込めます。読み込み前にはプレビュー画面で、追加・競合・削除を確認してから適用します。
-- **自動アップデート**——Sparkle による stable / beta の 2 チャンネルと、カスタムアップデートウィンドウ。
 - **小さなダウンロード**——アプリ全体が 3 MB 未満の `.dmg` に収まります。
 - **コアのロックにシステム権限は不要**——オプションの Accessibility 権限付き拡張モードで、より細かい URL ごと / フォーカス中フィールドごとのルールが使えます。
-- **自動化**——`lockime://` URL スキームにより、他のアプリ・スクリプト・ショートカットから LockIME を操作できます（下記参照）。
+- **自動化**——`lockime-voice://` URL スキームにより、他のアプリ・スクリプト・ショートカットから LockIME を操作できます（下記参照）。
 
 ## Comparison
 
@@ -89,10 +91,10 @@ LockIME に対する最も広く使われている代替ツールは **[Input So
 | 画面上の入力ヒント | ✗ | ✓ | ✓（オプション） |
 | 24 時間の作動ログ | ✓ | ✗ | ✗ |
 | 設定のバックアップ / インポート | ✓（`.lockime`、確認付き） | ✓（エクスポート/インポート + CLI） | — |
-| URL スキーム自動化 | ✓（`lockime://`、x-callback-url） | 部分的（`inputsourcepro://` インポート） | ✗ |
+| URL スキーム自動化 | ✓（`lockime-voice://`、x-callback-url） | 部分的（`inputsourcepro://` インポート） | ✗ |
 | UI 言語 | 9（ライブ切り替え） | 6 | zh · en · ja |
 | システム権限 | コアには不要 · URL ごとには Accessibility | コアには不要 · URL ごとには Accessibility | Accessibility¹ |
-| 自動アップデート | Sparkle（stable + beta） | ✓ | ✓ |
+| 自動アップデート | ✗（ソースのみのフォーク） | ✓ | ✓ |
 | アクティブにメンテナンス中（2026） | ✓ | ✓ | ✓ |
 
 ¹ KeyboardHolder はその権限要件を文書化していません。ウェブサイトごとのルールのためにブラウザのアドレスバーを読み取るには、実際には Accessibility 権限が必要です。「—」は確認された非対応ではなく、文書化されていない機能を示します。
@@ -105,12 +107,12 @@ LockIME に対する最も広く使われている代替ツールは **[Input So
 
 ## Automation
 
-LockIME は `lockime://` URL スキームを公開しており、他のアプリ・スクリプト・ショートカット・ランチャーから操作できます——オン/オフの切り替え、入力ソースの再設定、ルールの管理、そして [x-callback-url](https://x-callback-url.com) コールバックによる状態の読み取りが可能です。デフォルトではオフです——**設定 ▸ 一般 ▸ 自動化**でオンにしてください。
+LockIME は `lockime-voice://` URL スキームを公開しており、他のアプリ・スクリプト・ショートカット・ランチャーから操作できます——オン/オフの切り替え、入力ソースの再設定、ルールの管理、そして [x-callback-url](https://x-callback-url.com) コールバックによる状態の読み取りが可能です。デフォルトではオフです——**設定 ▸ 一般 ▸ 自動化**でオンにしてください。
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
 ```
 
 詳細なリファレンス：**[URL Scheme API](../URL-Scheme-API/README.ja.md)**。
@@ -134,7 +136,7 @@ make gen     # generate LockIME.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
-make archive # Release archive (Developer ID)
+make archive # ad-hoc-signed Release archive
 ```
 
 Xcode プロジェクトは `project.yml` から生成され、リポジトリには含まれません。
@@ -143,7 +145,7 @@ Xcode プロジェクトは `project.yml` から生成され、リポジトリ�
 
 ## Releasing
 
-dispatch 駆動の、公証済み Developer ID リリース。Sparkle による **stable** と **beta** の 2 チャンネルで自動アップデートします：Release ワークフロー（Actions → Release）を実行すると、git タグからバージョンを計算してビルドし、タグと GitHub Release を自動的に作成します——タグを手動でプッシュしないでください。beta チャンネルはナイトリービルドです。各リリースは Apple silicon と Intel の独立したアプリをそれぞれ提供し、各々が独自のアップデートフィードを持ちます（universal バイナリなし、アーキテクチャをまたぐアップデートなし）。[docs/RELEASING.md](../RELEASING.md) を参照してください。
+このフォークには公開バイナリのリリースパイプラインがありません。上流の Developer ID、公証、Sparkle、nightly、Homebrew の各ワークフローは無効化されています。現在の境界と、将来署名付き配布を有効にする条件は [docs/RELEASING.md](../RELEASING.md) を参照してください。
 
 ## Architecture
 
@@ -153,3 +155,5 @@ dispatch 駆動の、公証済み Developer ID リリース。Sparkle による 
 ## License
 
 Copyright © 2026 Hangzhou Wumou Software Co., Ltd.
+
+Modifications © 2026 zhangsiqiang519.

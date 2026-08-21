@@ -2,7 +2,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · **Português** · [Русский](README.ru.md)
 
-O LockIME expõe um esquema de URL `lockime://` para que outros apps, scripts, o
+O LockIME expõe um esquema de URL `lockime-voice://` para que outros apps, scripts, o
 Shortcuts, o Stream Deck, o Alfred/Raycast, o AppleScript — qualquer coisa que
 consiga abrir uma URL — possam controlá-lo: ativá-lo ou desativá-lo,
 redirecionar a fonte de entrada, gerenciar regras e ler o estado de volta.
@@ -17,7 +17,7 @@ retornar dados dos comandos de consulta.
 
 > **Nota de segurança.** Uma vez ativada, os comandos são executados **sem uma
 > confirmação por comando** — qualquer processo que consiga abrir uma URL
-> `lockime://` (incluindo uma página da web) pode controlar o LockIME. Todo
+> `lockime-voice://` (incluindo uma página da web) pode controlar o LockIME. Todo
 > comando é reversível e nenhum toca nos seus arquivos; o pior que um chamador
 > mal-intencionado pode fazer é alternar o bloqueio da sua fonte de entrada ou
 > editar regras. Deixe a API desativada quando não estiver usando-a.
@@ -29,8 +29,8 @@ retornar dados dos comandos de consulta.
 São aceitas duas formas equivalentes:
 
 ```
-lockime://<command>?<param>=<value>&<param>=<value>
-lockime://x-callback-url/<command>?<param>=<value>&…
+lockime-voice://<command>?<param>=<value>&<param>=<value>
+lockime-voice://x-callback-url/<command>?<param>=<value>&…
 ```
 
 - O **token de comando** (`<command>`) não diferencia maiúsculas de minúsculas.
@@ -46,7 +46,7 @@ x-callback-url; os parâmetros de callback abaixo também funcionam na forma
 simples.
 
 > **Builds de desenvolvimento.** Uma build de Debug do LockIME registra
-> `lockime-dev://` em vez de `lockime://`, de modo que uma build local nunca
+> `lockime-voice-dev://` em vez de `lockime-voice://`, de modo que uma build local nunca
 > sequestra o esquema do release instalado. Todo o resto é idêntico.
 
 ---
@@ -69,7 +69,7 @@ executada, de forma inofensiva).
 Exemplo de ida e volta — peça o status e receba-o de volta no seu próprio app:
 
 ```
-lockime://status?x-success=myapp%3A%2F%2Fgot-status
+lockime-voice://status?x-success=myapp%3A%2F%2Fgot-status
 ```
 
 Em caso de sucesso, o LockIME abre:
@@ -248,32 +248,32 @@ para os logs, portanto nunca é localizado.
 **Shell / `open(1)`**
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-default-source?id=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
 # url-regex corresponde à URL inteira — codifique o padrão em percent-encode (aqui: github\.com/.*/pull)
-open "lockime://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
-open "lockime://set-launch-at-login?enabled=on"
+open "lockime-voice://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
+open "lockime-voice://set-launch-at-login?enabled=on"
 ```
 
 **AppleScript**
 
 ```applescript
-open location "lockime://toggle-lock"
+open location "lockime-voice://toggle-lock"
 ```
 
 **Shortcuts (macOS)**
 
-Adicione uma ação **Open URLs** com `lockime://lock`, ou **Get Contents of URL**
+Adicione uma ação **Open URLs** com `lockime-voice://lock`, ou **Get Contents of URL**
 mais a forma x-callback-url para ler o estado de volta.
 
 **Ler o status a partir de um script** (usando um app/URL receptor de callback):
 
 ```sh
-open "lockime://status?x-success=myreceiver%3A%2F%2Fstatus"
+open "lockime-voice://status?x-success=myreceiver%3A%2F%2Fstatus"
 ```
 
 ---

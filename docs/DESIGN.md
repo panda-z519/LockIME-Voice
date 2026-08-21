@@ -197,7 +197,7 @@ the grant watcher.
   process-global `IsSecureEventInputEnabled()` — permission-free, so unlike the
   Accessibility-gated rules this row is never `.disabled`. The gate lives in
   `LockController` and covers the continuous lock and autonomous one-shot
-  switches alike; the explicit `lockime://switch-source` API is deliberately not
+  switches alike; the explicit `lockime-voice://switch-source` API is deliberately not
   gated.
 - **App / URL Rules:** rows via shared `AppRowLabel(bundleID:)` (icon 22 + name
   `.body` + bundle ID `.caption2 .secondary`). Empty state =

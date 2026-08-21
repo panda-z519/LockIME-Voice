@@ -6,13 +6,14 @@
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · **Deutsch** · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![Neueste Version](https://img.shields.io/github/v/release/oomol-lab/LockIME?sort=semver&color=3A5BD9)](https://github.com/oomol-lab/LockIME/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/oomol-lab/LockIME/ci.yml?branch=main&label=CI)](https://github.com/oomol-lab/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
 [![Lizenz: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
+
+> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. Derzeit wird nur Quellcode veröffentlicht; öffentliche Binärdateien, Developer-ID-Signierung, Notarisierung, Sparkle-Updates und Homebrew-Verteilung werden nicht angeboten.
 
 Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann immer du (oder eine andere App) die Eingabemethode wechselst, schaltet LockIME sofort auf die gesperrte zurück — global, pro Vordergrund-App oder (mit dem optionalen erweiterten Modus) pro Browser-URL.
 
@@ -39,13 +40,15 @@ Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann i
 
 ## Install
 
-Installiere mit [Homebrew](https://brew.sh) (der Cask wählt den zur Architektur deines Macs passenden Build):
+Erstelle derzeit einen lokal ad-hoc signierten Build aus dem Quellcode:
 
 ```sh
-brew install --cask oomol-lab/tap/lockime
+brew install xcodegen xcbeautify
+make build
+open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Oder lade die zu deinem Mac passende `.dmg`-Datei (`-arm64` für Apple silicon, `-x86_64` für Intel) aus dem [neuesten Release](https://github.com/oomol-lab/LockIME/releases/latest) herunter. So oder so hält sich die App via Sparkle automatisch aktuell.
+Ohne Developer-ID-Signierung oder Notarisierung müssen macOS-Berechtigungen nach einem neuen Build möglicherweise erneut erteilt werden.
 
 ## Features
 
@@ -63,10 +66,9 @@ Oder lade die zu deinem Mac passende `.dmg`-Datei (`-arm64` für Apple silicon, 
 - **Sprachwechsel zur Laufzeit** — wechsle sofort zwischen 9 Sprachen, ohne Neustart: English, 简体中文, 繁體中文, 日本語, Français, Deutsch, Español, Português, Русский.
 - **24-Stunden-Aktivitätsprotokoll** — sieh nach, was warum und wie lange zurückgeschaltet wurde.
 - **Konfigurations-Backup** — exportiere deine Regeln pro App und pro URL in eine `.lockime`-Datei und importiere sie wieder, mit einem Vorschau-Schritt, der Ergänzungen, Konflikte und Entfernungen auflistet, bevor etwas angewendet wird.
-- **Automatische Updates** — Stable- und Beta-Kanal via Sparkle, mit einem eigenen Update-Fenster.
 - **Winziger Download** — die gesamte App steckt in einer `.dmg` unter 3 MB.
 - **Keine Systemberechtigungen für das Kern-Sperren** — ein optionaler, über Accessibility freigeschalteter erweiterter Modus ermöglicht feinere Regeln pro URL und pro fokussiertem Feld.
-- **Automatisierung** — ein `lockime://`-URL-Schema lässt andere Apps, Skripte und Kurzbefehle LockIME steuern (siehe unten).
+- **Automatisierung** — ein `lockime-voice://`-URL-Schema lässt andere Apps, Skripte und Kurzbefehle LockIME steuern (siehe unten).
 
 ## Comparison
 
@@ -96,10 +98,10 @@ anwendet, in dem sie abweicht — wobei jede Regel weiterhin auf einen einmalige
 | Eingabe-Hinweise auf dem Bildschirm | ✗ | ✓ | ✓ (optional) |
 | 24-Stunden-Aktivitätsprotokoll | ✓ | ✗ | ✗ |
 | Konfigurations-Backup / -Import | ✓ (`.lockime`, mit Vorschau) | ✓ (Export/Import + CLI) | — |
-| URL-Schema-Automatisierung | ✓ (`lockime://`, x-callback-url) | teilweise (`inputsourcepro://`-Import) | ✗ |
+| URL-Schema-Automatisierung | ✓ (`lockime-voice://`, x-callback-url) | teilweise (`inputsourcepro://`-Import) | ✗ |
 | UI-Sprachen | 9 (Wechsel zur Laufzeit) | 6 | zh · en · ja |
 | Systemberechtigungen | keine für den Kern · Accessibility für Regeln pro URL | keine für den Kern · Accessibility für Regeln pro URL | Accessibility¹ |
-| Automatische Updates | Sparkle (stable + beta) | ✓ | ✓ |
+| Automatische Updates | ✗ (reiner Quellcode-Fork) | ✓ | ✓ |
 | Aktiv gepflegt (2026) | ✓ | ✓ | ✓ |
 
 ¹ KeyboardHolder dokumentiert seine Berechtigungsanforderungen nicht; das
@@ -124,12 +126,12 @@ GUI-Umschalter).
 
 ## Automation
 
-LockIME stellt ein `lockime://`-URL-Schema bereit, damit andere Apps, Skripte, Kurzbefehle und Launcher es steuern können — es ein- oder ausschalten, die Eingabequelle neu festlegen, Regeln verwalten und mit [x-callback-url](https://x-callback-url.com)-Rückrufen den Zustand auslesen. Sie ist standardmäßig aus — schalte sie unter **Einstellungen ▸ Allgemein ▸ Automatisierung** ein.
+LockIME stellt ein `lockime-voice://`-URL-Schema bereit, damit andere Apps, Skripte, Kurzbefehle und Launcher es steuern können — es ein- oder ausschalten, die Eingabequelle neu festlegen, Regeln verwalten und mit [x-callback-url](https://x-callback-url.com)-Rückrufen den Zustand auslesen. Sie ist standardmäßig aus — schalte sie unter **Einstellungen ▸ Allgemein ▸ Automatisierung** ein.
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
 ```
 
 Vollständige Referenz: **[URL Scheme API](../URL-Scheme-API/README.de.md)**.
@@ -153,7 +155,7 @@ make gen     # generate LockIME.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
-make archive # Release archive (Developer ID)
+make archive # ad-hoc-signed Release archive
 ```
 
 Das Xcode-Projekt wird aus `project.yml` generiert und ist nicht eingecheckt.
@@ -162,7 +164,7 @@ Hardware-berührende Integrationstests (echtes TIS-Umschalten) sind von `make te
 
 ## Releasing
 
-Dispatch-gesteuerte, notarisierte Developer-ID-Releases mit Sparkle-Auto-Update über die Kanäle **stable** und **beta**: Starte den Release-Workflow (Actions → Release) — er berechnet die Version aus den Git-Tags, baut und erstellt Tag und GitHub-Release automatisch — niemals einen Tag von Hand pushen. Der Beta-Kanal ist der Nightly-Build. Jedes Release liefert separate Apps für Apple silicon und Intel, jede mit eigenem Update-Feed (kein Universal-Binary, keine architekturübergreifenden Updates). Siehe [docs/RELEASING.md](../RELEASING.md).
+Dieser Fork besitzt keine öffentliche Binär-Release-Pipeline. Die Upstream-Abläufe für Developer ID, Notarisierung, Sparkle, Nightly und Homebrew sind deaktiviert. Die aktuelle Grenze und die Voraussetzungen für eine spätere signierte Verteilung stehen in [docs/RELEASING.md](../RELEASING.md).
 
 ## Architecture
 
@@ -172,3 +174,5 @@ Dispatch-gesteuerte, notarisierte Developer-ID-Releases mit Sparkle-Auto-Update 
 ## License
 
 Copyright © 2026 Hangzhou Wumou Software Co., Ltd.
+
+Modifications © 2026 zhangsiqiang519.

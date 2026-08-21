@@ -8,7 +8,7 @@ enum UpdateCheckOutcome {
     case upToDate
     case failed(UpdateFailure)
     #if DEBUG
-    /// A bare `make run` dev build declined to contact the real production feed
+    /// A bare `make run` dev build has no configured production feed
     /// (see `UpdateController.updatesDisabledForDevelopment`).
     case disabledInDevelopment
     #endif
@@ -88,19 +88,16 @@ final class UpdateController {
         driver.onUpdateSessionEnded = { [weak self] in self?.pendingUpdateVersion = nil }
     }
 
-    /// Build and start the updater. Fails gracefully if `SUPublicEDKey` is
-    /// missing/invalid (updates simply stay unavailable).
+    /// Start Sparkle only for the Debug loopback update lab. Normal Debug and
+    /// Release builds keep updates unavailable.
     func start() {
         #if DEBUG
         if updatesDisabledForDevelopment {
-            // Never start Sparkle in a plain dev build: no scheduled check can
-            // fire and the production feed is never contacted. The manual
-            // "Check for Updates…" button stays enabled and surfaces a
-            // "disabled in development" notice instead (see `checkForUpdates`).
-            canCheckForUpdates = true
+            // The fork has no production update feed. Only the loopback update
+            // lab may start Sparkle; ordinary builds keep updates unavailable.
+            canCheckForUpdates = false
             return
         }
-        #endif
         let updater = SPUUpdater(
             hostBundle: .main,
             applicationBundle: .main,
@@ -124,6 +121,11 @@ final class UpdateController {
         } catch {
             canCheckForUpdates = false
         }
+        #else
+        // Source-only distribution: no Developer ID, notarization, or signed
+        // appcast. Never construct Sparkle in a Release build.
+        canCheckForUpdates = false
+        #endif
     }
 
     /// A user-initiated check. If a scheduled check already found an update
@@ -170,28 +172,18 @@ final class UpdaterDelegate: NSObject, SPUUpdaterDelegate {
         return UpdateChannel.allowedChannels(for: .from(usesBeta: usesBeta))
     }
 
-    /// Each architecture is its own product with its own feed — we ship
-    /// single-arch apps and don't support cross-arch updates — so the feed
-    /// choice is pinned at compile time, where no build/CI misconfiguration
-    /// can reach it: an x86_64 binary can only ever see x86_64 updates.
-    /// arm64 returns `nil` to fall back to the Info.plist `SUFeedURL`
-    /// (`appcast.xml`) — the URL every already-shipped arm64 build reads,
-    /// which therefore must keep serving arm64-only entries forever (see
-    /// docs/RELEASING.md).
+    /// The source-only fork has no production feed. Debug update-lab runs may
+    /// inject a loopback feed; every normal build returns `nil`.
     func feedURLString(for updater: SPUUpdater) -> String? {
         #if DEBUG
         // Update lab (`make update-test-*`): point the updater at a loopback
-        // feed without touching the shipped `SUFeedURL`. Release builds never
-        // consult the environment.
+        // feed without adding a production `SUFeedURL`. Release builds never
+        // consult the environment or construct an updater.
         if let feed = ProcessInfo.processInfo.environment["LOCKIME_UPDATE_FEED"],
            !feed.isEmpty {
             return feed
         }
         #endif
-        #if arch(x86_64)
-        return "https://oomol-lab.github.io/LockIME/appcast-x86_64.xml"
-        #else
         return nil
-        #endif
     }
 }

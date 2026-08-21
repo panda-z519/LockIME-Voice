@@ -7,9 +7,9 @@ CONFIG      ?= Debug
 ARCH        ?= arm64
 DERIVED     := build/DerivedData
 ifeq ($(CONFIG),Debug)
-APP_NAME    := LockIME Dev
+APP_NAME    := LockIME Voice Dev
 else
-APP_NAME    := LockIME
+APP_NAME    := LockIME Voice
 endif
 ifeq ($(ARCH),arm64)
 DEST        := platform=macOS,arch=arm64
@@ -19,7 +19,7 @@ DEST        := generic/platform=macOS
 ARCHFLAGS   := ARCHS=$(ARCH) ONLY_ACTIVE_ARCH=NO
 endif
 APP         := $(DERIVED)/Build/Products/$(CONFIG)/$(APP_NAME).app
-DMG         := build/dmg/LockIME.dmg
+DMG         := build/dmg/LockIME-Voice.dmg
 XCB         := set -o pipefail && xcodebuild
 PRETTY      := | xcbeautify
 
@@ -55,14 +55,14 @@ test-hw: gen
 		-derivedDataPath $(DERIVED) -destination '$(DEST)' test $(PRETTY); \
 		status=$$?; rm -f /tmp/lockime_hw_tests; exit $$status
 
-## Build a Release archive (Developer ID)
+## Build an ad-hoc-signed Release archive
 archive: gen
 	$(XCB) -scheme $(SCHEME) -configuration Release \
 		-derivedDataPath $(DERIVED) -destination 'generic/platform=macOS' \
-		-archivePath build/LockIME.xcarchive archive $(PRETTY)
+		-archivePath build/LockIME-Voice.xcarchive archive $(PRETTY)
 
 ## Package the built app into a drag-to-install .dmg (CONFIG=Release for a
-## release-config bundle; the image is unsigned/unnotarized — CI handles that)
+## release-config bundle; the image remains ad-hoc-signed and unnotarized)
 dmg: build
 	scripts/make-dmg.sh "$(APP)" "$(DMG)"
 

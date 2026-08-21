@@ -4,16 +4,15 @@ import SwiftUI
 /// The Settings window's tabs. A stable identity lets one pane route the user to
 /// another — App Rules / URL Rules point at General's single Accessibility grant.
 enum SettingsTab: Hashable {
-    case general, appRules, urlRules, shortcuts, voiceInput, permissions, updates, log, backup
+    case general, appRules, urlRules, shortcuts, voiceInput, permissions, log, backup
 }
 
 /// Root of the Settings window — a standard multi-pane macOS settings TabView,
 /// the same shape as System Settings. Each pane is its own grouped `Form`.
 ///
-/// Two bodies for one view: the `Tab` builder (and tab badges) is macOS 15+,
-/// and the deployment floor is 14 — Sonoma falls back to the `.tabItem` API,
-/// which draws the same settings tabs minus the Updates badge. Keep both in
-/// sync when adding a pane. Both drive their selection off `AppState.settingsTab`
+/// Two bodies for one view: the `Tab` builder is macOS 15+, and the deployment
+/// floor is 14 — Sonoma falls back to the `.tabItem` API. Keep both in sync when
+/// adding a pane. Both drive their selection off `AppState.settingsTab`
 /// so the Accessibility badges can programmatically switch to General.
 struct SettingsRootView: View {
     @Environment(AppState.self) private var state
@@ -62,10 +61,6 @@ struct SettingsRootView: View {
             Tab("Permissions", systemImage: "hand.raised", value: SettingsTab.permissions) {
                 PermissionsSettingsPane()
             }
-            Tab("Updates", systemImage: "arrow.down.circle", value: SettingsTab.updates) {
-                UpdatesSettingsPane()
-            }
-            .badge(state.updateController.pendingUpdateVersion != nil ? 1 : 0)
             Tab("Log", systemImage: "list.bullet.rectangle", value: SettingsTab.log) {
                 ActivationLogPane()
             }
@@ -95,9 +90,6 @@ struct SettingsRootView: View {
             PermissionsSettingsPane()
                 .tabItem { Label("Permissions", systemImage: "hand.raised") }
                 .tag(SettingsTab.permissions)
-            UpdatesSettingsPane()
-                .tabItem { Label("Updates", systemImage: "arrow.down.circle") }
-                .tag(SettingsTab.updates)
             ActivationLogPane()
                 .tabItem { Label("Log", systemImage: "list.bullet.rectangle") }
                 .tag(SettingsTab.log)

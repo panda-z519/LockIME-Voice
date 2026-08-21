@@ -2,29 +2,23 @@
 
 ## Supported versions
 
-LockIME ships as a self-updating app: every install keeps itself current via
-[Sparkle](https://sparkle-project.org). Security fixes land in the **latest
-release only** — there are no back-ported patch branches. If you are running an
-older build, update before reporting (the menu-bar app checks automatically, or
-use **Check for Updates…**).
+LockIME Voice currently ships as source code only. Security fixes land on the
+latest `main` branch; there are no signed binary releases, automatic updates, or
+back-ported patch branches. Pull the latest source and rebuild before reporting.
 
-| Version            | Supported          |
-| ------------------ | ------------------ |
-| Latest release     | :white_check_mark: |
-| Anything older     | :x:                |
+| Version              | Supported          |
+| -------------------- | ------------------ |
+| Latest `main` source | :white_check_mark: |
+| Older commits        | :x:                |
 
 ## Reporting a vulnerability
 
 **Please do not open a public GitHub issue for security problems.** Disclose
 privately so a fix can ship before the details are public.
 
-Two private channels, either is fine:
-
 - **GitHub Security Advisories** — open a private report at
-  <https://github.com/oomol-lab/LockIME/security/advisories/new>
-  (preferred; keeps the discussion and fix linked to the repo).
-- **Email** — <bh@bugs.cc>. Feel free to encrypt or request a key first if you
-  want to send sensitive details.
+  <https://github.com/zhangsiqiang519/LockIME/security/advisories/new>
+  (keeps the discussion and fix linked to the repo).
 
 When you report, please include as much as you can:
 
@@ -46,19 +40,19 @@ a fix before disclosing publicly.
 
 ## Scope and notes
 
-LockIME is a non-sandboxed macOS menu-bar app. Some behavior is by design and
+LockIME Voice is a non-sandboxed macOS menu-bar app. Some behavior is by design and
 generally **out of scope** unless you can show it crosses a real trust boundary:
 
 - **Accessibility / Input Monitoring permissions.** The app needs these to read
   and switch the active input source. It does not log keystroke *content*; if
   you find it capturing or transmitting typed text, that is in scope.
-- **`lockime://` URL scheme.** The app accepts URL-scheme commands (see
+- **`lockime-voice://` URL scheme.** The app accepts URL-scheme commands (see
   `docs/URL-Scheme-API/`). Any input it accepts is fair game — report anything
   that lets a crafted URL exceed the documented API or affect other apps.
-- **Sparkle auto-update.** Updates are delivered over HTTPS and verified with an
-  EdDSA signature. Reports that defeat update authenticity or integrity (feed
-  tampering, signature bypass, downgrade attacks) are high priority.
+- **Unsigned local builds.** The fork has no Developer ID or notarized public
+  artifacts. Gatekeeper warnings and permission resets after rebuilding are
+  expected; bypasses that cross a real trust boundary remain in scope.
 - **Local configuration files** (exported `.lockime` backups, app preferences):
   issues that let untrusted input escalate when imported are in scope.
 
-Thanks for helping keep LockIME and its users safe.
+Thanks for helping keep LockIME Voice and its users safe.

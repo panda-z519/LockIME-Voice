@@ -1,7 +1,7 @@
 name: LockIME
 
 options:
-  bundleIdPrefix: com.oomol
+  bundleIdPrefix: com.zhangsiqiang519
   deploymentTarget:
     macOS: "14.0"
   developmentLanguage: en
@@ -25,16 +25,15 @@ settings:
     DEAD_CODE_STRIPPING: YES
     GCC_WARN_UNINITIALIZED_AUTOS: YES
     CLANG_WARN_DOCUMENTATION_COMMENTS: NO
-    # Local builds are always 0.0.0-development; CI overrides both values at
-    # archive time (version from git tags, build number date-stamped — see
-    # .github/workflows/build-publish.yml and scripts/ci/compute_version.sh).
+    # Source-fork builds use a development version. There is no public binary
+    # release pipeline until Developer ID signing is configured.
     MARKETING_VERSION: "0.0.0-development"
     CURRENT_PROJECT_VERSION: "1"
     ONLY_ACTIVE_ARCH: YES
     # Single-arch by design — we ship one app per architecture, never a
     # universal binary (download size). Local default is arm64; CI overrides
-    # per pass (`ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO`, see build-publish.yml),
-    # and `make build ARCH=x86_64` does the same locally.
+    # per pass (`ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO`), and
+    # `make build ARCH=x86_64` does the same locally.
     ARCHS: arm64
 
 packages:
@@ -57,7 +56,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: LockIMEKit
-        PRODUCT_BUNDLE_IDENTIFIER: com.oomol.LockIME.Kit
+        PRODUCT_BUNDLE_IDENTIFIER: com.zhangsiqiang519.LockIMEVoice.Kit
         DEFINES_MODULE: YES
         SKIP_INSTALL: YES
 
@@ -73,14 +72,14 @@ targets:
       - package: PermissionFlow
     settings:
       base:
-        PRODUCT_NAME: LockIME
+        PRODUCT_NAME: LockIME Voice
         PRODUCT_MODULE_NAME: LockIME
-        PRODUCT_BUNDLE_IDENTIFIER: com.oomol.LockIME
-        LOCKIME_BUNDLE_DISPLAY_NAME: LockIME
-        # URL-scheme API. Release registers `lockime://`; Debug uses a distinct
-        # `lockime-dev://` (overridden below) so a local dev build never hijacks
+        PRODUCT_BUNDLE_IDENTIFIER: com.zhangsiqiang519.LockIMEVoice
+        LOCKIME_BUNDLE_DISPLAY_NAME: LockIME Voice
+        # URL-scheme API. Release registers `lockime-voice://`; Debug uses a distinct
+        # `lockime-voice-dev://` (overridden below) so a local dev build never hijacks
         # the installed release's scheme. The handler is scheme-agnostic.
-        LOCKIME_URL_SCHEME: lockime
+        LOCKIME_URL_SCHEME: lockime-voice
         INFOPLIST_FILE: Sources/LockIME/Info.plist
         CODE_SIGN_ENTITLEMENTS: Sources/LockIME/LockIME.entitlements
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
@@ -91,16 +90,16 @@ targets:
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
       configs:
         Debug:
-          PRODUCT_NAME: LockIME Dev
-          PRODUCT_BUNDLE_IDENTIFIER: com.oomol.LockIME.dev
-          LOCKIME_BUNDLE_DISPLAY_NAME: LockIME Dev
-          LOCKIME_URL_SCHEME: lockime-dev
+          PRODUCT_NAME: LockIME Voice Dev
+          PRODUCT_BUNDLE_IDENTIFIER: com.zhangsiqiang519.LockIMEVoice.dev
+          LOCKIME_BUNDLE_DISPLAY_NAME: LockIME Voice Dev
+          LOCKIME_URL_SCHEME: lockime-voice-dev
           CODE_SIGN_IDENTITY: "-"
           DEVELOPMENT_TEAM: ""
           ENABLE_HARDENED_RUNTIME: NO
         Release:
-          CODE_SIGN_IDENTITY: "Developer ID Application"
-          DEVELOPMENT_TEAM: PWJ9VF7HHT
+          CODE_SIGN_IDENTITY: "-"
+          DEVELOPMENT_TEAM: ""
     postBuildScripts:
       # Sparkle ships as a fat (arm64 + x86_64) xcframework; since we ship
       # single-arch apps, strip the unused slice and re-sign (saves ~1.4 MB).
@@ -120,7 +119,7 @@ targets:
       - package: KeyboardShortcuts
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.oomol.LockIME.Tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.zhangsiqiang519.LockIMEVoice.Tests
         GENERATE_INFOPLIST_FILE: YES
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual

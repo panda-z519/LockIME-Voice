@@ -13,7 +13,7 @@ make update-test-stop           # tear down (server, app under test, lab copies)
 
 Each scenario builds Debug, then:
 
-1. Copies the app to `build/update-lab/run/LockIME Dev.app`, swaps `SUPublicEDKey`
+1. Copies the app to `build/update-lab/run/LockIME Voice Dev.app`, swaps `SUPublicEDKey`
    for a throwaway dev key (file-backed via CryptoKit — never the keychain),
    and re-signs ad-hoc. The DerivedData product is never mutated.
 2. Shapes `appcast.xml` for the scenario and signs archives with Sparkle's own
@@ -37,8 +37,8 @@ Notes:
 
 - Scenarios kill any running Debug app (like `make run`), reset Sparkle's
   skipped-version defaults, and clear its download cache for determinism.
-- The app under test uses the Debug app's `com.oomol.LockIME.dev` defaults
-  domain, separate from the released `com.oomol.LockIME` app. The lab touches
+- The app under test uses the Debug app's `com.zhangsiqiang519.LockIMEVoice.dev` defaults
+  domain, separate from the release `com.zhangsiqiang519.LockIMEVoice` app. The lab touches
   only Sparkle's skipped-version keys (`SUSkippedVersion`,
   `SUSkippedMajorVersion`, `SUSkippedMajorSubreleaseVersion`) and
   `SULastCheckTime`, and both scenario start *and* `update-test-stop` clear the

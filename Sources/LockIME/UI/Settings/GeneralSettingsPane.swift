@@ -98,7 +98,7 @@ struct GeneralSettingsPane: View {
             } header: {
                 Text("Automation")
             } footer: {
-                SectionFooter("When on, other apps and scripts can control LockIME with `lockime://` URL commands.")
+                SectionFooter("When on, other apps and scripts can control LockIME with `lockime-voice://` URL commands.")
             }
         }
         .formStyle(.grouped)

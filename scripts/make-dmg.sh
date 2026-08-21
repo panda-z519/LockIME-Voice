@@ -6,9 +6,8 @@
 # (hdiutil only) so it behaves identically on a developer's machine and on the CI
 # runners, which install nothing beyond xcodegen.
 #
-# Signing and notarization are deliberately NOT done here: CI signs and notarizes
-# the resulting image as separate, auditable steps (see build-publish.yml), and
-# local `make dmg` needs neither.
+# Signing and notarization are deliberately NOT done here. This source fork has
+# no public signing workflow, so `make dmg` produces an ad-hoc, unnotarized image.
 #
 #   make-dmg.sh <app-path> <output-dmg> [volume-name]
 set -euo pipefail

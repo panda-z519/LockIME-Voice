@@ -33,7 +33,7 @@ final class AppState {
         )
     }
 
-    /// Whether the `lockime://` URL-scheme API is allowed to act. **Off by
+    /// Whether the `lockime-voice://` URL-scheme API is allowed to act. **Off by
     /// default** — the user must opt in (Settings ▸ General ▸ Automation) before
     /// any external command takes effect. Stored in its own `UserDefaults` key,
     /// deliberately *not* part of `LockConfiguration`, so it is per-device and
@@ -82,7 +82,7 @@ final class AppState {
     /// About window, hosted in AppKit so it reliably comes to the foreground.
     @ObservationIgnored private lazy var aboutWindow = HostedWindowController(
         id: "about",
-        title: { [weak self] in self?.loc("About LockIME") ?? "About LockIME" },
+        title: { [weak self] in self?.loc("About LockIME Voice") ?? "About LockIME Voice" },
         styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
         transparentTitleBar: true
     ) { [weak self] in
@@ -161,7 +161,7 @@ final class AppState {
         ThirdPartyBundleLocalization.apply(language: languagePreference.effectiveLanguage)
     }
 
-    /// Opt the `lockime://` URL-scheme API in or out. Persisted immediately so the
+    /// Opt the `lockime-voice://` URL-scheme API in or out. Persisted immediately so the
     /// choice survives relaunch; takes effect for the next incoming command.
     func setAPIEnabled(_ enabled: Bool) {
         apiEnabled = enabled
@@ -231,7 +231,7 @@ final class AppState {
         case .russian: file = "README.ru.md"
         }
         // A constant, URL-safe GitHub address — not user-facing copy.
-        return URL(string: "https://github.com/oomol-lab/LockIME/blob/main/docs/URL-Scheme-API/\(file)")!
+        return URL(string: "https://github.com/zhangsiqiang519/LockIME/blob/main/docs/URL-Scheme-API/\(file)")!
     }
 
     func setLanguagePreference(_ preference: LanguagePreference) {
@@ -387,7 +387,7 @@ final class AppState {
         }
     }
 
-    /// Set when the user (menu **Quit** / `lockime://quit`) deliberately asks us
+    /// Set when the user (menu **Quit** / `lockime-voice://quit`) deliberately asks us
     /// to exit, so `AppDelegate.applicationShouldTerminate` can tell a *wanted*
     /// quit apart from the unsolicited `terminate:` AppKit fires the moment our
     /// menu bar icon is hidden — which must never kill the app.
@@ -497,7 +497,7 @@ final class AppState {
     }
 
     /// Cycle a *specific* app's rule to the previous/next input source. Shared by
-    /// the frontmost-app hotkey and the `lockime://cycle-app-source` URL command.
+    /// the frontmost-app hotkey and the `lockime-voice://cycle-app-source` URL command.
     /// Returns `false` (a no-op) when that app has no rule or there is nowhere to
     /// cycle, so the API can report `rule_not_found`.
     @discardableResult
@@ -640,7 +640,7 @@ final class AppState {
     var launchAtLoginActive: Bool { loginItem.isEnabled }
 
     /// Recent activation-log entries (newest first, within the 24h window) for
-    /// the `lockime://list-log` query.
+    /// the `lockime-voice://list-log` query.
     func recentActivationLog(limit: Int = 200) -> [ActivationLogEntry] {
         logStore.recent(limit: limit)
     }
@@ -671,19 +671,19 @@ final class AppState {
     }
 
     /// Perform a transient one-shot switch (no standing lock) for the
-    /// `lockime://switch-source` command. An active continuous lock still wins.
+    /// `lockime-voice://switch-source` command. An active continuous lock still wins.
     func switchSourceOnce(_ id: InputSourceID) {
         engine?.switchSourceOnce(id)
     }
 
-    /// Remove every per-app rule in one commit (`lockime://clear-app-rules`).
+    /// Remove every per-app rule in one commit (`lockime-voice://clear-app-rules`).
     func clearAppRules() {
         guard !config.appRules.isEmpty else { return }
         config.appRules.removeAll()
         commit()
     }
 
-    /// Remove every per-URL rule in one commit (`lockime://clear-url-rules`).
+    /// Remove every per-URL rule in one commit (`lockime-voice://clear-url-rules`).
     func clearURLRules() {
         guard !config.urlRules.isEmpty else { return }
         config.urlRules.removeAll()

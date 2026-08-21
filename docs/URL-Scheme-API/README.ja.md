@@ -2,7 +2,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · **日本語** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-LockIME は `lockime://` URL スキームを公開しており、他のアプリ・スクリプト・ショートカット・
+LockIME は `lockime-voice://` URL スキームを公開しており、他のアプリ・スクリプト・ショートカット・
 Stream Deck・Alfred/Raycast・AppleScript——URL を開けるものなら何でも——から操作できます：
 オン/オフの切り替え、入力ソースの再設定、ルールの管理、そして状態の読み取りが可能です。
 
@@ -15,7 +15,7 @@ Stream Deck・Alfred/Raycast・AppleScript——URL を開けるものなら何�
 > 間は、すべてのコマンドが `api_disabled` エラーを返し、何も起こりません。
 
 > **セキュリティに関する注意。** 有効化すると、コマンドは**コマンドごとの確認なしで**
-> 実行されます——`lockime://` URL を開けるプロセスなら何でも（Web ページも含めて）
+> 実行されます——`lockime-voice://` URL を開けるプロセスなら何でも（Web ページも含めて）
 > LockIME を操作できます。すべてのコマンドは取り消し可能で、ファイルに触れるものは一つも
 > ありません。悪意のある呼び出し元にできる最悪のことは、入力ソースのロックを切り替えたり、
 > ルールを編集したりすることだけです。使用していないときは API をオフにしておいてください。
@@ -27,8 +27,8 @@ Stream Deck・Alfred/Raycast・AppleScript——URL を開けるものなら何�
 同等の 2 つの形式を受け付けます：
 
 ```
-lockime://<command>?<param>=<value>&<param>=<value>
-lockime://x-callback-url/<command>?<param>=<value>&…
+lockime-voice://<command>?<param>=<value>&<param>=<value>
+lockime-voice://x-callback-url/<command>?<param>=<value>&…
 ```
 
 - **コマンドトークン**（`<command>`）は大文字小文字を区別しません。
@@ -41,8 +41,8 @@ lockime://x-callback-url/<command>?<param>=<value>&…
 `x-callback-url/` プレフィックスは x-callback-url ツール向けのオプションの糖衣構文です。
 以下のコールバックパラメータは、プレフィックスなしの形式でも機能します。
 
-> **Development builds.** LockIME の Debug ビルドは `lockime://` の代わりに
-> `lockime-dev://` を登録します。そのため、ローカルビルドがインストール済みの
+> **Development builds.** LockIME の Debug ビルドは `lockime-voice://` の代わりに
+> `lockime-voice-dev://` を登録します。そのため、ローカルビルドがインストール済みの
 > リリースのスキームを乗っ取ることはありません。それ以外はすべて同一です。
 
 ---
@@ -64,7 +64,7 @@ lockime://x-callback-url/<command>?<param>=<value>&…
 往復の例——ステータスを問い合わせ、それを自分のアプリへ受け取ります：
 
 ```
-lockime://status?x-success=myapp%3A%2F%2Fgot-status
+lockime-voice://status?x-success=myapp%3A%2F%2Fgot-status
 ```
 
 成功すると LockIME は次を開きます：
@@ -241,32 +241,32 @@ LockIME は設計上、**UI を開くコマンドを一切公開していませ�
 **Shell / `open(1)`**
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-default-source?id=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
 # url-regex は URL 全体にマッチします——パターンをパーセントエンコードしてください（ここでは：github\.com/.*/pull）
-open "lockime://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
-open "lockime://set-launch-at-login?enabled=on"
+open "lockime-voice://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
+open "lockime-voice://set-launch-at-login?enabled=on"
 ```
 
 **AppleScript**
 
 ```applescript
-open location "lockime://toggle-lock"
+open location "lockime-voice://toggle-lock"
 ```
 
 **Shortcuts (macOS)**
 
-**Open URLs** アクションに `lockime://lock` を指定するか、**Get Contents of URL**
+**Open URLs** アクションに `lockime-voice://lock` を指定するか、**Get Contents of URL**
 と x-callback-url 形式を組み合わせて状態を読み取ります。
 
 **スクリプトからステータスを読み取る**（コールバック受信アプリ/URL を使用）：
 
 ```sh
-open "lockime://status?x-success=myreceiver%3A%2F%2Fstatus"
+open "lockime-voice://status?x-success=myreceiver%3A%2F%2Fstatus"
 ```
 
 ---

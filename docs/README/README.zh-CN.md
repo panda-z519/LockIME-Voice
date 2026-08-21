@@ -6,13 +6,14 @@
 
 [English](../../README.md) · **简体中文** · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![最新版本](https://img.shields.io/github/v/release/oomol-lab/LockIME?sort=semver&color=3A5BD9)](https://github.com/oomol-lab/LockIME/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/oomol-lab/LockIME/ci.yml?branch=main&label=CI)](https://github.com/oomol-lab/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
 [![许可证: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
+
+> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。目前仅发布源码，不提供公共二进制、Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
 
 一款 macOS 菜单栏应用，用于**锁定你的键盘输入源**。每当你（或其他应用）切换输入法时，LockIME 会立即切回被锁定的那个——可以是全局的、按前台应用区分的，或者（在可选的增强模式下）按浏览器 URL 区分的。
 
@@ -39,16 +40,15 @@
 
 ## Install
 
-使用 [Homebrew](https://brew.sh) 安装（cask 会自动选择与你的 Mac
-架构匹配的构建）：
+当前请从源码构建本地 ad-hoc 签名版本：
 
 ```sh
-brew install --cask oomol-lab/tap/lockime
+brew install xcodegen xcbeautify
+make build
+open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-或者从[最新发布版](https://github.com/oomol-lab/LockIME/releases/latest)下载与你的
-Mac 匹配的 `.dmg`（Apple silicon 选 `-arm64`，Intel 选 `-x86_64`）。
-无论哪种方式，应用都会通过 Sparkle 自动保持最新。
+由于应用没有 Developer ID 签名或公证，重新构建后可能需要再次授予 macOS 权限。
 
 ## Features
 
@@ -66,10 +66,9 @@ Mac 匹配的 `.dmg`（Apple silicon 选 `-arm64`，Intel 选 `-x86_64`）。
 - **实时语言切换**——在 9 种语言间即时切换，无需重启：English、简体中文、繁體中文、日本語、Français、Deutsch、Español、Português、Русский。
 - **24 小时激活日志**——回顾切换了什么、为什么、持续了多久。
 - **配置备份**——把按应用和按 URL 的规则导出为 `.lockime` 文件，再导入回来；导入前会有一个预览步骤，先列出新增、冲突与移除项，确认后再应用。
-- **通过 Sparkle 自动更新**——stable 与 beta 两个通道，配有自定义更新窗口。
 - **超小体积**——整个应用打包成不到 3 MB 的 `.dmg`。
 - **核心锁定无需系统权限**——可选的、受 Accessibility 把关的增强模式可解锁更细粒度的按 URL / 聚焦字段规则。
-- **自动化**——通过 `lockime://` URL scheme，其他应用、脚本和 Shortcuts 都能驱动 LockIME（详见下文）。
+- **自动化**——通过 `lockime-voice://` URL scheme，其他应用、脚本和 Shortcuts 都能驱动 LockIME（详见下文）。
 
 ## Comparison
 
@@ -96,10 +95,10 @@ CLI 工具。它们都会在你于应用或站点之间移动时*切换*输入�
 | 屏幕输入提示 | ✗ | ✓ | ✓（可选） |
 | 24 小时激活日志 | ✓ | ✗ | ✗ |
 | 配置备份 / 导入 | ✓（`.lockime`，带审阅） | ✓（导出/导入 + CLI） | — |
-| URL scheme 自动化 | ✓（`lockime://`，x-callback-url） | 部分（`inputsourcepro://` 导入） | ✗ |
+| URL scheme 自动化 | ✓（`lockime-voice://`，x-callback-url） | 部分（`inputsourcepro://` 导入） | ✗ |
 | 界面语言 | 9（实时切换） | 6 | zh · en · ja |
 | 系统权限 | 核心无需 · 按 URL 需 Accessibility | 核心无需 · 按 URL 需 Accessibility | Accessibility¹ |
-| 自动更新 | Sparkle（stable + beta） | ✓ | ✓ |
+| 自动更新 | ✗（仅源码分支） | ✓ | ✓ |
 | 持续维护中（2026） | ✓ | ✓ | ✓ |
 
 ¹ KeyboardHolder 没有说明其权限要求；其按网站规则要读取浏览器地址栏，实际上需要
@@ -117,12 +116,12 @@ Accessibility 访问权限。“—” 表示未记录的能力，而非确认�
 
 ## Automation
 
-LockIME 提供了 `lockime://` URL scheme，让其他应用、脚本、Shortcuts 和启动器都能驱动它——开启或关闭它、重新指定输入源、管理规则，并通过 [x-callback-url](https://x-callback-url.com) 回调读回状态。它默认关闭——请在**设置 ▸ 通用 ▸ 自动化**中开启它。
+LockIME 提供了 `lockime-voice://` URL scheme，让其他应用、脚本、Shortcuts 和启动器都能驱动它——开启或关闭它、重新指定输入源、管理规则，并通过 [x-callback-url](https://x-callback-url.com) 回调读回状态。它默认关闭——请在**设置 ▸ 通用 ▸ 自动化**中开启它。
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
 ```
 
 完整参考：**[URL Scheme API](../URL-Scheme-API/README.zh-CN.md)**。
@@ -146,7 +145,7 @@ make gen     # generate LockIME.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
-make archive # Release archive (Developer ID)
+make archive # ad-hoc-signed Release archive
 ```
 
 Xcode 项目由 `project.yml` 生成，不纳入版本控制。
@@ -155,7 +154,7 @@ Xcode 项目由 `project.yml` 生成，不纳入版本控制。
 
 ## Releasing
 
-由 dispatch 驱动、经过公证的 Developer ID 发布，通过 Sparkle 在 **stable** 和 **beta** 两个通道自动更新：运行 Release 工作流（Actions → Release），它会从 git 标签计算版本号、构建，并自动创建标签和 GitHub Release——切勿手动推送标签。beta 通道即每夜构建。每个版本都分别提供 Apple silicon 与 Intel 两个独立应用，各自走自己的更新 feed（不提供 universal 二进制，也不支持跨架构更新）。参见 [docs/RELEASING.md](../RELEASING.md)。
+此分支没有公共二进制发布流水线。原项目的 Developer ID、公证、Sparkle、每夜构建和 Homebrew 发布流程已停用。参见 [docs/RELEASING.md](../RELEASING.md) 了解当前边界以及将来启用签名发布所需的条件。
 
 ## Architecture
 
@@ -165,3 +164,5 @@ Xcode 项目由 `project.yml` 生成，不纳入版本控制。
 ## License
 
 Copyright © 2026 Hangzhou Wumou Software Co., Ltd.
+
+Modifications © 2026 zhangsiqiang519.

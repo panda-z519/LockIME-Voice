@@ -257,7 +257,7 @@ struct URLRulesSettingsPane: View {
     ///
     /// The draft is shown only while it's a genuine permutation of the live rules
     /// (same id set). If `config` changed underneath an in-progress drag (an
-    /// external `lockime://set-url-rule`/remove) or the draft is otherwise stale, we
+    /// external `lockime-voice://set-url-rule`/remove) or the draft is otherwise stale, we
     /// fall back to the committed order so an external edit is never masked by a
     /// stuck draft. A drag released off every drop target leaves the draft set with
     /// no commit; it self-heals on the next drag or edit (which re-snapshots or

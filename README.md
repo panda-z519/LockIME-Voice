@@ -6,13 +6,17 @@
 
 **English** · [简体中文](docs/README/README.zh-CN.md) · [繁體中文](docs/README/README.zh-TW.md) · [日本語](docs/README/README.ja.md) · [Français](docs/README/README.fr.md) · [Deutsch](docs/README/README.de.md) · [Español](docs/README/README.es.md) · [Português](docs/README/README.pt.md) · [Русский](docs/README/README.ru.md)
 
-[![Latest release](https://img.shields.io/github/v/release/oomol-lab/LockIME?sort=semver&color=3A5BD9)](https://github.com/oomol-lab/LockIME/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/oomol-lab/LockIME/ci.yml?branch=main&label=CI)](https://github.com/oomol-lab/LockIME/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME/actions/workflows/ci.yml)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
+
+> **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
+> voice-input workflow. It currently ships as source code only: public binaries,
+> Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
+> are not provided.
 
 A macOS menu-bar app that **locks your keyboard input source**. Whenever you (or
 another app) switch input methods, LockIME immediately switches back to the locked
@@ -42,17 +46,16 @@ browser URL.
 
 ## Install
 
-Install with [Homebrew](https://brew.sh) (the cask picks the build matching
-your Mac's architecture):
+This fork currently builds an ad-hoc-signed local development app:
 
 ```sh
-brew install --cask oomol-lab/tap/lockime
+brew install xcodegen xcbeautify
+make build
+open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 ```
 
-Or download the `.dmg` matching your Mac (`-arm64` for Apple silicon,
-`-x86_64` for Intel) from the
-[latest release](https://github.com/oomol-lab/LockIME/releases/latest).
-Either way, the app keeps itself up to date via Sparkle.
+Because the app is not Developer ID signed or notarized, macOS permissions may
+need to be granted again after rebuilding.
 
 ## Features
 
@@ -101,12 +104,10 @@ Either way, the app keeps itself up to date via Sparkle.
 - **Config backup** — export your per-app and per-URL rules to a `.lockime`
   file and import them back, with a review step that previews additions,
   conflicts, and removals before anything is applied.
-- **Auto-update** — stable and beta channels via Sparkle, with a custom update
-  window.
 - **Tiny download** — the whole app ships in a `.dmg` under 3 MB.
 - **No system permissions for core locking** — an optional Accessibility-gated
   enhanced mode unlocks finer-grained per-URL and focused-field rules.
-- **Automation** — a `lockime://` URL scheme lets other apps, scripts, and
+- **Automation** — a `lockime-voice://` URL scheme lets other apps, scripts, and
   Shortcuts drive LockIME (see below).
 
 ## Comparison
@@ -136,10 +137,10 @@ back to a one-time *switch*.
 | On-screen input hints | ✗ | ✓ | ✓ (optional) |
 | 24-hour activation log | ✓ | ✗ | ✗ |
 | Config backup / import | ✓ (`.lockime`, with review) | ✓ (export/import + CLI) | — |
-| URL-scheme automation | ✓ (`lockime://`, x-callback-url) | partial (`inputsourcepro://` import) | ✗ |
+| URL-scheme automation | ✓ (`lockime-voice://`, x-callback-url) | partial (`inputsourcepro://` import) | ✗ |
 | UI languages | 9 (live switch) | 6 | zh · en · ja |
 | System permissions | none for core · Accessibility for per-URL | none for core · Accessibility for per-URL | Accessibility¹ |
-| Auto-update | Sparkle (stable + beta) | ✓ | ✓ |
+| Auto-update | ✗ (source-only fork) | ✓ | ✓ |
 | Actively maintained (2026) | ✓ | ✓ | ✓ |
 
 ¹ KeyboardHolder does not document its permission requirements; reading the
@@ -162,16 +163,16 @@ a GUI switcher).
 
 ## Automation
 
-LockIME exposes a `lockime://` URL scheme so other apps, scripts, Shortcuts, and
+LockIME exposes a `lockime-voice://` URL scheme so other apps, scripts, Shortcuts, and
 launchers can drive it — turn it on or off, retarget the input source, manage
 rules, and read state back with [x-callback-url](https://x-callback-url.com)
 callbacks. It is off by default — turn it on in **Settings ▸ General ▸
 Automation**.
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
 ```
 
 Full reference: **[URL Scheme API](docs/URL-Scheme-API/README.md)**.
@@ -201,7 +202,7 @@ make gen     # generate LockIME.xcodeproj from project.yml
 make build   # build (Debug)
 make run     # build & launch
 make test    # run unit tests
-make archive # Release archive (Developer ID)
+make archive # ad-hoc-signed Release archive
 ```
 
 The Xcode project is generated from `project.yml` and is not checked in.
@@ -211,13 +212,10 @@ Hardware-touching integration tests (real TIS switching) are excluded from
 
 ## Releasing
 
-Dispatch-driven, notarized Developer ID releases with Sparkle auto-update over
-**stable** and **beta** channels: run the Release workflow (Actions → Release)
-and it computes the version from git tags, builds, and creates the tag and
-GitHub Release automatically — never push a tag by hand. The beta channel is
-the nightly build. Every release ships separate Apple-silicon and Intel apps,
-each on its own update feed (no universal binary, no cross-arch updates). See
-[docs/RELEASING.md](docs/RELEASING.md).
+This fork has no public binary release pipeline. The upstream Developer ID,
+notarization, Sparkle, nightly, and Homebrew workflows are intentionally
+disabled. See [docs/RELEASING.md](docs/RELEASING.md) for the boundary and the
+requirements for enabling signed distribution later.
 
 ## Architecture
 
@@ -230,3 +228,5 @@ each on its own update feed (no universal binary, no cross-arch updates). See
 ## License
 
 Copyright © 2026 Hangzhou Wumou Software Co., Ltd.
+
+Modifications © 2026 zhangsiqiang519.

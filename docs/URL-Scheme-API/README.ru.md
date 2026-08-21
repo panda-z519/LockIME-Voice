@@ -2,7 +2,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · **Русский**
 
-LockIME предоставляет URL-схему `lockime://`, чтобы другие приложения, скрипты,
+LockIME предоставляет URL-схему `lockime-voice://`, чтобы другие приложения, скрипты,
 Shortcuts, Stream Deck, Alfred/Raycast, AppleScript — всё, что может открыть URL, —
 могли управлять им: включать и выключать его, менять источник ввода,
 управлять правилами и считывать состояние обратно.
@@ -17,7 +17,7 @@ Shortcuts, Stream Deck, Alfred/Raycast, AppleScript — всё, что може�
 > каждая команда возвращает ошибку `api_disabled` и ничего не происходит.
 
 > **Замечание о безопасности.** После включения команды выполняются **без
-> подтверждения для каждой команды** — любой процесс, способный открыть URL `lockime://`
+> подтверждения для каждой команды** — любой процесс, способный открыть URL `lockime-voice://`
 > (включая веб-страницу), может управлять LockIME. Каждая команда обратима и ни одна из них
 > не трогает ваши файлы; самое худшее, что может сделать злонамеренный вызывающий, —
 > переключить блокировку источника ввода или отредактировать правила.
@@ -30,8 +30,8 @@ Shortcuts, Stream Deck, Alfred/Raycast, AppleScript — всё, что може�
 Принимаются две эквивалентные формы:
 
 ```
-lockime://<command>?<param>=<value>&<param>=<value>
-lockime://x-callback-url/<command>?<param>=<value>&…
+lockime-voice://<command>?<param>=<value>&<param>=<value>
+lockime-voice://x-callback-url/<command>?<param>=<value>&…
 ```
 
 - **Токен команды** (`<command>`) нечувствителен к регистру.
@@ -44,8 +44,8 @@ lockime://x-callback-url/<command>?<param>=<value>&…
 Префикс `x-callback-url/` — это необязательный синтаксический сахар для инструментов
 x-callback-url; параметры колбэков ниже работают и с краткой формой.
 
-> **Development builds.** Debug-сборка LockIME регистрирует `lockime-dev://`
-> вместо `lockime://`, поэтому локальная сборка никогда не перехватывает схему
+> **Development builds.** Debug-сборка LockIME регистрирует `lockime-voice-dev://`
+> вместо `lockime-voice://`, поэтому локальная сборка никогда не перехватывает схему
 > установленного релиза. Всё остальное идентично.
 
 ---
@@ -67,7 +67,7 @@ x-callback-url; параметры колбэков ниже работают и
 Пример полного цикла — запросить статус и получить его обратно в собственное приложение:
 
 ```
-lockime://status?x-success=myapp%3A%2F%2Fgot-status
+lockime-voice://status?x-success=myapp%3A%2F%2Fgot-status
 ```
 
 При успехе LockIME открывает:
@@ -239,32 +239,32 @@ LockIME намеренно не предоставляет **никаких ко
 **Shell / `open(1)`**
 
 ```sh
-open "lockime://lock"
-open "lockime://lock-to-source?id=com.apple.keylayout.ABC"
-open "lockime://set-default-source?id=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
-open "lockime://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
+open "lockime-voice://lock"
+open "lockime-voice://lock-to-source?id=com.apple.keylayout.ABC"
+open "lockime-voice://set-default-source?id=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-app-rule?bundle=com.apple.Terminal&mode=lock&source=com.apple.keylayout.ABC"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&action=switch"
+open "lockime-voice://set-url-rule?host=github.com&source=com.apple.keylayout.ABC&match-type=domain"
 # url-regex сопоставляется со всем URL — закодируйте шаблон процентами (здесь: github\.com/.*/pull)
-open "lockime://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
-open "lockime://set-launch-at-login?enabled=on"
+open "lockime-voice://set-url-rule?pattern=github%5C.com%2F.%2A%2Fpull&source=com.apple.keylayout.ABC&match-type=url-regex"
+open "lockime-voice://set-launch-at-login?enabled=on"
 ```
 
 **AppleScript**
 
 ```applescript
-open location "lockime://toggle-lock"
+open location "lockime-voice://toggle-lock"
 ```
 
 **Shortcuts (macOS)**
 
-Добавьте действие **Open URLs** с `lockime://lock` или **Get Contents of URL**
+Добавьте действие **Open URLs** с `lockime-voice://lock` или **Get Contents of URL**
 плюс форму x-callback-url, чтобы считать состояние обратно.
 
 **Read status from a script** (с использованием приложения/URL-приёмника колбэка):
 
 ```sh
-open "lockime://status?x-success=myreceiver%3A%2F%2Fstatus"
+open "lockime-voice://status?x-success=myreceiver%3A%2F%2Fstatus"
 ```
 
 ---

@@ -12,7 +12,6 @@ struct MenuBarView: View {
 
     var body: some View {
         let state = appState
-        let pendingUpdate = state.updateController.pendingUpdateVersion
         // The menu is a native NSMenu (.menuBarExtraStyle(.menu)) — an AppKit
         // surface that bypasses the injected `\.locale`, so resolve the status
         // word through `loc` (app's chosen language) rather than a live
@@ -95,18 +94,6 @@ struct MenuBarView: View {
             Label { Text("Settings…") } icon: { Image(nsImage: MenuIcon.gear) }
         }
         .keyboardShortcut(",", modifiers: .command)
-
-        Button {
-            state.checkForUpdates()
-        } label: {
-            if pendingUpdate != nil {
-                Label { Text("Install Update…") } icon: { Image(nsImage: MenuIcon.updateReady) }
-            } else {
-                Label { Text("Check for Updates…") } icon: { Image(nsImage: MenuIcon.update) }
-            }
-        }
-        .keyboardShortcut("u", modifiers: .command)
-        .disabled(!state.updateController.canCheckForUpdates)
 
         Button {
             state.showAbout()

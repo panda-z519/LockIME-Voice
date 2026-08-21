@@ -15,11 +15,11 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 LAB_DIR="$REPO_ROOT/build/update-lab"
-APP_SRC="${UPDATE_LAB_APP:-$REPO_ROOT/build/DerivedData/Build/Products/Debug/LockIME Dev.app}"
+APP_SRC="${UPDATE_LAB_APP:-$REPO_ROOT/build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app}"
 PORT="${UPDATE_LAB_PORT:-8767}"
 PLISTBUDDY=/usr/libexec/PlistBuddy
-APP_NAME="${UPDATE_LAB_APP_NAME:-LockIME Dev}"
-BUNDLE_ID="${UPDATE_LAB_BUNDLE_ID:-com.oomol.LockIME.dev}"
+APP_NAME="${UPDATE_LAB_APP_NAME:-LockIME Voice Dev}"
+BUNDLE_ID="${UPDATE_LAB_BUNDLE_ID:-com.zhangsiqiang519.LockIMEVoice.dev}"
 EXECUTABLE_NAME="${UPDATE_LAB_EXECUTABLE_NAME:-$APP_NAME}"
 NEW_SHORT="99.0.0"
 NEW_BUILD="209901010101"
@@ -75,7 +75,7 @@ clear_skip_keys() {
 # Tear down the lab server. App-copy cleanup (killing the launched app, clearing
 # its skip keys) runs only with --with-app, i.e. when the caller resolved an
 # identity from the run copy — never against the env-var defaults, which alias
-# the real dev app ("LockIME Dev" / com.oomol.LockIME.dev) and would kill it /
+# the real dev app ("LockIME Voice Dev" / com.zhangsiqiang519.LockIMEVoice.dev) and would kill it /
 # clobber its defaults domain. See the stop branch below.
 stop_lab() { # [--with-app]
     if [[ -f "$PID_FILE" ]]; then
