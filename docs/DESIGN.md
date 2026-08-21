@@ -126,7 +126,7 @@ Bar glyph: template `lock.fill`/`lock.open`, swapped by state, optional one-shot
 `lock.open.fill` when disabled) plus the enabled-state word only ("Enabled" /
 "Disabled"), with the configured global toggle-lock shortcut echoed on the right.
 The current source name is **deliberately not repeated** here — the list below
-already marks the locked source with a checkmark. It's a **disabled** `Button`:
+moves the global default first and marks it with a pin. It's a **disabled** `Button`:
 a `Label` alone won't render a menu accelerator, but a disabled Button draws the
 key-equivalent glyphs natively while never firing them, so it stays a pure hint
 with no clash against the real global handler. The shortcut is read from
@@ -138,16 +138,17 @@ best-effort `KeyboardShortcut` for single printable keys (any modifiers, up to
 "⌃⌥⇧⌘X"); exotic keys (Space, arrows, F-keys) still work globally but aren't
 echoed. **The system input sources are flattened directly into the
 menu**, bracketed by one divider above and one below — no master toggle, no
-submenu. Each source is a `Button` carrying a leading checkmark **image** (the
-`CheckmarkSlot` NSImages), shown on the locked one and a same-size transparent
+submenu. The global default source is moved to the first row while all other
+sources retain their system order. Each source is a `Button` carrying a leading
+pin **image**, shown on the locked one and a same-size transparent
 slot otherwise; a source is checked iff LockIME is on **and** it is the global
-target (`config.defaultSourceID`) — the checkmark tracks the target regardless of
+target (`config.defaultSourceID`) — the pin tracks the target regardless of
 `config.defaultAction` (lock vs switch). The image (not a `Toggle`'s native checkmark,
 which lives in NSMenu's *state* column and collapses to zero width when nothing
 is checked) keeps the gutter reserved at a constant width, so the menu never
 grows or shrinks as the lock toggles — and NSMenu drops SwiftUI's `.opacity` on a
 Label's system-image icon, so the slot must swap the image itself, not hide a
-symbol. Clicking an unchecked source targets it (`AppState.lockToSource` sets
+symbol. Clicking an unpinned source targets it (`AppState.lockToSource` sets
 the global source *and* turns LockIME on in one commit,
 re-resolving and flipping the active source immediately); it **preserves** the
 configured global-default `defaultAction`, so under a *switch* default the pick
@@ -183,7 +184,7 @@ the grant watcher.
   LockIME into a pure per-app/per-site switcher, so no sub-toggle is needed).
   Animates with `withAnimation(DS.Motion.toggle)`. Then current source +
   activation count via `LabeledContent`, launch-at-login, language. The padlock
-  surfaces (tray/About icon, menu glyph/header, checkmark) track
+  surfaces (tray/About icon, menu glyph/header, pin) track
   `isAppEnabled = config.isEnabled`. A **Password Fields** section carries the
   **Enforce in password fields** toggle (`config.revertsInSecureInput`, **off by
   default**): off, LockIME respects macOS **secure event input** and leaves the

@@ -2,10 +2,7 @@ import AppKit
 import LockIMEKit
 import SwiftUI
 
-/// The single home for LockIME's optional system permissions. Today that's just
-/// Accessibility, which gates two features (per-URL rules + launcher/Spotlight
-/// detection); the feature panes only carry a passive `AccessibilityRequiredNote`
-/// that routes here, so the grant is requested in exactly one place.
+/// The single home for LockIME's optional system permissions.
 struct PermissionsSettingsPane: View {
     @Environment(AppState.self) private var state
 
@@ -17,10 +14,11 @@ struct PermissionsSettingsPane: View {
                         .foregroundStyle(.secondary)
                 } else {
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        Text("Grant once to unlock two optional features:")
+                        Text("Grant once to unlock three optional features:")
                         VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                             FeatureBullet("Per-URL rules in your browser")
                             FeatureBullet("Targeting launchers like Spotlight in app rules")
+                            FeatureBullet("Sending the voice input shortcut")
                         }
                     }
                     GrantAccessibilityButton()
@@ -30,15 +28,38 @@ struct PermissionsSettingsPane: View {
             } footer: {
                 SectionFooter("The core lock needs no permissions.")
             }
+
+            Section {
+                if state.inputMonitoringGranted {
+                    Label("Input Monitoring access granted", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                } else {
+                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                        Text("Keyboard event monitoring may be required for:")
+                        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                            FeatureBullet("Voice workflow shortcut and any-key ending")
+                        }
+                    }
+                    GrantInputMonitoringButton()
+                }
+            } header: {
+                Text("Input Monitoring")
+            } footer: {
+                SectionFooter("macOS may ask for Input Monitoring when LockIME listens for the key that ends a voice input session. The listener is pass-through and does not consume the key.")
+            }
         }
         .formStyle(.grouped)
         .navigationTitle(state.loc("Permissions"))
         // The watcher's abandon-stop lives on SettingsRootView (window close), so
         // switching tabs mid-grant doesn't kill detection; panes only reconcile
         // the shared status, which also recovers a grant the watcher missed.
-        .onAppear { state.refreshAccessibilityStatus() }
+        .onAppear {
+            state.refreshAccessibilityStatus()
+            state.refreshVoiceInputPermissionStatus()
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             state.refreshAccessibilityStatus()
+            state.refreshVoiceInputPermissionStatus()
         }
     }
 }

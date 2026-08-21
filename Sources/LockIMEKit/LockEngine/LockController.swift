@@ -1,6 +1,22 @@
 import Carbon
 import Foundation
 
+public struct TemporaryInputSourceOverrideToken: Sendable, Equatable {
+    fileprivate let generation: Int
+
+    fileprivate init(generation: Int) {
+        self.generation = generation
+    }
+}
+
+#if DEBUG
+public extension TemporaryInputSourceOverrideToken {
+    init(testGeneration: Int) {
+        self.init(generation: testGeneration)
+    }
+}
+#endif
+
 /// The heart of LockIME: a small state machine that keeps the active input
 /// source pinned to a target, debouncing against its own forced switches.
 ///
@@ -123,6 +139,10 @@ public final class LockController {
     /// long-delay wakeup would keep a *fresh, shorter* pause from arming its
     /// own, leaving the lock un-asserted until the stale one finally fired.
     private var conflictExpiryGeneration = 0
+    /// Current temporary override generation, used by voice input to pause the
+    /// continuous lock while it switches to the voice input method.
+    private var temporaryOverrideGeneration = 0
+    private var activeTemporaryOverride: TemporaryInputSourceOverrideToken?
 
     /// Context describing where the current `target` came from, set alongside it
     /// by `setTarget` and attached to every event the target produces (including
@@ -216,6 +236,7 @@ public final class LockController {
         ruleSource: RuleSource? = nil,
         matchedHost: String? = nil
     ) {
+        guard activeTemporaryOverride == nil else { return }
         // A one-shot switch never holds the lock: drop any standing target so a
         // later "source changed" notification is a no-op.
         target = nil
@@ -272,6 +293,27 @@ public final class LockController {
         )
     }
 
+    public func beginTemporaryOverride() -> TemporaryInputSourceOverrideToken {
+        temporaryOverrideGeneration += 1
+        let token = TemporaryInputSourceOverrideToken(generation: temporaryOverrideGeneration)
+        activeTemporaryOverride = token
+        settleUntil = 0
+        return token
+    }
+
+    public func endTemporaryOverride(_ token: TemporaryInputSourceOverrideToken) {
+        guard activeTemporaryOverride == token else { return }
+        activeTemporaryOverride = nil
+        settleUntil = 0
+    }
+
+    public func overrideSwitch(_ id: InputSourceID) -> Bool {
+        guard activeTemporaryOverride != nil else { return false }
+        guard let current = provider.currentSourceID(), current != id else { return true }
+        settleUntil = 0
+        return provider.select(id)
+    }
+
     /// Call when the system posts a "selected input source changed" notification.
     public func selectedSourceDidChange() {
         enforceIfNeeded(reason: .revertedSwitch)
@@ -281,6 +323,7 @@ public final class LockController {
 
     private func enforceIfNeeded(reason: ActivationReason) {
         guard isEnabled, let target else { return }
+        guard activeTemporaryOverride == nil else { return }
         // Respect macOS secure event input unless the user opted into enforcing
         // in password fields. While a secure field holds focus the OS coerces
         // the layout to ASCII; by default we leave that alone. NOTE:

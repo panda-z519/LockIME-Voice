@@ -4,6 +4,7 @@ import Foundation
 import KeyboardShortcuts
 import LockIMEKit
 import Observation
+import OSLog
 import PermissionFlow
 import SwiftData
 import SwiftUI
@@ -13,6 +14,8 @@ import SwiftUI
 @MainActor
 @Observable
 final class AppState {
+    private static let log = Logger(subsystem: LogSubsystem.current, category: "AppState")
+
     private(set) var config: LockConfiguration = .default
     private(set) var activationCount: Int = 0
     private(set) var currentSourceName: String = "—"
@@ -20,6 +23,15 @@ final class AppState {
     private(set) var availableSources: [InputSource] = []
     private(set) var loginItemState: LoginItemState = .unknown
     private(set) var accessibilityGranted: Bool = false
+    private(set) var inputMonitoringGranted: Bool = false
+    private(set) var eventPostingGranted: Bool = false
+
+    var voiceInputPermissionsGranted: Bool {
+        VoiceInputConfiguration.hasRequiredSystemPermissions(
+            inputMonitoringGranted: inputMonitoringGranted,
+            eventPostingGranted: eventPostingGranted
+        )
+    }
 
     /// Whether the `lockime://` URL-scheme API is allowed to act. **Off by
     /// default** — the user must opt in (Settings ▸ General ▸ Automation) before
@@ -54,6 +66,12 @@ final class AppState {
     private(set) var newAppRuleMode: AppRuleMode = .locked
     @ObservationIgnored private static let newAppRuleModeKey = "newAppRuleMode"
 
+    /// Per-device voice workflow configuration. It intentionally stays outside
+    /// `LockConfiguration` so backup/import never moves machine-specific input
+    /// source IDs or third-party voice shortcut assumptions between Macs.
+    private(set) var voiceInputConfig: VoiceInputConfiguration = .default
+    @ObservationIgnored private static let voiceInputConfigKey = "voiceInputConfiguration"
+
     /// The configured global toggle-lock shortcut, mirrored as observable state
     /// so the menu-bar header re-renders the moment the user binds or clears it
     /// in Settings (a plain `getShortcut` read isn't tracked by `@Observable`).
@@ -87,6 +105,9 @@ final class AppState {
     @ObservationIgnored private let loginItem = LoginItemController()
     @ObservationIgnored let logStore = LogStore()
     @ObservationIgnored private var engine: LockEngine?
+    @ObservationIgnored private var voiceInputCoordinator: VoiceInputCoordinator?
+    @ObservationIgnored private var voiceWorkflowShortcutMonitor: CGWorkflowShortcutEventMonitor?
+    @ObservationIgnored private var voiceWorkflowMonitorRefreshPending = false
     @ObservationIgnored private var purgeTask: Task<Void, Never>?
     @ObservationIgnored private var shortcutObserver: (any NSObjectProtocol)?
 
@@ -136,6 +157,7 @@ final class AppState {
         // decoding used for `AppRuleMode` on disk.
         newAppRuleMode = UserDefaults.standard.string(forKey: Self.newAppRuleModeKey)
             .flatMap(AppRuleMode.init(rawValue:)) ?? .locked
+        voiceInputConfig = Self.loadVoiceInputConfig()
         ThirdPartyBundleLocalization.apply(language: languagePreference.effectiveLanguage)
     }
 
@@ -163,6 +185,33 @@ final class AppState {
     func setNewAppRuleMode(_ mode: AppRuleMode) {
         newAppRuleMode = mode
         UserDefaults.standard.set(mode.rawValue, forKey: Self.newAppRuleModeKey)
+    }
+
+    func setVoiceInputConfig(_ config: VoiceInputConfiguration) {
+        voiceInputConfig = config
+        do {
+            let data = try JSONEncoder().encode(config)
+            UserDefaults.standard.set(data, forKey: Self.voiceInputConfigKey)
+        } catch {
+            Self.log.error("Failed to encode voice input configuration: \(String(describing: error), privacy: .public)")
+        }
+        refreshVoiceWorkflowShortcutMonitor()
+    }
+
+    private static func loadVoiceInputConfig() -> VoiceInputConfiguration {
+        guard let data = UserDefaults.standard.data(forKey: voiceInputConfigKey) else { return .default }
+        do {
+            return try JSONDecoder().decode(VoiceInputConfiguration.self, from: data)
+        } catch {
+            log.error("Failed to decode voice input configuration: \(String(describing: error), privacy: .public)")
+            return .default
+        }
+    }
+
+    func updateVoiceInputConfig(_ update: (inout VoiceInputConfiguration) -> Void) {
+        var next = voiceInputConfig
+        update(&next)
+        setVoiceInputConfig(next)
     }
 
     /// GitHub URL of the URL-scheme API reference, in the app's current language
@@ -207,7 +256,22 @@ final class AppState {
 
         let engine = LockEngine(urlProvider: AccessibilityBrowserURLReader())
         self.engine = engine
+        let voiceInputCoordinator = VoiceInputCoordinator(
+            overrideEngine: engine,
+            sender: CGShortcutEventSender(),
+            eventMonitor: CGShortcutEventMonitor(),
+            sourceActivationDelay: 0.3
+        )
+        voiceInputCoordinator.onSessionCleanup = { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.applyPendingVoiceWorkflowMonitorRefresh()
+            }
+        }
+        self.voiceInputCoordinator = voiceInputCoordinator
+        voiceWorkflowShortcutMonitor = CGWorkflowShortcutEventMonitor()
         accessibilityGranted = AXIsProcessTrusted()
+        inputMonitoringGranted = CGPreflightListenEventAccess()
+        eventPostingGranted = CGPreflightPostEventAccess()
         engine.onActivation = { [weak self] event in
             guard let self else { return }
             // `.conflictPaused` is the one diagnostic (non-switch) event: log it
@@ -283,6 +347,8 @@ final class AppState {
             self?.removeFrontmostAppRule()
         }
 
+        refreshVoiceWorkflowShortcutMonitor()
+
         // Mirror the configured shortcut into observable state, and keep it in
         // sync so the menu header reflects binds/clears made in Settings live.
         toggleLockShortcut = KeyboardShortcuts.getShortcut(for: .toggleLock)
@@ -308,6 +374,10 @@ final class AppState {
     /// Tear down observers and the purge loop for a clean shutdown.
     func stop() {
         engine?.stop()
+        voiceWorkflowShortcutMonitor?.stop()
+        voiceWorkflowShortcutMonitor = nil
+        voiceWorkflowMonitorRefreshPending = false
+        voiceInputCoordinator = nil
         purgeTask?.cancel()
         purgeTask = nil
         accessibilityWatcher.stop()
@@ -633,6 +703,7 @@ final class AppState {
         let trusted = AXIsProcessTrusted()
         let wasGranted = accessibilityGranted
         accessibilityGranted = trusted
+        refreshVoiceInputPermissionStatus()
         guard trusted != wasGranted else { return }
         if trusted {
             handleAccessibilityGranted()
@@ -655,6 +726,28 @@ final class AppState {
         accessibilityWatcher.start { [weak self] in self?.completeAccessibilityGrant() }
     }
 
+    func requestInputMonitoringAccess(
+        localeIdentifier: String?,
+        suggestedAppURLs: [URL],
+        sourceFrame: CGRect
+    ) {
+        permissionFlow.setLocaleIdentifier(localeIdentifier)
+        permissionFlow.authorize(
+            pane: .inputMonitoring,
+            suggestedAppURLs: suggestedAppURLs,
+            sourceFrameInScreen: sourceFrame
+        )
+    }
+
+    func refreshVoiceInputPermissionStatus() {
+        let canMonitor = CGPreflightListenEventAccess()
+        let canPost = CGPreflightPostEventAccess()
+        guard canMonitor != inputMonitoringGranted || canPost != eventPostingGranted else { return }
+        inputMonitoringGranted = canMonitor
+        eventPostingGranted = canPost
+        refreshVoiceWorkflowShortcutMonitor()
+    }
+
     /// Stop watching for the grant (e.g. when the pane disappears) so an
     /// abandoned request doesn't keep polling in the background.
     func stopAccessibilityWatch() {
@@ -665,6 +758,7 @@ final class AppState {
     /// never does) and flip the flag so the toggle becomes usable at once.
     private func completeAccessibilityGrant() {
         accessibilityGranted = true
+        refreshVoiceInputPermissionStatus()
         handleAccessibilityGranted()
     }
 
@@ -718,6 +812,85 @@ final class AppState {
         print("AXFLOW: \(panelClosed && toggleEnabled ? "ALL PASS" : "FAILED")")
     }
     #endif
+
+    private func handleVoiceInputWorkflowPressed() {
+        guard let voiceInputCoordinator else { return }
+        Self.log.notice("Voice workflow shortcut pressed")
+        do {
+            try voiceInputCoordinator.handleWorkflowShortcutPressed(
+                config: voiceInputConfig,
+                restoreSourceID: config.defaultSourceID,
+                installedSources: availableSources
+            )
+        } catch {
+            Self.log.error("Voice input workflow press failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    private func handleVoiceInputWorkflowReleased() {
+        guard let voiceInputCoordinator else { return }
+        Self.log.notice("Voice workflow shortcut released")
+        do {
+            try voiceInputCoordinator.handleWorkflowShortcutReleased(
+                config: voiceInputConfig
+            )
+        } catch {
+            Self.log.error("Voice input workflow release failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    private func refreshVoiceWorkflowShortcutMonitor() {
+        guard voiceInputCoordinator?.isSessionInProgress != true else {
+            voiceWorkflowMonitorRefreshPending = true
+            Self.log.notice("Voice workflow monitor refresh deferred until the active session ends")
+            return
+        }
+        voiceWorkflowMonitorRefreshPending = false
+        applyVoiceWorkflowShortcutMonitorRefresh()
+    }
+
+    private func applyPendingVoiceWorkflowMonitorRefresh() {
+        guard voiceWorkflowMonitorRefreshPending else { return }
+        voiceWorkflowMonitorRefreshPending = false
+        applyVoiceWorkflowShortcutMonitorRefresh()
+    }
+
+    private func applyVoiceWorkflowShortcutMonitorRefresh() {
+        guard let voiceWorkflowShortcutMonitor else { return }
+        let monitoredShortcut = voiceInputConfig.shortcutForMonitoring(
+            hasInputMonitoringAccess: inputMonitoringGranted,
+            hasEventPostingAccess: eventPostingGranted
+        )
+        if let monitoredShortcut {
+            Self.log.notice(
+                "Voice workflow monitor starting: keyCode=\(monitoredShortcut.keyCode) modifiers=\(monitoredShortcut.modifiers.rawValue) listenAccess=\(CGPreflightListenEventAccess()) postAccess=\(CGPreflightPostEventAccess())"
+            )
+        } else {
+            Self.log.notice("Voice workflow monitor stopped: disabled or shortcut missing")
+        }
+        do {
+            try voiceWorkflowShortcutMonitor.start(
+                shortcut: monitoredShortcut,
+                triggersModifierShortcutOnRelease: shouldTriggerModifierVoiceShortcutOnRelease
+            ) { [weak self] event in
+                switch event {
+                case .workflowKeyDown:
+                    self?.handleVoiceInputWorkflowPressed()
+                case .workflowKeyUp:
+                    self?.handleVoiceInputWorkflowReleased()
+                case .anyKey:
+                    break
+                }
+            }
+        } catch {
+            Self.log.error("Voice input workflow shortcut monitor failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    private var shouldTriggerModifierVoiceShortcutOnRelease: Bool {
+        guard voiceInputConfig.behavior != .holdToSpeak else { return false }
+        return voiceInputConfig.voiceShortcut?.isModifierKey == true
+    }
 
     func refreshSources() {
         if let engine { availableSources = engine.selectableSources() }

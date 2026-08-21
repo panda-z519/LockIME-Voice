@@ -30,6 +30,28 @@ struct GrantAccessibilityButton: View {
     }
 }
 
+struct GrantInputMonitoringButton: View {
+    @Environment(AppState.self) private var state
+    @Environment(\.locale) private var locale
+
+    var body: some View {
+        Button {
+            state.requestInputMonitoringAccess(
+                localeIdentifier: locale.identifier,
+                suggestedAppURLs: [Bundle.main.bundleURL],
+                sourceFrame: Self.clickSourceFrame()
+            )
+        } label: {
+            Label("Grant Input Monitoring Access", systemImage: "arrow.right.circle.fill")
+        }
+    }
+
+    private static func clickSourceFrame() -> CGRect {
+        let mouse = NSEvent.mouseLocation
+        return CGRect(x: mouse.x - 16, y: mouse.y - 16, width: 32, height: 32)
+    }
+}
+
 /// A passive "Requires Accessibility" note for feature panes (App Rules, URL
 /// Rules). It carries no grant button of its own — that lives only in General —
 /// it just explains the dependency in its own words and routes there, so the

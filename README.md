@@ -86,6 +86,10 @@ Either way, the app keeps itself up to date via Sparkle.
 - **Keyboard shortcuts** — configurable global shortcuts to toggle LockIME on or
   off and cycle the locked input source, plus per-app shortcuts to cycle or
   unbind the rule for whichever app is frontmost.
+- **Voice input workflow** — temporarily switch from your daily input source to
+  a configured voice-capable input source, send that input method's own voice
+  shortcut, then restore your daily source. The behavior and shortcut configured
+  in LockIME must match the selected input method's own voice input settings.
 - **Launch at login** — starts automatically when you log in (off by default).
 - **Light & dark mode** — a unified, system-native design language that adapts to
   light and dark appearance, plus a bespoke app icon. See

@@ -37,6 +37,8 @@ public final class LockEngine {
     /// hasn't proven the address bar is focused yet) and re-driven by the
     /// address-bar monitor's events.
     private var addressBarFocused = false
+    private var activeTemporaryOverrideToken: TemporaryInputSourceOverrideToken?
+    private var temporaryOverrideSourceDidChange: (@MainActor (InputSourceID?) -> Void)?
 
     /// Identity of the one-shot switch rule currently in effect, so the engine
     /// fires a `.switchOnce` resolution only on a *genuine transition into* the
@@ -171,6 +173,38 @@ public final class LockEngine {
     /// different source will revert it (see `LockController.commandSwitch`).
     public func switchSourceOnce(_ id: InputSourceID) { controller.commandSwitch(id) }
 
+    public func beginTemporaryInputSourceOverride(
+        sourceDidChange: @escaping @MainActor (InputSourceID?) -> Void
+    ) -> TemporaryInputSourceOverrideToken {
+        let token = controller.beginTemporaryOverride()
+        activeTemporaryOverrideToken = token
+        temporaryOverrideSourceDidChange = sourceDidChange
+        return token
+    }
+
+    public func beginTemporaryInputSourceOverride() -> TemporaryInputSourceOverrideToken {
+        beginTemporaryInputSourceOverride { _ in }
+    }
+
+    public func endTemporaryInputSourceOverride(_ token: TemporaryInputSourceOverrideToken) {
+        guard activeTemporaryOverrideToken == token else { return }
+        controller.endTemporaryOverride(token)
+        activeTemporaryOverrideToken = nil
+        temporaryOverrideSourceDidChange = nil
+        reevaluate(reason: .configChanged)
+        notifyCurrent()
+    }
+
+    public func temporaryOverrideSwitch(to id: InputSourceID) -> Bool {
+        let ok = controller.overrideSwitch(id)
+        notifyCurrent()
+        return ok
+    }
+
+    public func currentInputSourceID() -> InputSourceID? {
+        currentSourceID()
+    }
+
     public func currentSourceName() -> String {
         guard let id = provider.currentSourceID() else { return "—" }
         return provider.source(for: id)?.localizedName ?? id.rawValue
@@ -180,6 +214,7 @@ public final class LockEngine {
 
     private func handleSourceChange() {
         controller.selectedSourceDidChange()
+        temporaryOverrideSourceDidChange?(provider.currentSourceID())
         notifyCurrent()
     }
 
@@ -231,6 +266,9 @@ public final class LockEngine {
     }
 
     private func reevaluate(reason: ActivationReason) {
+        guard activeTemporaryOverrideToken == nil else {
+            return
+        }
         // A launcher excursion uses its own one-shot slot; clear it whenever no
         // launcher is up so the next excursion is a fresh re-entry and the
         // frontmost slot below is the only memory consulted for the real app.
@@ -384,3 +422,5 @@ public final class LockEngine {
         onCurrentSourceChange?(currentSourceName())
     }
 }
+
+extension LockEngine: VoiceInputSourceOverriding {}

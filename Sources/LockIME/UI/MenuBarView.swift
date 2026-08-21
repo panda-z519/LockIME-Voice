@@ -25,7 +25,8 @@ struct MenuBarView: View {
         // toggle-lock shortcut. Non-interactive: a *disabled* Button still draws
         // the accelerator natively but can't fire it, so it never clashes with
         // the real global handler — it's a pure hint. The source name is omitted:
-        // the list below already marks the locked source with a checkmark.
+        // the list below already moves the default source first and marks it
+        // with a pin.
         Button {} label: {
             Label {
                 Text(verbatim: status)
@@ -38,9 +39,10 @@ struct MenuBarView: View {
 
         Divider()
 
-        // The system input sources, flattened directly into the menu. Each is a
-        // Button carrying a leading checkmark in the menu-item *image* column —
-        // visible on the locked source (LockIME on AND this is the global
+        // The system input sources, flattened directly into the menu with the
+        // configured default first. Each is a Button carrying a leading pin in
+        // the menu-item *image* column — visible on the locked source (LockIME
+        // on AND this is the global
         // target), kept as an empty slot of the same size otherwise. That
         // reserves the gutter at a constant width, so the menu doesn't
         // grow/shrink as the lock toggles. (A `Toggle`'s native checkmark lives
@@ -49,11 +51,15 @@ struct MenuBarView: View {
         // macOS 27: 144pt unlocked vs 158pt locked.) Clicking an unchecked
         // source targets it (sets the global source + turns LockIME on, one
         // commit, preserving the configured lock/switch default behavior);
-        // clicking the checked source clears the global target (app and switch
+        // clicking the pinned source clears the global target (app and switch
         // rules stay live). No separate on/off toggle, no submenu. Source names are
         // verbatim system strings, not catalog keys. The global toggle-lock
         // shortcut (Settings ▸ Shortcuts) flips LockIME on/off.
-        ForEach(state.availableSources) { source in
+        let menuSources = InputSourceOrdering.defaultFirst(
+            state.availableSources,
+            defaultSourceID: state.config.defaultSourceID
+        )
+        ForEach(menuSources) { source in
             let isLockedTo = state.isAppEnabled && state.config.defaultSourceID == source.id
             Button {
                 if isLockedTo {
@@ -69,11 +75,11 @@ struct MenuBarView: View {
                     Text(verbatim: source.localizedName)
                 } icon: {
                     // NSMenu drops SwiftUI's `.opacity`, so a hidden-via-opacity
-                    // checkmark would show on every row. Swap the image itself
-                    // instead: the real checkmark when locked, a same-size empty
+                    // pin would show on every row. Swap the image itself
+                    // instead: the real pin when locked, a same-size empty
                     // slot otherwise — keeping the gutter reserved at a constant
                     // width either way.
-                    Image(nsImage: isLockedTo ? MenuIcon.checkmark : MenuIcon.blank)
+                    Image(nsImage: isLockedTo ? MenuIcon.pin : MenuIcon.blank)
                 }
             }
         }
@@ -180,7 +186,7 @@ private enum MenuIcon {
 
     static let lockClosed = symbol("lock.fill")
     static let lockOpen = symbol("lock.open.fill")
-    static let checkmark = symbol("checkmark")
+    static let pin = symbol("pin.fill")
     static let gear = symbol("gearshape")
     static let update = symbol("arrow.down.circle")
     static let updateReady = symbol("arrow.down.circle.fill")

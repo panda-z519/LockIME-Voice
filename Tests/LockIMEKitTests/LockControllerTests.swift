@@ -94,6 +94,73 @@ struct LockControllerTests {
         #expect((events.first?.durationMs ?? -1) >= 0)
     }
 
+    @Test("temporary override pauses lock reversion until ended")
+    func temporaryOverridePausesLockReversionUntilEnded() {
+        let (controller, provider, uptime) = make(current: us, enabled: true)
+        controller.setTarget(us)
+
+        let token = controller.beginTemporaryOverride()
+        #expect(controller.overrideSwitch(abc))
+        #expect(provider.current == abc)
+
+        uptime.advance(by: 1.0)
+        controller.selectedSourceDidChange()
+        #expect(provider.current == abc)
+        #expect(provider.selectCalls == [abc])
+
+        controller.endTemporaryOverride(token)
+        controller.selectedSourceDidChange()
+        #expect(provider.current == us)
+        #expect(provider.selectCalls == [abc, us])
+    }
+
+    @Test("old temporary override token cannot end a newer override")
+    func oldTemporaryOverrideTokenCannotEndNewerOverride() {
+        let (controller, provider, uptime) = make(current: us, enabled: true)
+        controller.setTarget(us)
+
+        let old = controller.beginTemporaryOverride()
+        let newer = controller.beginTemporaryOverride()
+        #expect(controller.overrideSwitch(abc))
+        controller.endTemporaryOverride(old)
+
+        uptime.advance(by: 1.0)
+        controller.selectedSourceDidChange()
+        #expect(provider.current == abc)
+
+        controller.endTemporaryOverride(newer)
+        controller.selectedSourceDidChange()
+        #expect(provider.current == us)
+    }
+
+    @Test("override switch requires an active temporary override")
+    func overrideSwitchRequiresActiveTemporaryOverride() {
+        let (controller, provider, _) = make(current: us, enabled: true)
+        controller.setTarget(us)
+
+        #expect(!controller.overrideSwitch(abc))
+        #expect(provider.current == us)
+        #expect(provider.selectCalls.isEmpty)
+    }
+
+    @Test("temporary override blocks one-shot switches without clearing the standing target")
+    func temporaryOverrideBlocksOneShotSwitches() {
+        let (controller, provider, _) = make(current: us, enabled: true)
+        controller.setTarget(us)
+        let token = controller.beginTemporaryOverride()
+
+        controller.switchOnce(abc)
+
+        #expect(provider.current == us)
+        #expect(provider.selectCalls.isEmpty)
+
+        controller.endTemporaryOverride(token)
+        provider.current = abc
+        controller.selectedSourceDidChange()
+        #expect(provider.current == us)
+        #expect(provider.selectCalls == [us])
+    }
+
     @Test("disabled controller never forces a switch")
     func disabledDoesNothing() {
         let (controller, provider, _) = make(current: abc)

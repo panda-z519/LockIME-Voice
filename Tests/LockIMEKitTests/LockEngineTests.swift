@@ -988,6 +988,104 @@ struct LockEngineSwitchTests {
         #expect(provider.current == abc)
         #expect(provider.selectCalls == [abc])
     }
+
+    @Test("ending a temporary voice override restores the active app rule")
+    func temporaryVoiceOverrideRestoresActiveAppRule() {
+        let voice: InputSourceID = "voice.source"
+        let provider = MockInputSourceProvider(
+            current: us,
+            sources: [.stub(us.rawValue), .stub(abc.rawValue), .stub(voice.rawValue)]
+        )
+        let engine = LockEngine(
+            provider: provider,
+            appMonitor: MockFrontmostMonitor(bundleID: "com.apple.Terminal")
+        )
+        engine.start()
+        engine.apply(LockConfiguration(
+            isEnabled: true,
+            defaultSourceID: us,
+            appRules: [AppRule(
+                bundleID: "com.apple.Terminal",
+                mode: .locked,
+                lockedSourceID: abc
+            )]
+        ))
+        #expect(provider.current == abc)
+
+        let token = engine.beginTemporaryInputSourceOverride()
+        #expect(engine.temporaryOverrideSwitch(to: voice))
+        #expect(provider.current == voice)
+
+        engine.endTemporaryInputSourceOverride(token)
+        #expect(provider.current == abc)
+        #expect(provider.selectCalls == [abc, voice, abc])
+    }
+
+    @Test("temporary voice override defers a one-shot app rule until the session ends")
+    func temporaryVoiceOverrideDefersOneShotAppRule() {
+        let voice: InputSourceID = "voice.source"
+        let provider = MockInputSourceProvider(
+            current: us,
+            sources: [.stub(us.rawValue), .stub(abc.rawValue), .stub(voice.rawValue)]
+        )
+        let monitor = MockFrontmostMonitor(bundleID: "com.foo.App")
+        let engine = LockEngine(provider: provider, appMonitor: monitor)
+        engine.start()
+        engine.apply(LockConfiguration(
+            isEnabled: true,
+            defaultSourceID: us,
+            appRules: [AppRule(
+                bundleID: "com.apple.Terminal",
+                mode: .switched,
+                lockedSourceID: abc
+            )]
+        ))
+
+        let token = engine.beginTemporaryInputSourceOverride()
+        #expect(engine.temporaryOverrideSwitch(to: voice))
+        monitor.activate("com.apple.Terminal")
+
+        #expect(provider.current == voice)
+        #expect(provider.selectCalls == [voice])
+
+        engine.endTemporaryInputSourceOverride(token)
+        #expect(provider.current == abc)
+        #expect(provider.selectCalls == [voice, abc])
+    }
+
+    @Test("stale temporary voice token cannot resume rules")
+    func staleTemporaryVoiceTokenCannotResumeRules() {
+        let voice: InputSourceID = "voice.source"
+        let provider = MockInputSourceProvider(
+            current: us,
+            sources: [.stub(us.rawValue), .stub(abc.rawValue), .stub(voice.rawValue)]
+        )
+        let monitor = MockFrontmostMonitor(bundleID: "com.foo.App")
+        let engine = LockEngine(provider: provider, appMonitor: monitor)
+        engine.start()
+        engine.apply(LockConfiguration(
+            isEnabled: true,
+            defaultSourceID: us,
+            appRules: [AppRule(
+                bundleID: "com.apple.Terminal",
+                mode: .locked,
+                lockedSourceID: abc
+            )]
+        ))
+
+        let stale = engine.beginTemporaryInputSourceOverride()
+        let active = engine.beginTemporaryInputSourceOverride()
+        #expect(engine.temporaryOverrideSwitch(to: voice))
+        monitor.activate("com.apple.Terminal")
+
+        engine.endTemporaryInputSourceOverride(stale)
+        #expect(provider.current == voice)
+        #expect(provider.selectCalls == [voice])
+
+        engine.endTemporaryInputSourceOverride(active)
+        #expect(provider.current == abc)
+        #expect(provider.selectCalls == [voice, abc])
+    }
 }
 
 @MainActor

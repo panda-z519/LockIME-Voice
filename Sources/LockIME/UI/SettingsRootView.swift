@@ -4,7 +4,7 @@ import SwiftUI
 /// The Settings window's tabs. A stable identity lets one pane route the user to
 /// another — App Rules / URL Rules point at General's single Accessibility grant.
 enum SettingsTab: Hashable {
-    case general, appRules, urlRules, shortcuts, permissions, updates, log, backup
+    case general, appRules, urlRules, shortcuts, voiceInput, permissions, updates, log, backup
 }
 
 /// Root of the Settings window — a standard multi-pane macOS settings TabView,
@@ -56,6 +56,9 @@ struct SettingsRootView: View {
             Tab("Shortcuts", systemImage: "command", value: SettingsTab.shortcuts) {
                 ShortcutsSettingsPane()
             }
+            Tab("Voice Input", systemImage: "waveform", value: SettingsTab.voiceInput) {
+                VoiceInputSettingsPane()
+            }
             Tab("Permissions", systemImage: "hand.raised", value: SettingsTab.permissions) {
                 PermissionsSettingsPane()
             }
@@ -86,6 +89,9 @@ struct SettingsRootView: View {
             ShortcutsSettingsPane()
                 .tabItem { Label("Shortcuts", systemImage: "command") }
                 .tag(SettingsTab.shortcuts)
+            VoiceInputSettingsPane()
+                .tabItem { Label("Voice Input", systemImage: "waveform") }
+                .tag(SettingsTab.voiceInput)
             PermissionsSettingsPane()
                 .tabItem { Label("Permissions", systemImage: "hand.raised") }
                 .tag(SettingsTab.permissions)
