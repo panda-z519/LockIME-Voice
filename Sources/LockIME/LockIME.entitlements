@@ -4,6 +4,9 @@
 <dict>
 	<!-- Non-sandboxed Developer ID app. Accessibility APIs are incompatible with
 	     the App Sandbox, so com.apple.security.app-sandbox is intentionally absent.
-	     Hardened Runtime is enabled via build settings; no exceptions needed yet. -->
+	     Release preview builds are ad-hoc signed and embed Sparkle from SPM, so
+	     Library Validation must be disabled or macOS rejects Sparkle at launch. -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
 </dict>
 </plist>

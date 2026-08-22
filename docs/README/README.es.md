@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.1` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
+> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.2` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
 
 Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada de teclado**. Cada vez que tú (u otra aplicación) cambias el método de entrada, LockIME vuelve inmediatamente al bloqueado — globalmente, por aplicación en primer plano, o (con el modo mejorado opcional) por URL del navegador.
 
@@ -48,15 +48,15 @@ Frente al proyecto upstream, este fork añade una fuente de voz configurable, un
 
 Descarga el instalador correspondiente:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-x86_64.dmg)
 
 Sumas SHA-256:
 
-- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
-- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
 
-Abre el DMG y arrastra **LockIME Voice** a Applications. Como la versión preliminar tiene firma ad-hoc y no está notarizada, usa clic derecho → **Open** o autorízala en **System Settings ▸ Privacy & Security**. Después concede **Accessibility** e **Input Monitoring**.
+Abre el DMG y arrastra **LockIME Voice** a Applications. Como la versión preliminar tiene firma ad-hoc y no está notarizada, usa clic derecho → **Open**. Si macOS muestra "Apple could not verify...", abre **System Settings ▸ Privacy & Security**, haz clic en **Open Anyway** para **LockIME Voice**, confirma el inicio y después concede **Accessibility** e **Input Monitoring**.
 
 También puedes compilar desde el código:
 

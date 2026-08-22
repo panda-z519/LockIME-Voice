@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.1` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
+> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.2` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
 
 一款 macOS 選單列應用程式，用於**鎖定你的鍵盤輸入法**。每當你（或其他應用程式）切換輸入法時，LockIME 會立即切回被鎖定的那個——可以是全域的、依最前方應用程式區分的，或者（在可選的增強模式下）依瀏覽器 URL 區分的。
 
@@ -56,15 +56,15 @@
 
 下載與你的 Mac 相符的安裝包：
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-x86_64.dmg)
 
 SHA-256 校驗和：
 
-- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
-- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
 
-開啟 DMG，將 **LockIME Voice** 拖入「應用程式」。由於預覽版只使用 ad-hoc 簽名且未公證，macOS 首次啟動時可能阻止開啟。請右鍵應用程式選擇「開啟」，或前往 **系統設定 ▸ 隱私權與安全性**允許開啟，再授予 **輔助使用**與**輸入監控**權限。
+開啟 DMG，將 **LockIME Voice** 拖入「應用程式」。由於預覽版只使用 ad-hoc 簽名且未公證，macOS 首次啟動時可能阻止開啟。請右鍵應用程式選擇「開啟」。如果 macOS 提示「Apple 無法驗證……」，請前往 **系統設定 ▸ 隱私權與安全性**，點擊 **LockIME Voice** 對應的**仍要打開**，確認啟動後再授予 **輔助使用**與**輸入監控**權限。
 
 也可以從原始碼建置：
 

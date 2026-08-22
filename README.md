@@ -14,7 +14,7 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. `v0.1.1` provides ad-hoc-signed preview installers, but
+> voice-input workflow. `v0.1.2` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
 > are not available.
 
@@ -71,18 +71,20 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 Download the installer matching your Mac:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.1/LockIME-Voice-0.1.1-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-arm64.dmg)
+- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-x86_64.dmg)
 
 SHA-256 checksums:
 
-- `LockIME-Voice-0.1.1-arm64.dmg`: `f12cc1551fcd0c1ce3736c2f5c3995037108b8f5adeecd1f7a7f9777591a40ec`
-- `LockIME-Voice-0.1.1-x86_64.dmg`: `497bced062df7450133fa728bab3029165c42e3e0baf9a36ce1e07a6d07e3c42`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
 
 Open the DMG and drag **LockIME Voice** to Applications. Because this preview is
 ad-hoc signed and not notarized, macOS may block the first launch. Right-click
-the app and choose **Open**, or allow it under **System Settings ▸ Privacy &
-Security**, then grant **Accessibility** and **Input Monitoring**.
+the app and choose **Open**. If macOS shows "Apple could not verify...", open
+**System Settings ▸ Privacy & Security**, click **Open Anyway** for
+**LockIME Voice**, confirm the launch, then grant **Accessibility** and
+**Input Monitoring**.
 
 To build from source instead:
 

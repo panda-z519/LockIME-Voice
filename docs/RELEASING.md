@@ -1,6 +1,6 @@
 # Releasing LockIME Voice
 
-LockIME Voice `v0.1.1` ships manually built preview DMGs alongside the source.
+LockIME Voice `v0.1.2` ships manually built preview DMGs alongside the source.
 The repository has no Apple Developer membership, Developer ID certificate,
 notarization credentials, Sparkle signing key, public update feed, Homebrew
 cask, or automated binary publishing workflow.
@@ -45,7 +45,7 @@ overwrites the shared Release product path:
 ```sh
 scripts/make-dmg.sh \
   'build/DerivedData/Build/Products/Release/LockIME Voice.app' \
-  'build/dmg/LockIME-Voice-0.1.1-<arch>.dmg'
+  'build/dmg/LockIME-Voice-0.1.2-<arch>.dmg'
 ```
 
 Before sharing any artifact, verify its identity and ad-hoc signature:
