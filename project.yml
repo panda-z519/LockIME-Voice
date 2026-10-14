@@ -100,6 +100,13 @@ targets:
         Release:
           CODE_SIGN_IDENTITY: "-"
           DEVELOPMENT_TEAM: ""
+          # Ad-hoc signing otherwise makes Xcode inject its base entitlements,
+          # which include `get-task-allow` — the "this build is debuggable" flag.
+          # Shipping it in a distributed app is wrong (it permits attaching a
+          # debugger to someone else's copy), so inject nothing and sign with the
+          # entitlements file alone. Debug keeps the injection so local
+          # debugging works, matching `ENABLE_HARDENED_RUNTIME: NO` there.
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
     postBuildScripts:
       # Sparkle ships as a fat (arm64 + x86_64) xcframework; since we ship
       # single-arch apps, strip the unused slice and re-sign (saves ~1.4 MB).
