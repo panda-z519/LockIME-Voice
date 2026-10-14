@@ -120,14 +120,72 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// old KeyboardShortcuts trigger, which could not stop the key reaching the
     /// input method and so produced the shortcut-conflict prompt.
     @ObservationIgnored private var voiceKeyMonitor: CGConsumingVoiceKeyMonitor?
-    /// True while the user is recording a shortcut in Settings. The consuming tap
-    /// must stand down: it would otherwise swallow the very key the recorder is
-    /// waiting to read. Recording is inherently a moment when the key should go to
-    /// LockIME's recorder, not to the session.
-    var isRecordingShortcut = false {
-        didSet {
-            guard isRecordingShortcut != oldValue else { return }
-            refreshVoiceKeyMonitor()
+    /// Whether LockIME's own Settings window currently holds keyboard focus. The
+    /// consuming tap yields the voice key in that case, so the in-app recorder can
+    /// read it instead of having the press swallowed.
+    ///
+    /// Deliberately derived from the *window* being key rather than set by a
+    /// SwiftUI `onAppear` on the recorder: `onAppear` fires when the view is
+    /// built, so it would disable the tap for as long as the pane existed — and
+    /// the voice key would fall through to the input method, which is exactly the
+    /// conflict this design removes.
+    /// Whether one of our own ordinary windows (Settings) is currently key, which
+    /// is when the in-app recorder may be reading the voice key.
+    ///
+    /// Maintained from AppKit's notifications rather than polled from inside the
+    /// event-tap callback: polling `NSApp.windows` proved racy — a window that had
+    /// just closed could still be reported as key, so the tap kept yielding
+    /// afterwards and the voice key silently stopped working.
+    var isSettingsWindowFocused: Bool { settingsWindowFocused }
+
+    @ObservationIgnored private var settingsWindowFocused = false
+    @ObservationIgnored private var windowObservers: [any NSObjectProtocol] = []
+
+    private func startObservingWindowFocus() {
+        guard windowObservers.isEmpty else { return }
+        let center = NotificationCenter.default
+        let names: [Notification.Name] = [
+            NSWindow.didBecomeKeyNotification,
+            NSWindow.didResignKeyNotification,
+            NSWindow.willCloseNotification,
+        ]
+        for name in names {
+            let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
+                // `Notification` is not Sendable, so take the only fact we need
+                // (is this one of our own ordinary windows?) before hopping to
+                // the main actor.
+                let isStatusItemWindow = (note.object as? NSWindow)
+                    .map { $0.className.contains("NSStatusBarWindow") } ?? true
+                MainActor.assumeIsolated {
+                    guard let self, !isStatusItemWindow else { return }
+                    switch name {
+                    case NSWindow.didBecomeKeyNotification:
+                        self.settingsWindowFocused = true
+                    case NSWindow.didResignKeyNotification, NSWindow.willCloseNotification:
+                        // Only clear when nothing else of ours is key, so closing
+                        // an auxiliary window while Settings stays open is safe.
+                        self.settingsWindowFocused = self.anyOwnWindowIsKey()
+                    default:
+                        break
+                    }
+                }
+            }
+            windowObservers.append(token)
+        }
+    }
+
+    private func stopObservingWindowFocus() {
+        for token in windowObservers { NotificationCenter.default.removeObserver(token) }
+        windowObservers.removeAll()
+        settingsWindowFocused = false
+    }
+
+    /// Re-derives the flag from the live window list. Used on the events that can
+    /// clear it, and safe to call at any time.
+    private func anyOwnWindowIsKey() -> Bool {
+        NSApp.windows.contains { window in
+            !window.className.contains("NSStatusBarWindow")
+                && (window.isKeyWindow || window.isMainWindow)
         }
     }
     @ObservationIgnored private var purgeTask: Task<Void, Never>?
@@ -306,6 +364,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         }
         self.voiceInputCoordinator = voiceInputCoordinator
         voiceKeyMonitor = CGConsumingVoiceKeyMonitor()
+        startObservingWindowFocus()
         accessibilityGranted = AXIsProcessTrusted()
         eventPostingGranted = CGPreflightPostEventAccess()
         // Arm the consuming tap now that it exists. Without this the voice key
@@ -422,6 +481,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         // coordinator's cleanup callback re-runs the pending state refresh, so
         // doing it in this order leaves the observable flags consistent instead
         // of letting the callback re-set them from the dying session.
+        stopObservingWindowFocus()
         voiceKeyMonitor?.stop()
         voiceKeyMonitor = nil
         voiceInputCoordinator?.stopActiveSession()
@@ -882,11 +942,14 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// the same key back, marked so the tap ignores its own output.
     func refreshVoiceKeyMonitor() {
         guard let voiceKeyMonitor else { return }
-        guard !isRecordingShortcut, voiceInputConfig.isEnabled, let shortcut = voiceKeyShortcut else {
+        guard voiceInputConfig.isEnabled, let shortcut = voiceKeyShortcut else {
             voiceKeyMonitor.stop()
             return
         }
         do {
+            voiceKeyMonitor.shouldYieldKey = { [weak self] in
+                self?.isSettingsWindowFocused ?? false
+            }
             try voiceKeyMonitor.start(keyCode: shortcut.keyCode) { [weak self] event in
                 switch event {
                 case .pressed:

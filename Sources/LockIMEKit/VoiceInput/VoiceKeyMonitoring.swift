@@ -57,6 +57,14 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
     /// Tracks the down/up phase so a press is reported once, however macOS
     /// repeats the event while the key is held.
     private var isDown = false
+    /// Asks whether LockIME's own UI currently wants the raw key — i.e. the user
+    /// is recording a shortcut in Settings. Evaluated per event rather than
+    /// tracked with an external flag: a flag set from SwiftUI's `onAppear` fires
+    /// when the *view* is built, not when recording starts, so it would disable
+    /// the tap for as long as the pane was on screen (and, if the pane stayed
+    /// alive, permanently). Deciding here keeps the tap active whenever the user
+    /// is not actually recording.
+    public var shouldYieldKey: (@MainActor () -> Bool)?
 
     public init() {}
 
@@ -130,6 +138,9 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
         // Our own synthesized key: let it through untouched, or LockIME would
         // treat its own output as a new press and loop.
         guard !ShortcutEventMarker.isMarked(event) else { return false }
+        // The user is recording this very key in Settings: yield it so the
+        // recorder can read it, instead of swallowing the press.
+        if shouldYieldKey?() == true { return false }
 
         let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
         let modifiers = VoiceShortcut.Modifiers(event.flags)

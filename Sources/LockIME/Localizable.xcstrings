@@ -14614,58 +14614,6 @@
         }
       }
     },
-    "LockIME sends the voice shortcut for you; it never listens for your keys. Keep the two shortcuts below different from each other.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "语音快捷键由 LockIME 代发，它不会监听你的按键。下面两个快捷键务必不要相同。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "語音快捷鍵由 LockIME 代為送出，它不會監聽你的按鍵。下面兩個快捷鍵務必不要相同。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音声ショートカットは LockIME が代わりに送信します。キー入力を監視することはありません。下の 2 つは必ず別の組み合わせにしてください。"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LockIME envoie le raccourci vocal à votre place ; il n'écoute jamais vos frappes. Les deux raccourcis ci-dessous doivent être différents."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LockIME sendet den Sprachkurzbefehl für Sie; Ihre Tastenanschläge werden nie mitgelesen. Die beiden Kurzbefehle unten müssen sich unterscheiden."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LockIME envía el atajo de voz por ti; nunca escucha tus pulsaciones. Los dos atajos de abajo deben ser distintos."
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O LockIME envia o atalho de voz por você; ele nunca escuta suas teclas. Os dois atalhos abaixo precisam ser diferentes."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LockIME отправляет голосовую комбинацию за вас и никогда не перехватывает ваши нажатия. Две комбинации ниже должны различаться."
-          }
-        }
-      }
-    },
     "This is the same combination as LockIME's voice shortcut. Use two different shortcuts, or the key is handled twice and macOS reports a shortcut conflict.": {
       "localizations": {
         "zh-Hans": {
@@ -15182,6 +15130,58 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сначала запишите здесь комбинацию: это собственный триггер LockIME, и он должен отличаться от голосовой комбинации метода ввода ниже."
+          }
+        }
+      }
+    },
+    "LockIME takes over your voice shortcut so the input method never sees the press, and sends it back to start and stop recording. It never listens for your typing.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音快捷键由 LockIME 代发，它不会监听你的按键。下面两个快捷键务必不要相同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音快捷鍵由 LockIME 代為送出，它不會監聽你的按鍵。下面兩個快捷鍵務必不要相同。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声ショートカットは LockIME が代わりに送信します。キー入力を監視することはありません。下の 2 つは必ず別の組み合わせにしてください。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME envoie le raccourci vocal à votre place ; il n'écoute jamais vos frappes. Les deux raccourcis ci-dessous doivent être différents."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME sendet den Sprachkurzbefehl für Sie; Ihre Tastenanschläge werden nie mitgelesen. Die beiden Kurzbefehle unten müssen sich unterscheiden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME envía el atajo de voz por ti; nunca escucha tus pulsaciones. Los dos atajos de abajo deben ser distintos."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O LockIME envia o atalho de voz por você; ele nunca escuta suas teclas. Os dois atalhos abaixo precisam ser diferentes."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME отправляет голосовую комбинацию за вас и никогда не перехватывает ваши нажатия. Две комбинации ниже должны различаться."
           }
         }
       }

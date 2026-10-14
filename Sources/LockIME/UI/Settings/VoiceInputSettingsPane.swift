@@ -40,7 +40,7 @@ struct VoiceInputSettingsPane: View {
             } header: {
                 Text("Voice Input")
             } footer: {
-                SectionFooter("LockIME sends the voice shortcut for you; it never listens for your keys. Keep the two shortcuts below different from each other.")
+                SectionFooter("LockIME takes over your voice shortcut so the input method never sees the press, and sends it back to start and stop recording. It never listens for your typing.")
             }
 
             Section {
@@ -54,14 +54,10 @@ struct VoiceInputSettingsPane: View {
                     LocalizedStringKey("Voice shortcut"),
                     name: .voiceInput
                 )
-                // The consuming tap owns this key, so it stands down while this
-                // pane is open: otherwise it would swallow the press the recorder
-                // is waiting to read. The cost is that the voice key is inactive
-                // while Settings sits on this pane — an acceptable trade, since
-                // the user is configuring rather than dictating, and it is the
-                // only way to keep recording possible at all.
-                .onAppear { state.isRecordingShortcut = true }
-                .onDisappear { state.isRecordingShortcut = false }
+                // No bookkeeping needed here: the consuming tap yields the key
+                // by itself whenever this window holds focus (see
+                // `AppState.isSettingsWindowFocused`), so the recorder can read a
+                // press while the tap stays active the rest of the time.
 
                 if !state.voiceKeyConfigured {
                     VoiceInputStatusNote(
