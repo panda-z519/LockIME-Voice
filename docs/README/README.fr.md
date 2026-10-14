@@ -40,7 +40,7 @@ Une application de barre de menus macOS qui **verrouille votre source de saisie 
 
 ## Changes in LockIME Voice
 
-Par rapport à l'upstream, ce fork ajoute une source vocale configurable, un raccourci enregistré unique avec modificateurs gauche/droite, trois modes de fin, une prise de contrôle temporaire compatible avec les règles, la restauration de la valeur globale **App Rules**, des sessions répétables avec délai de sécurité et filtrage des événements, ainsi que la source par défaut placée en tête avec une épingle.
+Par rapport à l'upstream, ce fork ajoute une source vocale configurable, des raccourcis distincts pour LockIME et la méthode de saisie, un changement temporaire de source de saisie pendant la dictée (optionnel, désactivé par défaut), la restauration de la valeur globale **App Rules**, des sessions répétables avec délai de sécurité, ainsi que la source par défaut placée en tête avec une épingle.
 
 ![Réglages de saisie vocale LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -92,20 +92,17 @@ Après réinstallation ou reconstruction, les autorisations peuvent être redema
 
 La source de saisie vocale est entièrement configurable ; LockIME Voice n'impose ni Doubao, ni WeChat, ni aucune autre méthode de saisie.
 
-1. Définissez la source globale par défaut dans **Settings ▸ App Rules** ; elle sera restaurée après la dictée.
-2. Ouvrez **Settings ▸ Voice Input**, activez le workflow et choisissez une source compatible avec la voix.
-3. Enregistrez le raccourci vocal propre à cette méthode et choisissez le même mode de fin : nouvel appui, maintien ou touche quelconque.
-4. Accordez **Accessibility** et **Input Monitoring** lorsque macOS le demande.
+1. Ouvrez **Settings ▸ Voice Input** et activez le workflow.
+2. Enregistrez le **raccourci vocal de la méthode de saisie** — celui que votre méthode de saisie utilise pour sa propre dictée. Définissez-le d'abord dans la méthode de saisie et gardez-le distinct du raccourci propre à LockIME.
+3. Enregistrez le **raccourci vocal de LockIME** (dans **Settings ▸ Shortcuts ▸ Global shortcuts** ou dans le même panneau). C'est la touche que vous pressez réellement.
+4. Facultatif : activez **Changer automatiquement de source de saisie** et choisissez la source vocale si ce n'est pas celle que vous utilisez au quotidien. Définissez d'abord la source par défaut globale dans **Settings ▸ App Rules** : c'est elle que LockIME rétablira ensuite.
+5. Accordez l'autorisation d'envoyer des événements clavier lorsque macOS la demande.
 
-Si la source vocale est identique à la source globale par défaut, LockIME Voice
-la traite en mode direct : aucun raccourci LockIME n'est requis, et le raccourci
-vocal propre à la méthode reste le déclencheur. Configurez ce raccourci dans la
-méthode de saisie avant d'utiliser le mode direct.
+Appuyer sur le raccourci de LockIME envoie le raccourci vocal de la méthode de saisie : la dictée démarre donc dans la méthode active. Avec le changement automatique activé, LockIME bascule d'abord vers la source vocale configurée, attend la confirmation de macOS, puis rétablit la source par défaut globale à la fin de la dictée ou au déclenchement du délai de sécurité.
 
-Le raccourci suspend les règles normales, bascule vers la source vocale, attend la confirmation de macOS puis envoie le raccourci interne. À la fin ou au délai de sécurité, LockIME Voice restaure la source globale et reprend les règles.
+Comme LockIME ne fait qu'*envoyer* ce raccourci et n'écoute jamais vos frappes, les deux raccourcis doivent être des combinaisons distinctes. Une seule combinaison partagée fait revenir le conflit : la touche est traitée deux fois et macOS ou la méthode de saisie signale un conflit de raccourcis.
 
-Testez dans TextEdit ou un champ texte simple. L'affichage du panneau vocal ne suffit pas : le texte reconnu doit réellement apparaître au curseur.
-
+Testez le workflow dans TextEdit ou un autre champ de texte simple. Voir le panneau vocal ne suffit pas : le texte reconnu doit apparaître à la position du curseur.
 ## Comparison
 
 Les deux alternatives à LockIME les plus utilisées sont

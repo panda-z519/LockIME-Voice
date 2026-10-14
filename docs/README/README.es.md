@@ -40,7 +40,7 @@ Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada
 
 ## Changes in LockIME Voice
 
-Frente al proyecto upstream, este fork añade una fuente de voz configurable, un único atajo grabado con modificadores izquierdo/derecho, tres formas de finalizar, control temporal compatible con las reglas, restauración del valor global de **App Rules**, sesiones repetibles con timeout y filtrado de eventos, y la fuente predeterminada primero con un icono de chincheta.
+Frente al proyecto upstream, este fork añade una fuente de voz configurable, atajos separados para LockIME y el método de entrada, un cambio temporal de fuente de entrada durante la voz que es opcional y está desactivado por defecto, restauración del valor global de **App Rules**, sesiones repetibles con timeout y la fuente predeterminada primero con un icono de chincheta.
 
 ![Ajustes de entrada por voz de LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -92,20 +92,17 @@ Tras reinstalar o recompilar puede ser necesario volver a conceder permisos. No 
 
 La fuente de entrada por voz es totalmente configurable; LockIME Voice no fija Doubao, WeChat ni ningún otro método de entrada.
 
-1. Configura la fuente global predeterminada en **Settings ▸ App Rules**; se restaurará al terminar la voz.
-2. Abre **Settings ▸ Voice Input**, activa el flujo y elige una fuente compatible con voz.
-3. Graba el atajo de voz propio del método y selecciona el mismo final: pulsar otra vez, mantener pulsado o cualquier tecla.
-4. Concede **Accessibility** e **Input Monitoring** cuando se solicite.
+1. Abre **Settings ▸ Voice Input** y activa el flujo de trabajo.
+2. Graba el **atajo de voz del método de entrada**: el atajo que tu método de entrada usa para su propia función de voz. Configúralo primero dentro del método de entrada y mantenlo distinto del atajo propio de LockIME.
+3. Graba el **atajo de voz de LockIME** (en **Settings ▸ Shortcuts ▸ Global shortcuts** o en el mismo panel). Esa es la tecla que pulsas realmente.
+4. Opcional: activa **Cambiar de fuente de entrada automáticamente** y elige la fuente con voz si no es la que usas a diario. Configura antes la fuente predeterminada global en **Settings ▸ App Rules**: es la que LockIME restaura después.
+5. Concede permiso para enviar eventos de teclado cuando se solicite.
 
-Si la fuente de voz es la misma que la fuente global predeterminada, LockIME
-Voice la trata como modo directo: no se requiere un atajo de LockIME, y el atajo
-de voz propio del método sigue siendo el disparador. Configura ese atajo dentro
-del método de entrada antes de usar el modo directo.
+Al pulsar el atajo de LockIME se envía el atajo de voz del método de entrada, así que la entrada de voz se inicia en el método activo. Con el cambio automático activado, LockIME se mueve primero a la fuente de voz configurada, espera la confirmación de macOS y restaura la fuente predeterminada global cuando termina la voz o salta el tiempo de espera de seguridad.
 
-El atajo pausa las reglas normales, cambia a la fuente de voz, espera la confirmación de macOS y envía el atajo interno. Al terminar o vencer el tiempo de seguridad, LockIME Voice restaura la fuente global y reanuda las reglas.
+Como LockIME solo *envía* ese atajo y nunca escucha tus pulsaciones, los dos atajos deben ser combinaciones distintas. Usar una sola combinación reintroduce el conflicto: la tecla se procesa dos veces y macOS o el método de entrada avisa de un conflicto de atajos.
 
-Prueba en TextEdit u otro campo de texto sencillo. Mostrar el panel de voz no basta: el texto reconocido debe aparecer realmente en el cursor.
-
+Prueba el flujo en TextEdit u otro campo de texto simple. Ver el panel de voz no basta: el texto reconocido debe aparecer en la posición actual del cursor.
 ## Comparison
 
 Las dos alternativas a LockIME más utilizadas son

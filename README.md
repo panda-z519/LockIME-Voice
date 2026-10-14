@@ -50,9 +50,10 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 - **Configurable voice input source** — no input method is hard-coded; Doubao,
   WeChat, or another installed input source can be selected.
-- **One recorded shortcut** — the workflow and the selected input method use
-  the same recorded shortcut, including left/right modifiers and multi-key
-  combinations.
+- **Two separate shortcuts** — LockIME owns a global voice shortcut of its own
+  and sends the one configured inside your input method. Keeping them different
+  is what avoids the shortcut-conflict prompt that a single shared combination
+  causes; left/right modifiers and multi-key combinations are supported.
 - **Three voice behaviors** — press again to end, hold to speak, or press any
   key to end, matching the selected input method's own setting.
 - **Rule-safe temporary override** — normal LockIME enforcement pauses while
@@ -129,10 +130,10 @@ permissions again. Automatic updates are not available.
 - **Keyboard shortcuts** — configurable global shortcuts to toggle LockIME on or
   off and cycle the locked input source, plus per-app shortcuts to cycle or
   unbind the rule for whichever app is frontmost.
-- **Voice input workflow** — temporarily switch from your daily input source to
-  a configured voice-capable input source, send that input method's own voice
-  shortcut, then restore your daily source. The behavior and shortcut configured
-  in LockIME must match the selected input method's own voice input settings.
+- **Voice input workflow** — press LockIME's own voice shortcut and it sends the
+  voice shortcut configured inside your input method. Enable automatic switching
+  to have it move to a configured voice input source for the session and restore
+  your daily source afterwards. Keep the two shortcuts different.
 - **Launch at login** — starts automatically when you log in (off by default).
 - **Light & dark mode** — a unified, system-native design language that adapts to
   light and dark appearance, plus a bespoke app icon. See
@@ -155,27 +156,31 @@ permissions again. Automatic updates are not available.
 The voice input source is fully configurable; LockIME Voice does not hard-code
 Doubao, WeChat, or any other input method.
 
-1. Set the global default input source under **Settings ▸ App Rules**. This is
-   the source restored after voice input ends.
-2. Open **Settings ▸ Voice Input**, enable the workflow, and choose the
-   voice-capable input source.
-3. Record the exact shortcut used by that input method's own voice feature, then
-   choose the matching ending behavior: press again, hold to speak, or any key.
-4. Grant **Accessibility** and **Input Monitoring** when prompted.
+1. Open **Settings ▸ Voice Input** and enable the workflow.
+2. Record **Input method voice shortcut** — the exact shortcut your input method
+   uses for its own voice feature. Set that shortcut inside the input method
+   first, and keep it different from LockIME's own shortcut.
+3. Record **LockIME voice shortcut** under **Settings ▸ Shortcuts ▸ Global
+   shortcuts** (or in the same pane). This is the key you actually press.
+4. Optional: turn on **Switch input source automatically** and choose the
+   voice-capable input source if it is not the one you normally type in. Set the
+   global default under **Settings ▸ App Rules** first — that is what LockIME
+   restores afterwards.
+5. Grant permission to send keyboard events when prompted.
 
-If the voice input source is the same as the global default source, LockIME
-Voice treats it as direct mode: no LockIME shortcut is required, and the input
-method's own voice shortcut remains the trigger. Configure that shortcut inside
-the input method before using direct mode.
+Pressing LockIME's shortcut sends the input method's voice shortcut, so voice
+input starts in whichever input method is active. With automatic switching on,
+LockIME first moves to the configured voice input source, waits for macOS to
+confirm the switch, and restores the global default source when voice input ends
+or the safety timeout fires.
 
-Pressing the configured shortcut pauses normal LockIME rules, switches to the
-voice input source, waits for macOS to confirm the switch, and sends the input
-method's shortcut. When voice input ends or the safety timeout fires, LockIME
-Voice restores the global default source and resumes normal enforcement.
+Because LockIME only *sends* that shortcut and never listens for your keys, the
+two shortcuts must be different combinations. Using one single combination
+reintroduces the conflict: the key is handled twice, and macOS or the input
+method reports a shortcut conflict.
 
 Test the workflow in TextEdit or another plain text field. Seeing the voice
 panel is not enough: recognized text must appear at the current cursor position.
-
 ## Comparison
 
 The two most widely-used alternatives to LockIME are

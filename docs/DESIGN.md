@@ -168,7 +168,7 @@ Keep `.keyboardShortcut` hints. Zero custom color — NSMenu supplies everything
 (Active-scope `.badge` is a nice-to-have — verify it renders on the real macOS 26
 build before relying on it.)
 
-### 4.2 Settings window — top 7-tab `TabView`, widened
+### 4.2 Settings window — top 8-tab `TabView`, widened
 No sidebar (`.sidebarAdaptable` breaks `ToolbarSpacer` on macOS). Frame
 `minWidth 680, idealWidth 700, minHeight 600`, growable. (`minHeight` sized so the
 tallest pane — General, now with the **Automation** ▸ URL Scheme API toggle —
@@ -220,10 +220,28 @@ the grant watcher.
   never re-yanks the underlying app); the kit's `LockController.switchOnce`
   performs the switch without installing a standing target.
 - **Shortcuts:** native recorder rows in two sections — **Global** (toggle lock,
-  lock to previous/next input source) and **Current app** (cycle, or remove, the
-  frontmost app's rule). Recorder titles must be `LocalizedStringKey(...)`, not a
-  bare `String` literal, or the label renders in the system language (see the
-  i18n guards in CLAUDE.md).
+  lock to previous/next input source, and the voice workflow's own trigger) and
+  **Current app** (cycle, or remove, the frontmost app's rule). The voice
+  trigger must differ from the shortcut the voice input method uses internally
+  (see **Voice Input** below); the footer says so. Recorder titles must be
+  `LocalizedStringKey(...)`, not a bare `String` literal, or the label renders
+  in the system language (see the i18n guards in CLAUDE.md).
+- **Voice Input:** the workflow pane, built around **two** shortcuts, not one.
+  `KeyboardShortcuts.Recorder` ("LockIME voice shortcut", `.voiceInput`) is the
+  key the user actually presses and the only one LockIME handles. The
+  combination configured *inside* the selected input method, which LockIME only
+  hand-rolled `VoiceShortcutEditor` ("Input method voice shortcut") holds the
+  combination the key was processed twice — once by the input method, once by
+  LockIME's synthetic copy — and macOS/the input method reported a shortcut
+  conflict; the pane therefore warns when the two match. **Switch input source
+  automatically** (default **off**) gates everything source-related: off means
+  the synthesized shortcut alone does the job and the input source is never
+  touched; on reveals the voice-source picker, the restore-source row and the
+  restore timeout, and makes `VoiceInputCoordinator` take a `LockController`
+  temporary override for the session. Modifier/key display comes from
+  `VoiceShortcut.displayText`, which also renders the Fn/🌐 key. The workflow
+  needs **event posting** only — no Input Monitoring grant, because nothing is
+  listening for the user's keys.
 - **Permissions:** the single home for the optional Accessibility grant
   (`AXIsProcessTrusted`), which unlocks two features — per-URL rules and
   launcher-overlay detection (Spotlight/Raycast/…). One `GrantAccessibilityButton`
@@ -299,7 +317,7 @@ Reduce Transparency). Replace with:
 | Question | Decision |
 |---|---|
 | Toast | Delete; NSAlert + inline Updates result + "Last checked" |
-| Settings nav | Keep top TabView (7 tabs incl. Permissions), widen to 680 |
+| Settings nav | Keep top TabView (8 tabs incl. Voice Input and Permissions), widen to 680 |
 | Icon format | `.appiconset` PNG set, full-bleed source, pre-masked shipped PNGs |
 | Accent delivery | Asset-catalog `AccentColor` as Global Accent |
 | Update header art | Real app icon, not lock SF Symbol |

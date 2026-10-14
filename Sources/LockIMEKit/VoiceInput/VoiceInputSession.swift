@@ -23,5 +23,4 @@ public enum VoiceInputCoordinatorError: Error, Equatable, Sendable {
     case switchToVoiceFailed(InputSourceID)
     case restoreDefaultFailed(InputSourceID)
     case shortcutSendFailed
-    case eventMonitorStartFailed
 }

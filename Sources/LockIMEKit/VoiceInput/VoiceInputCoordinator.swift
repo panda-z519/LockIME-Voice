@@ -32,26 +32,30 @@ public final class TaskVoiceTimeoutScheduler: VoiceTimeoutScheduling {
 public final class VoiceInputCoordinator {
     private enum RestoreReason: String {
         case workflowShortcut
-        case holdRelease
-        case anyKey
         case safetyTimeout
         case sourceSelectionFailed
         case shortcutSendFailed
-        case eventMonitorFailed
     }
 
     private static let log = Logger(subsystem: LogSubsystem.current, category: "VoiceInput")
-    private static let activationGraceDelay: TimeInterval = 0.8
+    /// How long to wait for the system to confirm the switch into the voice
+    /// input source before declaring the session failed.
     private static let sourceSelectionDeadline: TimeInterval = 0.5
 
     private let overrideEngine: any VoiceInputSourceOverriding
     private let sender: any ShortcutEventSending
     private let fallbackRestoreSourceID: @MainActor () -> InputSourceID?
     private let timeoutScheduler: any VoiceTimeoutScheduling
-    private let eventMonitor: (any ShortcutEventMonitoring)?
+    /// Extra settle time between confirming the voice input source and sending
+    /// its voice shortcut. Only used by the automatic-switch path; synthetic
+    /// sending needs no wait, so the default is zero.
     private let sourceActivationDelay: TimeInterval
     private var token: TemporaryInputSourceOverrideToken?
     private var restoreSourceID: InputSourceID?
+    /// Whether *this* session took over the input source and therefore has to
+    /// hand it back. False in the no-switch path, where ending the session must
+    /// leave the user's input source exactly where it was.
+    private var ownsInputSource = false
     private var generation = 0
     private var didSendVoiceShortcut = false
     private var didScheduleVoiceShortcut = false
@@ -76,36 +80,39 @@ public final class VoiceInputCoordinator {
         sender: any ShortcutEventSending,
         fallbackRestoreSourceID: @escaping @MainActor () -> InputSourceID? = { nil },
         timeoutScheduler: any VoiceTimeoutScheduling = TaskVoiceTimeoutScheduler(),
-        eventMonitor: (any ShortcutEventMonitoring)? = nil,
         sourceActivationDelay: TimeInterval = 0
     ) {
         self.overrideEngine = overrideEngine
         self.sender = sender
         self.fallbackRestoreSourceID = fallbackRestoreSourceID
         self.timeoutScheduler = timeoutScheduler
-        self.eventMonitor = eventMonitor
         self.sourceActivationDelay = sourceActivationDelay
     }
 
+    /// A trigger press, from LockIME's own global shortcut (`voiceInput`). It is
+    /// a *separate* combination from the input method's own voice shortcut, so
+    /// each key is handled exactly once: LockIME acts on this one and the input
+    /// method acts on the synthesized one. Sharing a single combination is what
+    /// made macOS report a shortcut conflict.
     public func handleWorkflowShortcutPressed(
         config: VoiceInputConfiguration,
         restoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
-        switch state {
-        case .idle:
-            guard config.workflowMode(defaultSourceID: restoreSourceID) == .bridged else { return }
-            try start(
-                config: config,
-                restoreSourceID: restoreSourceID,
-                installedSources: installedSources
-            )
-        case .failed, .endingVoice, .restoringDefaultInput:
+        // A switched-off workflow must never act — in *any* state. Checked before
+        // the switch so a stale live session can't be ended either: the user
+        // turned the feature off, so LockIME stops synthesizing keys. The session
+        // is torn down locally (no further key is sent) and the state reset.
+        guard config.isEnabled else {
             cleanupOverride()
-            guard config.workflowMode(defaultSourceID: restoreSourceID) == .bridged else {
-                state = .idle
-                return
-            }
+            state = .idle
+            return
+        }
+        switch state {
+        case .idle, .failed, .endingVoice, .restoringDefaultInput:
+            // A stale/abandoned session (a failure, an interrupted restore) is
+            // cleared first so the next press always starts from a clean slate.
+            cleanupOverride()
             try start(
                 config: config,
                 restoreSourceID: restoreSourceID,
@@ -114,46 +121,59 @@ public final class VoiceInputCoordinator {
         case .preparingVoice:
             break
         case .voiceActive:
-            switch sessionBehavior {
-            case .pressOncePressAgainEnds:
-                try end(sendEndShortcut: true)
-            case .pressOnceAnyKeyEnds:
-                try end(sendEndShortcut: false)
-            default:
-                break
-            }
+            // Ending is a press-again tap. A session left over from a behavior
+            // this build no longer offers (a `holdToSpeak` configuration carried
+            // over from v0.1.2) must still be endable, so fall back to the tap
+            // rather than stranding the session with no way out.
+            try end(sendEndShortcut: true)
         }
     }
 
-    public func handleWorkflowShortcutReleased(config: VoiceInputConfiguration) throws {
-        guard sessionBehavior == .holdToSpeak else { return }
-        switch state {
-        case .preparingVoice:
-            try restoreDefault(reason: .holdRelease)
-        case .voiceActive:
-            guard let sessionShortcut else { return }
-            try sender.sendKeyUp(sessionShortcut)
-            try restoreDefault(reason: .holdRelease)
-        default:
-            return
-        }
-    }
-
-    public func handleAnyKeyDuringVoice(config: VoiceInputConfiguration) throws {
-        guard state == .voiceActive, sessionBehavior == .pressOnceAnyKeyEnds else { return }
-        try restoreDefault(reason: .anyKey)
-    }
-
+    /// The safety timeout. In a switching session it hands the input source back;
+    /// in a shortcut-only session there is nothing to hand back, but the input
+    /// method may still be recording, so the timeout must also *end* the session
+    /// the same way a second press would — otherwise LockIME reports idle while
+    /// the microphone is still live, and the next press would start a fresh
+    /// session instead of ending the running one.
     public func handleRestoreTimeout(config: VoiceInputConfiguration) throws {
         guard state == .voiceActive else { return }
-        try restoreDefault(reason: .safetyTimeout)
+        if ownsInputSource {
+            try restoreDefault(reason: .safetyTimeout)
+            return
+        }
+        guard let sessionShortcut else {
+            failAndRestore(.shortcutSendFailed, reason: .safetyTimeout)
+            throw VoiceInputCoordinatorError.shortcutSendFailed
+        }
+        do {
+            try sender.sendTap(sessionShortcut)
+        } catch {
+            failAndRestore(.shortcutSendFailed, reason: .safetyTimeout)
+            throw VoiceInputCoordinatorError.shortcutSendFailed
+        }
+        cleanupOverride()
+        state = .idle
     }
-
+    /// Begin a session. Two shapes:
+    ///  * **automatic switching** — take over the input source, wait for the
+    ///    switch to land, then send the input method's voice shortcut;
+    ///  * **shortcut only** (automatic switching off, or the voice input method
+    ///    being the global default) — send the voice shortcut straight away, and
+    ///    never touch the input source, so nothing has to be restored.
     private func start(
         config: VoiceInputConfiguration,
         restoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
+        guard let voiceShortcut = config.voiceShortcut else {
+            state = .failed(.validationFailed([.missingVoiceShortcut]))
+            throw VoiceInputCoordinatorError.validationFailed([.missingVoiceShortcut])
+        }
+        // Validate against the *configuration*, not against the resolved mode: a
+        // mode of `.direct` also covers "automatic switching is on but its
+        // sources are missing", and skipping validation there would let a
+        // half-configured workflow synthesize a key into whatever input method
+        // happens to be active.
         let errors = config.validationErrors(
             defaultSourceID: restoreSourceID,
             installedSources: installedSources
@@ -162,24 +182,29 @@ public final class VoiceInputCoordinator {
             state = .failed(.validationFailed(errors))
             throw VoiceInputCoordinatorError.validationFailed(errors)
         }
-        guard let voiceSourceID = config.voiceSourceID else {
-            state = .failed(.validationFailed([.missingVoiceSource]))
-            throw VoiceInputCoordinatorError.validationFailed([.missingVoiceSource])
-        }
-        guard let voiceShortcut = config.voiceShortcut else {
-            state = .failed(.validationFailed([.missingVoiceShortcut]))
-            throw VoiceInputCoordinatorError.validationFailed([.missingVoiceShortcut])
-        }
+        let switchesSource = config.workflowMode(defaultSourceID: restoreSourceID) == .bridged
         Self.log.notice(
-            "Voice workflow starting: source=\(voiceSourceID.rawValue, privacy: .public) keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue)"
+            "Voice workflow starting: switchesSource=\(switchesSource) source=\(config.voiceSourceID?.rawValue ?? "-", privacy: .public) keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue)"
         )
-        state = .preparingVoice
         generation += 1
         let currentGeneration = generation
         didSendVoiceShortcut = false
-        didScheduleVoiceShortcut = false
+        didScheduleVoiceShortcut = true
+        ownsInputSource = false
         sessionShortcut = voiceShortcut
         sessionBehavior = config.behavior
+        guard switchesSource, let voiceSourceID = config.voiceSourceID else {
+            self.restoreSourceID = nil
+            state = .preparingVoice
+            activateVoiceShortcut(
+                config: config,
+                voiceShortcut: voiceShortcut,
+                generation: currentGeneration
+            )
+            return
+        }
+        state = .preparingVoice
+        didScheduleVoiceShortcut = false
         token = overrideEngine.beginTemporaryInputSourceOverride { [weak self] sourceID in
             guard sourceID == voiceSourceID else { return }
             self?.scheduleVoiceShortcutActivation(
@@ -188,6 +213,7 @@ public final class VoiceInputCoordinator {
                 generation: currentGeneration
             )
         }
+        ownsInputSource = true
         self.restoreSourceID = restoreSourceID
         guard overrideEngine.temporaryOverrideSwitch(to: voiceSourceID) else {
             Self.log.error("Voice input source switch failed: \(voiceSourceID.rawValue, privacy: .public)")
@@ -260,18 +286,12 @@ public final class VoiceInputCoordinator {
             Self.log.notice(
                 "Sending voice shortcut: keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue)"
             )
-            switch config.behavior {
-            case .pressOncePressAgainEnds, .pressOnceAnyKeyEnds:
-                try sender.sendTap(voiceShortcut)
-            case .holdToSpeak:
-                try sender.sendKeyDown(voiceShortcut)
-            }
+            // Only press-once / press-again is reachable: the other two
+            // behaviors need a key-up or any-key listener (the removed
+            // shared-key monitor) and are no longer offered.
+            try sender.sendTap(voiceShortcut)
             armRestoreTimeout(config: config, generation: generation)
-            if config.behavior == .pressOnceAnyKeyEnds {
-                armActivationGrace(config: config, generation: generation)
-            } else {
-                state = .voiceActive
-            }
+            state = .voiceActive
         } catch {
             failAndRestore(.shortcutSendFailed, reason: .shortcutSendFailed)
         }
@@ -287,15 +307,26 @@ public final class VoiceInputCoordinator {
             do {
                 try sender.sendTap(sessionShortcut)
             } catch {
-                state = .failed(.shortcutSendFailed)
-                cleanupOverride()
+                // The end tap failing must not strand the session in the voice
+                // input method: hand the source back anyway (the opponent in a
+                // `holdToSpeak`-style config can't be ended, but the user's
+                // typing source still has to be restored).
+                failAndRestore(.shortcutSendFailed, reason: .shortcutSendFailed)
                 throw VoiceInputCoordinatorError.shortcutSendFailed
             }
         }
         try restoreDefault(reason: .workflowShortcut)
     }
 
+    /// Hand the input source back and end the session. In the shortcut-only path
+    /// nothing was taken over, so there is no restore — the user's input source
+    /// is left exactly where it was.
     private func restoreDefault(reason: RestoreReason) throws {
+        guard ownsInputSource else {
+            cleanupOverride()
+            state = .idle
+            return
+        }
         guard let restoreSourceID else {
             state = .failed(.validationFailed([.missingDefaultSource]))
             cleanupOverride()
@@ -327,12 +358,12 @@ public final class VoiceInputCoordinator {
     private func cleanupOverride() {
         let hadSession = token != nil || sessionBehavior != nil
         generation += 1
-        eventMonitor?.stop()
         if let token {
             overrideEngine.endTemporaryInputSourceOverride(token)
             self.token = nil
         }
         restoreSourceID = nil
+        ownsInputSource = false
         didSendVoiceShortcut = false
         didScheduleVoiceShortcut = false
         sessionShortcut = nil
@@ -348,20 +379,11 @@ public final class VoiceInputCoordinator {
             try? self.handleRestoreTimeout(config: config)
         }
     }
-
-    private func armActivationGrace(config: VoiceInputConfiguration, generation: Int) {
-        timeoutScheduler.schedule(after: Self.activationGraceDelay) { [weak self] in
-            guard let self, self.generation == generation, self.state == .preparingVoice else { return }
-            self.state = .voiceActive
-            do {
-                try self.armAnyKeyMonitorIfNeeded(config: config, generation: generation)
-            } catch {
-                self.failAndRestore(
-                    .eventMonitorStartFailed,
-                    reason: .eventMonitorFailed
-                )
-            }
-        }
+    /// Abandon any in-flight session without restoring the input source. Used on
+    /// app shutdown, where the override hand-back would race the process exit.
+    public func stopActiveSession() {
+        cleanupOverride()
+        state = .idle
     }
 
     private func failAndRestore(
@@ -369,7 +391,7 @@ public final class VoiceInputCoordinator {
         reason: RestoreReason
     ) {
         state = .failed(failure)
-        guard token != nil, restoreSourceID != nil else {
+        guard ownsInputSource else {
             cleanupOverride()
             return
         }
@@ -378,26 +400,6 @@ public final class VoiceInputCoordinator {
             state = .failed(failure)
         } catch {
             // restoreDefault preserves the more actionable restore failure state.
-        }
-    }
-
-    private func armAnyKeyMonitorIfNeeded(
-        config: VoiceInputConfiguration,
-        generation: Int
-    ) throws {
-        guard config.behavior == .pressOnceAnyKeyEnds, let eventMonitor else { return }
-        try eventMonitor.start { [weak self] event in
-            guard event == .anyKey else { return }
-            self?.handleAnyKeyEvent(config: config, generation: generation)
-        }
-    }
-
-    private func handleAnyKeyEvent(config: VoiceInputConfiguration, generation: Int) {
-        guard self.generation == generation, state == .voiceActive else { return }
-        eventMonitor?.stop()
-        timeoutScheduler.schedule(after: config.restoreDelay.interval) { [weak self] in
-            guard let self, self.generation == generation, self.state == .voiceActive else { return }
-            try? self.handleAnyKeyDuringVoice(config: config)
         }
     }
 

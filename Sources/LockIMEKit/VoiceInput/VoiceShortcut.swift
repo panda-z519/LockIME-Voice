@@ -168,6 +168,8 @@ public struct VoiceShortcut: Codable, Sendable, Equatable, Hashable {
         case 50: "`"
         case 51: "⌫"
         case 53: "⎋"
+        case 63: "fn"
+        case 179: "fn"
         case 123: "←"
         case 124: "→"
         case 125: "↓"
@@ -216,5 +218,28 @@ public extension VoiceShortcut.Modifiers {
         if flags.contains(.maskControl) { insert(.control) }
         if flags.contains(.maskAlternate) { insert(.option) }
         if flags.contains(.maskShift) { insert(.shift) }
+    }
+
+    /// The Carbon modifier mask (`cmdKey` / `controlKey` / `optionKey` /
+    /// `shiftKey`) for this set — the representation `KeyboardShortcuts` stores.
+    var carbonFlags: Int {
+        var flags = 0
+        if contains(.command) { flags |= 1 << 8 }   // cmdKey
+        if contains(.shift) { flags |= 1 << 9 }     // shiftKey
+        if contains(.option) { flags |= 1 << 11 }   // optionKey
+        if contains(.control) { flags |= 1 << 12 }  // controlKey
+        return flags
+    }
+}
+
+public extension VoiceShortcut {
+    /// The Fn / 🌐 key. macOS reports it as key code 63 with no modifiers.
+    static let functionKey = VoiceShortcut(keyCode: 63)
+
+    /// Whether this shortcut is the Fn / 🌐 key — a key macOS reserves for
+    /// itself, so binding it inside an input method both collides with the
+    /// system's own handling and prompts about a shortcut conflict.
+    var isFunctionKey: Bool {
+        keyCode == 63 || keyCode == 179
     }
 }

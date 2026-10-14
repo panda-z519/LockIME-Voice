@@ -79,6 +79,10 @@ public enum VoiceInputValidationError: Equatable, Sendable {
 
 public enum VoiceInputConfigurationNotice: Equatable, Sendable {
     case settingsMustMatchInputMethod
+    /// The LockIME trigger shortcut and the input method's own voice shortcut
+    /// must be two different combinations — sharing one processes it twice and
+    /// makes macOS or the input method report a shortcut conflict.
+    case separateTriggerShortcut
 }
 
 public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
@@ -86,6 +90,12 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
     public var voiceSourceID: InputSourceID?
     public var voiceShortcut: VoiceShortcut?
     public var behavior: VoiceInputBehavior
+    /// Whether a trigger switches the Mac to `voiceSourceID` for the session and
+    /// switches back afterwards. **Off by default**: the synthesized shortcut
+    /// alone already starts voice input in whatever input method is active, so
+    /// turning this off is the zero-configuration, conflict-free setup. On, the
+    /// session owns the input source (daily typing resumes automatically).
+    public var switchesVoiceSourceAutomatically: Bool
     public var restoreTimeout: VoiceRestoreTimeout
     public var restoreDelay: VoiceRestoreDelay
 
@@ -94,6 +104,7 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         voiceSourceID: InputSourceID? = nil,
         voiceShortcut: VoiceShortcut? = nil,
         behavior: VoiceInputBehavior = .pressOncePressAgainEnds,
+        switchesVoiceSourceAutomatically: Bool = false,
         restoreTimeout: VoiceRestoreTimeout = .seconds(60),
         restoreDelay: VoiceRestoreDelay = .seconds(2)
     ) {
@@ -101,43 +112,30 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         self.voiceSourceID = voiceSourceID
         self.voiceShortcut = voiceShortcut
         self.behavior = behavior
+        self.switchesVoiceSourceAutomatically = switchesVoiceSourceAutomatically
         self.restoreTimeout = restoreTimeout.normalizedForSafety
         self.restoreDelay = restoreDelay
     }
 
     public static let `default` = VoiceInputConfiguration()
 
+    /// `.direct` means the workflow must *not* switch input sources: either
+    /// automatic switching is off (the shortcut alone does the job), or the
+    /// selected voice input method is already the global default. `.bridged`
+    /// means the session has to switch to `voiceSourceID` first.
     public func workflowMode(defaultSourceID: InputSourceID?) -> VoiceInputWorkflowMode {
         guard isEnabled else { return .disabled }
-        guard let voiceSourceID, let defaultSourceID, voiceSourceID == defaultSourceID else {
-            return .bridged
-        }
-        return .direct
+        guard switchesVoiceSourceAutomatically, let voiceSourceID else { return .direct }
+        guard let defaultSourceID, voiceSourceID != defaultSourceID else { return .direct }
+        return .bridged
     }
 
-    public static func hasRequiredSystemPermissions(
-        inputMonitoringGranted: Bool,
-        eventPostingGranted: Bool
-    ) -> Bool {
-        inputMonitoringGranted && eventPostingGranted
-    }
-
-    public func shortcutForMonitoring(
-        defaultSourceID: InputSourceID?,
-        installedSources: [InputSource],
-        hasInputMonitoringAccess: Bool,
-        hasEventPostingAccess: Bool
-    ) -> VoiceShortcut? {
-        guard workflowMode(defaultSourceID: defaultSourceID) == .bridged,
-              validationErrors(
-                  defaultSourceID: defaultSourceID,
-                  installedSources: installedSources
-              ).isEmpty,
-              Self.hasRequiredSystemPermissions(
-            inputMonitoringGranted: hasInputMonitoringAccess,
-            eventPostingGranted: hasEventPostingAccess
-        ) else { return nil }
-        return voiceShortcut
+    /// Whether the workflow holds the system permission it needs. Only event
+    /// *posting* matters now: LockIME no longer listens for the input method's
+    /// voice key (that listener caused the double handling behind the
+    /// conflict prompt), it only synthesizes the shortcut.
+    public static func hasRequiredSystemPermissions(eventPostingGranted: Bool) -> Bool {
+        eventPostingGranted
     }
 
     public func validationErrors(
@@ -147,26 +145,44 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         guard isEnabled else { return [] }
         let installed = Set(installedSources.map(\.id))
         var errors: [VoiceInputValidationError] = []
-        if let voiceSourceID {
-            if !installed.contains(voiceSourceID) { errors.append(.voiceSourceUnavailable(voiceSourceID)) }
-        } else {
-            errors.append(.missingVoiceSource)
-        }
-        if workflowMode(defaultSourceID: defaultSourceID) == .bridged, voiceShortcut == nil {
+        if voiceShortcut == nil {
             errors.append(.missingVoiceShortcut)
         }
-        if let defaultSourceID {
-            if !installed.contains(defaultSourceID) {
-                errors.append(.defaultSourceUnavailable(defaultSourceID))
+        // Source problems only block the workflow when it actually has to touch
+        // the input source: automatic switching is on, or the selected voice
+        // input method is the global default (the workflow then still needs that
+        // default to be real). Otherwise the synthesized shortcut alone is a
+        // complete configuration, so a missing source must not block it.
+        if requiresInstalledSources(defaultSourceID: defaultSourceID) {
+            if let voiceSourceID {
+                if !installed.contains(voiceSourceID) {
+                    errors.append(.voiceSourceUnavailable(voiceSourceID))
+                }
+            } else {
+                errors.append(.missingVoiceSource)
             }
-        } else {
-            errors.append(.missingDefaultSource)
+            if let defaultSourceID {
+                if !installed.contains(defaultSourceID) {
+                    errors.append(.defaultSourceUnavailable(defaultSourceID))
+                }
+            } else {
+                errors.append(.missingDefaultSource)
+            }
         }
         return errors
     }
 
+    /// Whether this configuration must resolve real installed input sources —
+    /// true when automatic switching is on (a source to switch to) or the
+    /// selected voice input method is the global default (a source to stay on).
+    private func requiresInstalledSources(defaultSourceID: InputSourceID?) -> Bool {
+        if switchesVoiceSourceAutomatically { return true }
+        guard let voiceSourceID, let defaultSourceID else { return false }
+        return voiceSourceID == defaultSourceID
+    }
+
     public func requiredNotices() -> [VoiceInputConfigurationNotice] {
-        isEnabled ? [.settingsMustMatchInputMethod] : []
+        isEnabled ? [.settingsMustMatchInputMethod, .separateTriggerShortcut] : []
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -175,6 +191,7 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         case voiceSourceID
         case voiceShortcut
         case behavior
+        case switchesVoiceSourceAutomatically
         case restoreTimeout
         case restoreDelay
     }
@@ -194,6 +211,21 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         restoreTimeout = try container.decodeIfPresent(VoiceRestoreTimeout.self, forKey: .restoreTimeout)
             .map(\.normalizedForSafety)
             ?? .seconds(60)
+        // Absent in a configuration written before automatic switching existed
+        // (v0.1.2 and earlier): those builds always switched the input source as
+        // part of the workflow, so an upgraded configuration keeps doing exactly
+        // what it did — the flag defaults to "on" for stored data, while a fresh
+        // `VoiceInputConfiguration()` starts at the conflict-free "off".
+        if container.contains(.switchesVoiceSourceAutomatically) {
+            switchesVoiceSourceAutomatically = try container.decode(
+                Bool.self,
+                forKey: .switchesVoiceSourceAutomatically
+            )
+        } else {
+            switchesVoiceSourceAutomatically = voiceSourceID != nil
+        }
+        restoreDelay = try container.decodeIfPresent(VoiceRestoreDelay.self, forKey: .restoreDelay)
+            ?? .seconds(2)
         restoreDelay = try container.decodeIfPresent(VoiceRestoreDelay.self, forKey: .restoreDelay)
             ?? .seconds(2)
     }
@@ -204,6 +236,10 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         try container.encodeIfPresent(voiceSourceID, forKey: .voiceSourceID)
         try container.encodeIfPresent(voiceShortcut, forKey: .voiceShortcut)
         try container.encode(behavior, forKey: .behavior)
+        try container.encode(
+            switchesVoiceSourceAutomatically,
+            forKey: .switchesVoiceSourceAutomatically
+        )
         try container.encode(restoreTimeout, forKey: .restoreTimeout)
         try container.encode(restoreDelay, forKey: .restoreDelay)
     }

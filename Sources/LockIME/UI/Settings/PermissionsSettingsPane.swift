@@ -29,23 +29,27 @@ struct PermissionsSettingsPane: View {
                 SectionFooter("The core lock needs no permissions.")
             }
 
+            // Event posting is the only keyboard permission the voice workflow
+            // still needs: LockIME synthesizes the input method's own voice key
+            // rather than listening for it, so no Input Monitoring grant (and no
+            // key listener) is involved any more.
             Section {
-                if state.inputMonitoringGranted {
-                    Label("Input Monitoring access granted", systemImage: "checkmark.circle.fill")
+                if state.eventPostingGranted {
+                    Label("Keyboard event posting granted", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.secondary)
                 } else {
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        Text("Keyboard event monitoring may be required for:")
+                        Text("Grant to let LockIME send the voice input shortcut:")
                         VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                            FeatureBullet("Voice workflow shortcut and any-key ending")
+                            FeatureBullet("Sending the voice input shortcut")
                         }
                     }
-                    GrantInputMonitoringButton()
+                    GrantEventPostingButton()
                 }
             } header: {
-                Text("Input Monitoring")
+                Text("Event Posting")
             } footer: {
-                SectionFooter("macOS may ask for Input Monitoring when LockIME listens for the key that ends a voice input session. The listener is pass-through and does not consume the key.")
+                SectionFooter("macOS may ask for permission when LockIME sends the voice input shortcut. LockIME only sends that one key; it never listens for your typing.")
             }
         }
         .formStyle(.grouped)

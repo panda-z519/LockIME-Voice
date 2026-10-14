@@ -576,50 +576,210 @@
     },
     "API documentation": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "API-Dokumentation" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Documentación de la API" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Documentation de l’API" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "API ドキュメント" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Documentação da API" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Документация API" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "API 文档" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "API 文件" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API-Dokumentation"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Documentación de la API"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Documentation de l’API"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API ドキュメント"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Documentação da API"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Документация API"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 文档"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 文件"
+          }
+        }
       }
     },
     "Automation": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Automatisierung" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Automatización" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Automatisation" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "自動化" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Automação" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Автоматизация" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "自动化" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "自動化" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisierung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatización"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisation"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動化"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automação"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Автоматизация"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动化"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動化"
+          }
+        }
       }
     },
     "URL Scheme API": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "es": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "URL Scheme API" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL Scheme API"
+          }
+        }
       }
     },
-    "When on, other apps and scripts can control LockIME with `lockime-voice://` URL commands." : {
+    "When on, other apps and scripts can control LockIME with `lockime-voice://` URL commands.": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Wenn aktiviert, können andere Apps und Skripte LockIME mit `lockime-voice://`-URL-Befehlen steuern." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado, otras apps y scripts pueden controlar LockIME con comandos URL `lockime-voice://`." } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Une fois activé, les autres apps et scripts peuvent contrôler LockIME avec des commandes URL `lockime-voice://`." } },
-        "ja": { "stringUnit": { "state": "translated", "value": "オンにすると、他のアプリやスクリプトが `lockime-voice://` URL コマンドで LockIME を操作できます。" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Quando ativado, outros apps e scripts podem controlar o LockIME com comandos URL `lockime-voice://`." } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Когда включено, другие приложения и скрипты могут управлять LockIME с помощью URL-команд `lockime-voice://`." } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "开启后，其他应用和脚本可以通过 `lockime-voice://` URL 命令控制 LockIME。" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "開啟後，其他應用程式與指令稿可以透過 `lockime-voice://` URL 指令控制 LockIME。" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn aktiviert, können andere Apps und Skripte LockIME mit `lockime-voice://`-URL-Befehlen steuern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está activado, otras apps y scripts pueden controlar LockIME con comandos URL `lockime-voice://`."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une fois activé, les autres apps et scripts peuvent contrôler LockIME avec des commandes URL `lockime-voice://`."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンにすると、他のアプリやスクリプトが `lockime-voice://` URL コマンドで LockIME を操作できます。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando ativado, outros apps e scripts podem controlar o LockIME com comandos URL `lockime-voice://`."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Когда включено, другие приложения и скрипты могут управлять LockIME с помощью URL-команд `lockime-voice://`."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，其他应用和脚本可以通过 `lockime-voice://` URL 命令控制 LockIME。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟後，其他應用程式與指令稿可以透過 `lockime-voice://` URL 指令控制 LockIME。"
+          }
+        }
       }
     },
     "Switch to": {
@@ -11336,203 +11496,3695 @@
     },
     "Address bar": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Adressleiste" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Barra de direcciones" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Barre d’adresse" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバー" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Barra de endereços" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Адресная строка" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressleiste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de direcciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre d’adresse"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバー"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de endereços"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адресная строка"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列"
+          }
+        }
       }
     },
     "Set the input source in the address bar": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Eingabequelle in der Adressleiste festlegen" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Establecer la fuente de entrada en la barra de direcciones" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Définir la source de saisie dans la barre d’adresse" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーで入力ソースを設定" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Definir a fonte de entrada na barra de endereços" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Задавать источник ввода в адресной строке" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "在地址栏中设置输入法" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "在網址列中設定輸入法" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingabequelle in der Adressleiste festlegen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Establecer la fuente de entrada en la barra de direcciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir la source de saisie dans la barre d’adresse"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーで入力ソースを設定"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir a fonte de entrada na barra de endereços"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Задавать источник ввода в адресной строке"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在地址栏中设置输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在網址列中設定輸入法"
+          }
+        }
       }
     },
     "The address-bar rule requires Accessibility": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Die Adressleisten-Regel erfordert Bedienungshilfen" } },
-        "es": { "stringUnit": { "state": "translated", "value": "La regla de la barra de direcciones requiere accesibilidad" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "La règle de barre d’adresse nécessite l’accessibilité" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーのルールにはアクセシビリティが必要です" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "A regra da barra de endereços requer acessibilidade" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Правило адресной строки требует универсального доступа" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏规则需要辅助功能权限" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列規則需要輔助使用權限" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Adressleisten-Regel erfordert Bedienungshilfen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La regla de la barra de direcciones requiere accesibilidad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La règle de barre d’adresse nécessite l’accessibilité"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーのルールにはアクセシビリティが必要です"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A regra da barra de endereços requer acessibilidade"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Правило адресной строки требует универсального доступа"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏规则需要辅助功能权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列規則需要輔助使用權限"
+          }
+        }
       }
     },
     "Choose an input source for the address bar.": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Wählen Sie eine Eingabequelle für die Adressleiste." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Elige una fuente de entrada para la barra de direcciones." } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Choisissez une source de saisie pour la barre d’adresse." } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーの入力ソースを選択してください。" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Escolha uma fonte de entrada para a barra de endereços." } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Выберите источник ввода для адресной строки." } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "请为地址栏选择一个输入法。" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "請為網址列選擇一個輸入法。" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wählen Sie eine Eingabequelle für die Adressleiste."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige una fuente de entrada para la barra de direcciones."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez une source de saisie pour la barre d’adresse."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーの入力ソースを選択してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha uma fonte de entrada para a barra de endereços."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите источник ввода для адресной строки."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请为地址栏选择一个输入法。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請為網址列選擇一個輸入法。"
+          }
+        }
       }
     },
     "Address bar focused": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Adressleiste fokussiert" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Barra de direcciones enfocada" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Barre d’adresse active" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーにフォーカス" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Barra de endereços em foco" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Фокус на адресной строке" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏获得焦点" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列取得焦點" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressleiste fokussiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de direcciones enfocada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre d’adresse active"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーにフォーカス"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de endereços em foco"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фокус на адресной строке"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏获得焦点"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列取得焦點"
+          }
+        }
       }
     },
     "Address bar blurred": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Adressleiste nicht mehr fokussiert" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Barra de direcciones sin foco" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Barre d’adresse désactivée" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーのフォーカス解除" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Barra de endereços sem foco" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Фокус снят с адресной строки" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏失去焦点" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列失去焦點" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressleiste nicht mehr fokussiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de direcciones sin foco"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre d’adresse désactivée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーのフォーカス解除"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de endereços sem foco"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фокус снят с адресной строки"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏失去焦点"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列失去焦點"
+          }
+        }
       }
     },
     "Address-bar rule": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Adressleisten-Regel" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Regla de barra de direcciones" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Règle de barre d’adresse" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバーのルール" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Regra da barra de endereços" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Правило адресной строки" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏规则" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列規則" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressleisten-Regel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regla de barra de direcciones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Règle de barre d’adresse"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバーのルール"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regra da barra de endereços"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Правило адресной строки"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏规则"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列規則"
+          }
+        }
       }
     },
     "URL rules first": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "URL-Regeln zuerst" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Reglas de URL primero" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Règles d’URL d’abord" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "URL ルール優先" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Regras de URL primeiro" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Сначала правила URL" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "网址规则优先" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址規則優先" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL-Regeln zuerst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reglas de URL primero"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Règles d’URL d’abord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL ルール優先"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regras de URL primeiro"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала правила URL"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网址规则优先"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址規則優先"
+          }
+        }
       }
     },
     "Address bar first": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Adressleiste zuerst" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Barra de direcciones primero" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Barre d’adresse d’abord" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "アドレスバー優先" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Barra de endereços primeiro" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Сначала адресная строка" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "地址栏优先" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "網址列優先" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adressleiste zuerst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de direcciones primero"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre d’adresse d’abord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アドレスバー優先"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barra de endereços primeiro"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала адресная строка"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址栏优先"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網址列優先"
+          }
+        }
       }
     },
     "Behavior": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Verhalten" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Comportamiento" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Comportement" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "動作" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Comportamento" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Поведение" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "行为" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "行為" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verhalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comportamiento"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comportement"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "動作"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comportamento"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поведение"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行为"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行為"
+          }
+        }
       }
     },
     "Priority": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Priorität" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Prioridad" } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Priorité" } },
-        "ja": { "stringUnit": { "state": "translated", "value": "優先順位" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Prioridade" } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Приоритет" } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "优先级" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "優先順序" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priorität"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prioridad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priorité"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "優先順位"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prioridade"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приоритет"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "优先级"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "優先順序"
+          }
+        }
       }
     },
     "While a browser's address bar is focused, LockIME sets your chosen input source so you can type web addresses. “Lock” keeps it fixed; “Switch” sets it once and lets you change it. “Priority” decides which wins when a URL rule also matches the page.": {
       "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Solange die Adressleiste eines Browsers fokussiert ist, legt LockIME die gewählte Eingabequelle fest, damit Sie Webadressen eingeben können. „Sperren“ hält sie fest; „Wechseln“ setzt sie einmalig und lässt Sie sie ändern. „Priorität“ entscheidet, was Vorrang hat, wenn auch eine URL-Regel auf die Seite zutrifft." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Mientras la barra de direcciones de un navegador está enfocada, LockIME establece la fuente de entrada elegida para que puedas escribir direcciones web. «Bloquear» la mantiene fija; «Cambiar» la establece una vez y te deja cambiarla. «Prioridad» decide cuál prevalece cuando una regla de URL también coincide con la página." } },
-        "fr": { "stringUnit": { "state": "translated", "value": "Lorsque la barre d’adresse d’un navigateur est active, LockIME définit la source de saisie choisie pour vous permettre de saisir des adresses web. « Verrouiller » la maintient fixe ; « Basculer » la définit une fois et vous laisse la changer. « Priorité » détermine ce qui l’emporte lorsqu’une règle d’URL correspond aussi à la page." } },
-        "ja": { "stringUnit": { "state": "translated", "value": "ブラウザのアドレスバーがフォーカスされている間、LockIME は選択した入力ソースに設定し、ウェブアドレスを入力しやすくします。「ロック」は固定したままにし、「切り替え」は一度だけ設定して、その後は変更できます。「優先順位」は、URL ルールも現在のページに一致する場合にどちらを優先するかを決めます。" } },
-        "pt": { "stringUnit": { "state": "translated", "value": "Enquanto a barra de endereços de um navegador está em foco, o LockIME define a fonte de entrada escolhida para você digitar endereços da web. «Bloquear» a mantém fixa; «Alternar» a define uma vez e permite que você a altere. «Prioridade» decide qual prevalece quando uma regra de URL também corresponde à página." } },
-        "ru": { "stringUnit": { "state": "translated", "value": "Пока адресная строка браузера в фокусе, LockIME устанавливает выбранный источник ввода, чтобы вы могли вводить веб-адреса. «Блокировать» удерживает его постоянно; «Переключить» задаёт его один раз и позволяет изменить. «Приоритет» определяет, что важнее, когда правило URL тоже подходит к странице." } },
-        "zh-Hans": { "stringUnit": { "state": "translated", "value": "当浏览器地址栏获得焦点时，LockIME 会设置为你选择的输入法，便于输入网址。「锁定」会保持不变；「切换」只设置一次，之后你可自行更改。「优先级」决定当某条网址规则也匹配当前页面时以哪个为准。" } },
-        "zh-Hant": { "stringUnit": { "state": "translated", "value": "當瀏覽器網址列取得焦點時，LockIME 會設定為你選擇的輸入法，方便輸入網址。「鎖定」會維持不變；「切換」只設定一次，之後你可自行變更。「優先順序」決定當某條網址規則也符合目前頁面時以哪個為準。" } }
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solange die Adressleiste eines Browsers fokussiert ist, legt LockIME die gewählte Eingabequelle fest, damit Sie Webadressen eingeben können. „Sperren“ hält sie fest; „Wechseln“ setzt sie einmalig und lässt Sie sie ändern. „Priorität“ entscheidet, was Vorrang hat, wenn auch eine URL-Regel auf die Seite zutrifft."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras la barra de direcciones de un navegador está enfocada, LockIME establece la fuente de entrada elegida para que puedas escribir direcciones web. «Bloquear» la mantiene fija; «Cambiar» la establece una vez y te deja cambiarla. «Prioridad» decide cuál prevalece cuando una regla de URL también coincide con la página."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lorsque la barre d’adresse d’un navigateur est active, LockIME définit la source de saisie choisie pour vous permettre de saisir des adresses web. « Verrouiller » la maintient fixe ; « Basculer » la définit une fois et vous laisse la changer. « Priorité » détermine ce qui l’emporte lorsqu’une règle d’URL correspond aussi à la page."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ブラウザのアドレスバーがフォーカスされている間、LockIME は選択した入力ソースに設定し、ウェブアドレスを入力しやすくします。「ロック」は固定したままにし、「切り替え」は一度だけ設定して、その後は変更できます。「優先順位」は、URL ルールも現在のページに一致する場合にどちらを優先するかを決めます。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto a barra de endereços de um navegador está em foco, o LockIME define a fonte de entrada escolhida para você digitar endereços da web. «Bloquear» a mantém fixa; «Alternar» a define uma vez e permite que você a altere. «Prioridade» decide qual prevalece quando uma regra de URL também corresponde à página."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока адресная строка браузера в фокусе, LockIME устанавливает выбранный источник ввода, чтобы вы могли вводить веб-адреса. «Блокировать» удерживает его постоянно; «Переключить» задаёт его один раз и позволяет изменить. «Приоритет» определяет, что важнее, когда правило URL тоже подходит к странице."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当浏览器地址栏获得焦点时，LockIME 会设置为你选择的输入法，便于输入网址。「锁定」会保持不变；「切换」只设置一次，之后你可自行更改。「优先级」决定当某条网址规则也匹配当前页面时以哪个为准。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "當瀏覽器網址列取得焦點時，LockIME 會設定為你選擇的輸入法，方便輸入網址。「鎖定」會維持不變；「切換」只設定一次，之後你可自行變更。「優先順序」決定當某條網址規則也符合目前頁面時以哪個為準。"
+          }
+        }
       }
     },
-    "Voice Input": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Spracheingabe"}}, "es": {"stringUnit": {"state": "translated", "value": "Entrada de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Saisie vocale"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力"}}, "pt": {"stringUnit": {"state": "translated", "value": "Entrada por voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Голосовой ввод"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入"}}}},
-    "Enable Voice Input Workflow": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Spracheingabe-Workflow aktivieren"}}, "es": {"stringUnit": {"state": "translated", "value": "Activar flujo de entrada de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Activer le workflow de saisie vocale"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力ワークフローを有効にする"}}, "pt": {"stringUnit": {"state": "translated", "value": "Ativar fluxo de entrada por voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Включить голосовой сценарий"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "启用语音输入工作流"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "啟用語音輸入工作流程"}}}},
-    "Use this shortcut in any app to start or end the configured voice input workflow.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Verwenden Sie diesen Kurzbefehl in jeder App, um den konfigurierten Spracheingabe-Workflow zu starten oder zu beenden."}}, "es": {"stringUnit": {"state": "translated", "value": "Usa este atajo en cualquier app para iniciar o finalizar el flujo de entrada de voz configurado."}}, "fr": {"stringUnit": {"state": "translated", "value": "Utilisez ce raccourci dans n’importe quelle app pour démarrer ou terminer le workflow de saisie vocale configuré."}}, "ja": {"stringUnit": {"state": "translated", "value": "任意のアプリでこのショートカットを使い、設定済みの音声入力ワークフローを開始または終了します。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Use este atalho em qualquer app para iniciar ou encerrar o fluxo de entrada por voz configurado."}}, "ru": {"stringUnit": {"state": "translated", "value": "Используйте это сочетание в любом приложении, чтобы начать или завершить настроенный голосовой сценарий."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "在任何 App 中使用此快捷键，开始或结束已配置的语音输入工作流。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "在任何 App 中使用此快捷鍵，開始或結束已設定的語音輸入工作流程。"}}}},
-    "Input Sources": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Eingabequellen"}}, "es": {"stringUnit": {"state": "translated", "value": "Fuentes de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "Sources de saisie"}}, "ja": {"stringUnit": {"state": "translated", "value": "入力ソース"}}, "pt": {"stringUnit": {"state": "translated", "value": "Fontes de entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Источники ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "输入法"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "輸入法"}}}},
-    "Voice input source": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Spracheingabequelle"}}, "es": {"stringUnit": {"state": "translated", "value": "Fuente de entrada de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Source de saisie vocale"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力ソース"}}, "pt": {"stringUnit": {"state": "translated", "value": "Fonte de entrada por voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Источник голосового ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入法"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入法"}}}},
-    "Voice Trigger": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sprachauslöser"}}, "es": {"stringUnit": {"state": "translated", "value": "Activador de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Déclencheur vocal"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声トリガー"}}, "pt": {"stringUnit": {"state": "translated", "value": "Acionador de voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Запуск голоса"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音触发"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音觸發"}}}},
-    "Voice behavior": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sprachverhalten"}}, "es": {"stringUnit": {"state": "translated", "value": "Comportamiento de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Comportement vocal"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声の動作"}}, "pt": {"stringUnit": {"state": "translated", "value": "Comportamento de voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Поведение голоса"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音行为"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音行為"}}}},
-    "Press once, press again to end": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Einmal drücken, erneut drücken zum Beenden"}}, "es": {"stringUnit": {"state": "translated", "value": "Pulsar una vez y otra vez para terminar"}}, "fr": {"stringUnit": {"state": "translated", "value": "Appuyer une fois, puis encore pour terminer"}}, "ja": {"stringUnit": {"state": "translated", "value": "一度押して開始、もう一度押して終了"}}, "pt": {"stringUnit": {"state": "translated", "value": "Pressione uma vez e novamente para terminar"}}, "ru": {"stringUnit": {"state": "translated", "value": "Нажать один раз, затем ещё раз для завершения"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "按一次开始，再按一次结束"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "按一次開始，再按一次結束"}}}},
-    "Hold to speak": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zum Sprechen gedrückt halten"}}, "es": {"stringUnit": {"state": "translated", "value": "Mantener para hablar"}}, "fr": {"stringUnit": {"state": "translated", "value": "Maintenir pour parler"}}, "ja": {"stringUnit": {"state": "translated", "value": "押したまま話す"}}, "pt": {"stringUnit": {"state": "translated", "value": "Manter pressionado para falar"}}, "ru": {"stringUnit": {"state": "translated", "value": "Удерживать для речи"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "按住说话"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "按住說話"}}}},
-    "Press once, any key to end": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Einmal drücken, beliebige Taste beendet"}}, "es": {"stringUnit": {"state": "translated", "value": "Pulsar una vez, cualquier tecla termina"}}, "fr": {"stringUnit": {"state": "translated", "value": "Appuyer une fois, n’importe quelle touche termine"}}, "ja": {"stringUnit": {"state": "translated", "value": "一度押して開始、任意のキーで終了"}}, "pt": {"stringUnit": {"state": "translated", "value": "Pressione uma vez, qualquer tecla termina"}}, "ru": {"stringUnit": {"state": "translated", "value": "Нажать один раз, любая клавиша завершает"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "按一次开始，任意键结束"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "按一次開始，任意鍵結束"}}}},
-    "Voice input method shortcut": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sprachkurzbefehl der Eingabemethode"}}, "es": {"stringUnit": {"state": "translated", "value": "Atajo de voz del método de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "Raccourci vocal de la méthode de saisie"}}, "ja": {"stringUnit": {"state": "translated", "value": "入力メソッド内の音声ショートカット"}}, "pt": {"stringUnit": {"state": "translated", "value": "Atalho de voz do método de entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Голосовое сочетание метода ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "输入法内部语音快捷键"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "輸入法內部語音快捷鍵"}}}},
-    "Restore input source": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Eingabequelle wiederherstellen"}}, "es": {"stringUnit": {"state": "translated", "value": "Restaurar fuente de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "Restaurer la source de saisie"}}, "ja": {"stringUnit": {"state": "translated", "value": "復元する入力ソース"}}, "pt": {"stringUnit": {"state": "translated", "value": "Restaurar fonte de entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Восстановить источник ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "恢复输入法"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "恢復輸入法"}}}},
-    "After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before enabling the workflow.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Nach Ende der Spracheingabe stellt LockIME die globale Standard-Eingabequelle aus den App-Regeln wieder her. Legen Sie diese Standardregel fest, bevor Sie den Workflow aktivieren."}}, "es": {"stringUnit": {"state": "translated", "value": "Cuando termina la entrada de voz, LockIME restaura la fuente de entrada predeterminada global de Reglas de apps. Configura esa regla predeterminada antes de activar el flujo."}}, "fr": {"stringUnit": {"state": "translated", "value": "À la fin de la saisie vocale, LockIME restaure la source de saisie par défaut globale définie dans les règles d’apps. Définissez cette règle par défaut avant d’activer le workflow."}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力が終了すると、LockIME はアプリルールのグローバルデフォルト入力ソースを復元します。ワークフローを有効にする前に、そのデフォルトルールを設定してください。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Quando a entrada por voz termina, o LockIME restaura a fonte de entrada padrão global das Regras de apps. Defina essa regra padrão antes de ativar o fluxo."}}, "ru": {"stringUnit": {"state": "translated", "value": "После завершения голосового ввода LockIME восстанавливает глобальный источник ввода по умолчанию из правил приложений. Настройте это правило по умолчанию перед включением сценария."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入结束后，LockIME 会恢复「应用规则」里的全局默认输入法。启用工作流前，请先在那里设置默认规则。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入結束後，LockIME 會恢復「應用程式規則」裡的全域預設輸入法。啟用工作流程前，請先在那裡設定預設規則。"}}}},
-    "Automatic restore timeout": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zeitlimit für automatische Wiederherstellung"}}, "es": {"stringUnit": {"state": "translated", "value": "Tiempo de espera de restauración automática"}}, "fr": {"stringUnit": {"state": "translated", "value": "Délai de restauration automatique"}}, "ja": {"stringUnit": {"state": "translated", "value": "自動復元タイムアウト"}}, "pt": {"stringUnit": {"state": "translated", "value": "Tempo limite de restauração automática"}}, "ru": {"stringUnit": {"state": "translated", "value": "Тайм-аут автовосстановления"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "自动恢复超时"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "自動恢復逾時"}}}},
-    "10 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "10 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "10 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "10 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "10 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "10 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "10 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "10 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "10 秒"}}}},
-    "20 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "20 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "20 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "20 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "20 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "20 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "20 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "20 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "20 秒"}}}},
-    "30 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "30 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "30 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "30 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "30 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "30 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "30 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "30 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "30 秒"}}}},
-    "60 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "60 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "60 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "60 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "60 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "60 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "60 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "60 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "60 秒"}}}},
-    "120 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "120 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "120 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "120 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "120 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "120 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "120 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "120 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "120 秒"}}}},
-    "300 seconds": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "300 Sekunden"}}, "es": {"stringUnit": {"state": "translated", "value": "300 segundos"}}, "fr": {"stringUnit": {"state": "translated", "value": "300 secondes"}}, "ja": {"stringUnit": {"state": "translated", "value": "300 秒"}}, "pt": {"stringUnit": {"state": "translated", "value": "300 segundos"}}, "ru": {"stringUnit": {"state": "translated", "value": "300 секунд"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "300 秒"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "300 秒"}}}},
-    "The voice behavior and shortcut here must match the voice input settings in the selected input method. LockIME only switches to that input method and sends this configured shortcut.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Das Sprachverhalten und der Kurzbefehl hier müssen mit den Spracheingabeeinstellungen der gewählten Eingabemethode übereinstimmen. LockIME wechselt nur zu dieser Eingabemethode und sendet den hier konfigurierten Kurzbefehl."}}, "es": {"stringUnit": {"state": "translated", "value": "El comportamiento de voz y el atajo aquí deben coincidir con la configuración de entrada de voz del método de entrada seleccionado. LockIME solo cambia a ese método de entrada y envía este atajo configurado."}}, "fr": {"stringUnit": {"state": "translated", "value": "Le comportement vocal et le raccourci définis ici doivent correspondre aux réglages de saisie vocale de la méthode de saisie sélectionnée. LockIME se contente de basculer vers cette méthode et d’envoyer ce raccourci configuré."}}, "ja": {"stringUnit": {"state": "translated", "value": "ここでの音声動作とショートカットは、選択した入力メソッド内の音声入力設定と一致している必要があります。LockIME はその入力メソッドへ切り替え、このショートカットを送信するだけです。"}}, "pt": {"stringUnit": {"state": "translated", "value": "O comportamento de voz e o atalho aqui devem corresponder às configurações de entrada por voz do método de entrada selecionado. O LockIME apenas alterna para esse método de entrada e envia este atalho configurado."}}, "ru": {"stringUnit": {"state": "translated", "value": "Поведение голоса и сочетание здесь должны совпадать с настройками голосового ввода в выбранном методе ввода. LockIME только переключается на этот метод ввода и отправляет настроенное сочетание."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "这里的语音行为和快捷键必须与所选输入法内部的语音输入设置保持一致。LockIME 只负责切换到该输入法并发送这里配置的快捷键。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "這裡的語音行為和快捷鍵必須與所選輸入法內部的語音輸入設定保持一致。LockIME 只負責切換到該輸入法並送出這裡設定的快捷鍵。"}}}},
-    "Press shortcut…": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Kurzbefehl drücken …"}}, "es": {"stringUnit": {"state": "translated", "value": "Pulsa el atajo…"}}, "fr": {"stringUnit": {"state": "translated", "value": "Appuyez sur le raccourci…"}}, "ja": {"stringUnit": {"state": "translated", "value": "ショートカットを押す…"}}, "pt": {"stringUnit": {"state": "translated", "value": "Pressione o atalho…"}}, "ru": {"stringUnit": {"state": "translated", "value": "Нажмите сочетание…"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "按下快捷键…"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "按下快捷鍵…"}}}},
-    "Record shortcut": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Kurzbefehl aufzeichnen"}}, "es": {"stringUnit": {"state": "translated", "value": "Grabar atajo"}}, "fr": {"stringUnit": {"state": "translated", "value": "Enregistrer le raccourci"}}, "ja": {"stringUnit": {"state": "translated", "value": "ショートカットを記録"}}, "pt": {"stringUnit": {"state": "translated", "value": "Gravar atalho"}}, "ru": {"stringUnit": {"state": "translated", "value": "Записать сочетание"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "录入快捷键"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "錄入快捷鍵"}}}},
-    "Clear": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Löschen"}}, "es": {"stringUnit": {"state": "translated", "value": "Borrar"}}, "fr": {"stringUnit": {"state": "translated", "value": "Effacer"}}, "ja": {"stringUnit": {"state": "translated", "value": "クリア"}}, "pt": {"stringUnit": {"state": "translated", "value": "Limpar"}}, "ru": {"stringUnit": {"state": "translated", "value": "Очистить"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "清除"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "清除"}}}},
-    "Key": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Taste"}}, "es": {"stringUnit": {"state": "translated", "value": "Tecla"}}, "fr": {"stringUnit": {"state": "translated", "value": "Touche"}}, "ja": {"stringUnit": {"state": "translated", "value": "キー"}}, "pt": {"stringUnit": {"state": "translated", "value": "Tecla"}}, "ru": {"stringUnit": {"state": "translated", "value": "Клавиша"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "按键"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "按鍵"}}}},
-    "Key code": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Tastencode"}}, "es": {"stringUnit": {"state": "translated", "value": "Código de tecla"}}, "fr": {"stringUnit": {"state": "translated", "value": "Code de touche"}}, "ja": {"stringUnit": {"state": "translated", "value": "キーコード"}}, "pt": {"stringUnit": {"state": "translated", "value": "Código da tecla"}}, "ru": {"stringUnit": {"state": "translated", "value": "Код клавиши"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "键码"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "鍵碼"}}}},
-    "Set": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Festlegen"}}, "es": {"stringUnit": {"state": "translated", "value": "Definir"}}, "fr": {"stringUnit": {"state": "translated", "value": "Définir"}}, "ja": {"stringUnit": {"state": "translated", "value": "設定"}}, "pt": {"stringUnit": {"state": "translated", "value": "Definir"}}, "ru": {"stringUnit": {"state": "translated", "value": "Задать"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "设置"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "設定"}}}},
-    "Command": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Befehl"}}, "es": {"stringUnit": {"state": "translated", "value": "Comando"}}, "fr": {"stringUnit": {"state": "translated", "value": "Commande"}}, "ja": {"stringUnit": {"state": "translated", "value": "Command"}}, "pt": {"stringUnit": {"state": "translated", "value": "Command"}}, "ru": {"stringUnit": {"state": "translated", "value": "Command"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "Command"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "Command"}}}},
-    "Control": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Control"}}, "es": {"stringUnit": {"state": "translated", "value": "Control"}}, "fr": {"stringUnit": {"state": "translated", "value": "Contrôle"}}, "ja": {"stringUnit": {"state": "translated", "value": "Control"}}, "pt": {"stringUnit": {"state": "translated", "value": "Control"}}, "ru": {"stringUnit": {"state": "translated", "value": "Control"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "Control"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "Control"}}}},
-    "Option": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Option"}}, "es": {"stringUnit": {"state": "translated", "value": "Opción"}}, "fr": {"stringUnit": {"state": "translated", "value": "Option"}}, "ja": {"stringUnit": {"state": "translated", "value": "Option"}}, "pt": {"stringUnit": {"state": "translated", "value": "Option"}}, "ru": {"stringUnit": {"state": "translated", "value": "Option"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "Option"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "Option"}}}},
-    "Shift": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Umschalt"}}, "es": {"stringUnit": {"state": "translated", "value": "Mayús"}}, "fr": {"stringUnit": {"state": "translated", "value": "Majuscule"}}, "ja": {"stringUnit": {"state": "translated", "value": "Shift"}}, "pt": {"stringUnit": {"state": "translated", "value": "Shift"}}, "ru": {"stringUnit": {"state": "translated", "value": "Shift"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "Shift"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "Shift"}}}},
-    "Keyboard event monitoring may be required for:": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Tastaturereignis-Überwachung kann erforderlich sein für:"}}, "es": {"stringUnit": {"state": "translated", "value": "La supervisión de eventos de teclado puede ser necesaria para:"}}, "fr": {"stringUnit": {"state": "translated", "value": "La surveillance des événements clavier peut être requise pour :"}}, "ja": {"stringUnit": {"state": "translated", "value": "キーボードイベント監視が必要になる場合があります:"}}, "pt": {"stringUnit": {"state": "translated", "value": "O monitoramento de eventos do teclado pode ser necessário para:"}}, "ru": {"stringUnit": {"state": "translated", "value": "Мониторинг событий клавиатуры может потребоваться для:"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "以下功能可能需要键盘事件监听："}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "以下功能可能需要鍵盤事件監聽："}}}},
-    "Any-key voice ending": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sprache mit beliebiger Taste beenden"}}, "es": {"stringUnit": {"state": "translated", "value": "Finalizar voz con cualquier tecla"}}, "fr": {"stringUnit": {"state": "translated", "value": "Fin vocale par n’importe quelle touche"}}, "ja": {"stringUnit": {"state": "translated", "value": "任意のキーで音声を終了"}}, "pt": {"stringUnit": {"state": "translated", "value": "Encerrar voz com qualquer tecla"}}, "ru": {"stringUnit": {"state": "translated", "value": "Завершение голоса любой клавишей"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "任意键结束语音"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "任意鍵結束語音"}}}},
-    "Input Monitoring": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Eingabeüberwachung"}}, "es": {"stringUnit": {"state": "translated", "value": "Monitorización de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "Surveillance de l’entrée"}}, "ja": {"stringUnit": {"state": "translated", "value": "入力監視"}}, "pt": {"stringUnit": {"state": "translated", "value": "Monitoramento de entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Мониторинг ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "输入监控"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "輸入監控"}}}},
-    "macOS may ask for Input Monitoring when LockIME listens for the key that ends a voice input session. The listener is pass-through and does not consume the key.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "macOS kann Eingabeüberwachung anfordern, wenn LockIME auf die Taste wartet, die eine Spracheingabesitzung beendet. Der Listener ist pass-through und verbraucht die Taste nicht."}}, "es": {"stringUnit": {"state": "translated", "value": "macOS puede pedir Monitorización de entrada cuando LockIME escucha la tecla que termina una sesión de entrada de voz. El listener deja pasar la tecla y no la consume."}}, "fr": {"stringUnit": {"state": "translated", "value": "macOS peut demander la surveillance de l’entrée lorsque LockIME écoute la touche qui termine une session de saisie vocale. L’écoute est transparente et ne consomme pas la touche."}}, "ja": {"stringUnit": {"state": "translated", "value": "LockIME が音声入力セッションを終了するキーを監視する際、macOS が入力監視の許可を求めることがあります。リスナーはパススルーで、そのキーを消費しません。"}}, "pt": {"stringUnit": {"state": "translated", "value": "O macOS pode solicitar Monitoramento de Entrada quando o LockIME escuta a tecla que encerra uma sessão de entrada por voz. O listener é pass-through e não consome a tecla."}}, "ru": {"stringUnit": {"state": "translated", "value": "macOS может запросить мониторинг ввода, когда LockIME ожидает клавишу завершения голосового ввода. Слушатель пропускает клавишу дальше и не поглощает её."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "当 LockIME 监听用于结束语音输入会话的按键时，macOS 可能会请求输入监控权限。监听器是透传的，不会吞掉该按键。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "當 LockIME 監聽用於結束語音輸入工作階段的按鍵時，macOS 可能會要求輸入監控權限。監聽器是透傳的，不會吃掉該按鍵。"}}}},
-    "Input Monitoring access granted": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zugriff auf Eingabeüberwachung gewährt"}}, "es": {"stringUnit": {"state": "translated", "value": "Acceso a Monitorización de entrada concedido"}}, "fr": {"stringUnit": {"state": "translated", "value": "Accès à la surveillance de l’entrée accordé"}}, "ja": {"stringUnit": {"state": "translated", "value": "入力監視アクセスが許可されています"}}, "pt": {"stringUnit": {"state": "translated", "value": "Acesso ao Monitoramento de Entrada concedido"}}, "ru": {"stringUnit": {"state": "translated", "value": "Доступ к мониторингу ввода предоставлен"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "已授予输入监控权限"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "已授予輸入監控權限"}}}},
-    "Grant Input Monitoring Access": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zugriff auf Eingabeüberwachung gewähren"}}, "es": {"stringUnit": {"state": "translated", "value": "Conceder acceso a Monitorización de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "Autoriser la surveillance de l’entrée"}}, "ja": {"stringUnit": {"state": "translated", "value": "入力監視アクセスを許可"}}, "pt": {"stringUnit": {"state": "translated", "value": "Conceder acesso ao Monitoramento de Entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Предоставить доступ к мониторингу ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "授予输入监控权限"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "授予輸入監控權限"}}}},
-    "Voice input requires Accessibility and Input Monitoring": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Spracheingabe erfordert Bedienungshilfen und Eingabeüberwachung"}}, "es": {"stringUnit": {"state": "translated", "value": "La entrada de voz requiere Accesibilidad y Monitorización de entrada"}}, "fr": {"stringUnit": {"state": "translated", "value": "La saisie vocale nécessite Accessibilité et Surveillance de l’entrée"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力にはアクセシビリティと入力監視が必要です"}}, "pt": {"stringUnit": {"state": "translated", "value": "A entrada por voz requer Acessibilidade e Monitoramento de Entrada"}}, "ru": {"stringUnit": {"state": "translated", "value": "Для голосового ввода требуются Универсальный доступ и Мониторинг ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入需要辅助功能和输入监控权限"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入需要輔助使用和輸入監控權限"}}}},
-    "Grant once to unlock three optional features:": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Einmal gewähren, um drei optionale Funktionen freizuschalten:"}}, "es": {"stringUnit": {"state": "translated", "value": "Concede una vez para habilitar tres funciones opcionales:"}}, "fr": {"stringUnit": {"state": "translated", "value": "Autorisez une fois pour activer trois fonctions facultatives :"}}, "ja": {"stringUnit": {"state": "translated", "value": "一度許可すると、3 つのオプション機能が有効になります:"}}, "pt": {"stringUnit": {"state": "translated", "value": "Conceda uma vez para ativar três recursos opcionais:"}}, "ru": {"stringUnit": {"state": "translated", "value": "Предоставьте доступ один раз, чтобы включить три дополнительные функции:"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "授权一次即可启用三项可选功能："}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "授權一次即可啟用三項選用功能："}}}},
-    "Sending the voice input shortcut": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Senden des Spracheingabe-Kurzbefehls"}}, "es": {"stringUnit": {"state": "translated", "value": "Enviar el atajo de entrada de voz"}}, "fr": {"stringUnit": {"state": "translated", "value": "Envoi du raccourci de saisie vocale"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力ショートカットの送信"}}, "pt": {"stringUnit": {"state": "translated", "value": "Enviar o atalho de entrada por voz"}}, "ru": {"stringUnit": {"state": "translated", "value": "Отправка сочетания голосового ввода"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "发送语音输入快捷键"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "傳送語音輸入快捷鍵"}}}},
-    "Voice workflow shortcut and any-key ending": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Sprachworkflow-Kurzbefehl und Beenden mit beliebiger Taste"}}, "es": {"stringUnit": {"state": "translated", "value": "Atajo del flujo de voz y finalización con cualquier tecla"}}, "fr": {"stringUnit": {"state": "translated", "value": "Raccourci du flux vocal et fin par n’importe quelle touche"}}, "ja": {"stringUnit": {"state": "translated", "value": "音声ワークフローのショートカットと任意キーでの終了"}}, "pt": {"stringUnit": {"state": "translated", "value": "Atalho do fluxo de voz e encerramento com qualquer tecla"}}, "ru": {"stringUnit": {"state": "translated", "value": "Сочетание голосового сценария и завершение любой клавишей"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音工作流快捷键和任意键结束"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音工作流程快捷鍵和任意鍵結束"}}}},
-    "Voice input is active. End the current session before changing these settings.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Spracheingabe ist aktiv. Beenden Sie die aktuelle Sitzung, bevor Sie diese Einstellungen ändern."}}, "es": {"stringUnit": {"state": "translated", "value": "La entrada de voz está activa. Finaliza la sesión actual antes de cambiar estos ajustes."}}, "fr": {"stringUnit": {"state": "translated", "value": "La saisie vocale est active. Terminez la session en cours avant de modifier ces réglages."}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力が有効です。これらの設定を変更する前に、現在のセッションを終了してください。"}}, "pt": {"stringUnit": {"state": "translated", "value": "A entrada por voz está ativa. Encerre a sessão atual antes de alterar esses ajustes."}}, "ru": {"stringUnit": {"state": "translated", "value": "Голосовой ввод активен. Завершите текущий сеанс, прежде чем менять эти настройки."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入正在进行。请先结束当前会话，再修改这些设置。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入正在進行。請先結束目前工作階段，再修改這些設定。"}}}},
-    "Select a voice input source before using voice input.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Wählen Sie eine Spracheingabequelle aus, bevor Sie die Spracheingabe verwenden."}}, "es": {"stringUnit": {"state": "translated", "value": "Selecciona una fuente de entrada de voz antes de usar la entrada de voz."}}, "fr": {"stringUnit": {"state": "translated", "value": "Sélectionnez une source de saisie vocale avant d’utiliser la saisie vocale."}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力を使う前に、音声入力ソースを選択してください。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Selecione uma fonte de entrada por voz antes de usar a entrada por voz."}}, "ru": {"stringUnit": {"state": "translated", "value": "Выберите источник голосового ввода перед использованием голосового ввода."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "使用语音输入前，请先选择语音输入法。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "使用語音輸入前，請先選擇語音輸入法。"}}}},
-    "Set a global default input source in App Rules before using voice input.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Legen Sie in den App-Regeln eine globale Standard-Eingabequelle fest, bevor Sie die Spracheingabe verwenden."}}, "es": {"stringUnit": {"state": "translated", "value": "Configura una fuente de entrada predeterminada global en Reglas de apps antes de usar la entrada de voz."}}, "fr": {"stringUnit": {"state": "translated", "value": "Définissez une source de saisie par défaut globale dans les règles d’apps avant d’utiliser la saisie vocale."}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力を使う前に、アプリルールでグローバルデフォルト入力ソースを設定してください。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Defina uma fonte de entrada padrão global em Regras de apps antes de usar a entrada por voz."}}, "ru": {"stringUnit": {"state": "translated", "value": "Перед использованием голосового ввода задайте глобальный источник ввода по умолчанию в правилах приложений."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "使用语音输入前，请先在「应用规则」中设置全局默认输入法。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "使用語音輸入前，請先在「應用程式規則」中設定全域預設輸入法。"}}}},
-    "The configured global default input source is unavailable.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Die konfigurierte globale Standard-Eingabequelle ist nicht verfügbar."}}, "es": {"stringUnit": {"state": "translated", "value": "La fuente de entrada predeterminada global configurada no está disponible."}}, "fr": {"stringUnit": {"state": "translated", "value": "La source de saisie par défaut globale configurée est indisponible."}}, "ja": {"stringUnit": {"state": "translated", "value": "設定済みのグローバルデフォルト入力ソースは利用できません。"}}, "pt": {"stringUnit": {"state": "translated", "value": "A fonte de entrada padrão global configurada não está disponível."}}, "ru": {"stringUnit": {"state": "translated", "value": "Настроенный глобальный источник ввода по умолчанию недоступен."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "已配置的全局默认输入法不可用。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "已設定的全域預設輸入法無法使用。"}}}},
-    "The configured voice input source is unavailable.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Die konfigurierte Spracheingabequelle ist nicht verfügbar."}}, "es": {"stringUnit": {"state": "translated", "value": "La fuente de entrada de voz configurada no está disponible."}}, "fr": {"stringUnit": {"state": "translated", "value": "La source de saisie vocale configurée est indisponible."}}, "ja": {"stringUnit": {"state": "translated", "value": "設定済みの音声入力ソースは利用できません。"}}, "pt": {"stringUnit": {"state": "translated", "value": "A fonte de entrada por voz configurada não está disponível."}}, "ru": {"stringUnit": {"state": "translated", "value": "Настроенный источник голосового ввода недоступен."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "已配置的语音输入法不可用。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "已設定的語音輸入法無法使用。"}}}},
-    "Unavailable": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Nicht verfügbar"}}, "es": {"stringUnit": {"state": "translated", "value": "No disponible"}}, "fr": {"stringUnit": {"state": "translated", "value": "Indisponible"}}, "ja": {"stringUnit": {"state": "translated", "value": "利用不可"}}, "pt": {"stringUnit": {"state": "translated", "value": "Indisponível"}}, "ru": {"stringUnit": {"state": "translated", "value": "Недоступно"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "不可用"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "無法使用"}}}},
-    "Not set": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Nicht festgelegt"}}, "es": {"stringUnit": {"state": "translated", "value": "Sin configurar"}}, "fr": {"stringUnit": {"state": "translated", "value": "Non défini"}}, "ja": {"stringUnit": {"state": "translated", "value": "未設定"}}, "pt": {"stringUnit": {"state": "translated", "value": "Não definido"}}, "ru": {"stringUnit": {"state": "translated", "value": "Не задано"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "未设置"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "未設定"}}}},
-    "Not required": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Nicht erforderlich"}}, "es": {"stringUnit": {"state": "translated", "value": "No requerido"}}, "fr": {"stringUnit": {"state": "translated", "value": "Non requis"}}, "ja": {"stringUnit": {"state": "translated", "value": "不要"}}, "pt": {"stringUnit": {"state": "translated", "value": "Não necessário"}}, "ru": {"stringUnit": {"state": "translated", "value": "Не требуется"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "无需设置"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "無需設定"}}}},
-    "The voice input source matches the global default. Set the voice shortcut in that input method, then use it directly; LockIME will not intercept it.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Die Spracheingabequelle entspricht dem globalen Standard. Legen Sie den Sprachkurzbefehl in dieser Eingabemethode fest und verwenden Sie ihn direkt; LockIME fängt ihn nicht ab."}}, "es": {"stringUnit": {"state": "translated", "value": "La fuente de entrada de voz coincide con la predeterminada global. Configura el atajo de voz en ese método de entrada y úsalo directamente; LockIME no lo interceptará."}}, "fr": {"stringUnit": {"state": "translated", "value": "La source de saisie vocale correspond à la valeur par défaut globale. Définissez le raccourci vocal dans cette méthode de saisie, puis utilisez-le directement ; LockIME ne l’interceptera pas."}}, "ja": {"stringUnit": {"state": "translated", "value": "音声入力ソースはグローバルデフォルトと同じです。その入力メソッド内で音声ショートカットを設定し、直接使ってください。LockIME は捕捉しません。"}}, "pt": {"stringUnit": {"state": "translated", "value": "A fonte de entrada por voz corresponde ao padrão global. Defina o atalho de voz nesse método de entrada e use-o diretamente; o LockIME não o interceptará."}}, "ru": {"stringUnit": {"state": "translated", "value": "Источник голосового ввода совпадает с глобальным по умолчанию. Настройте голосовое сочетание в этом методе ввода и используйте его напрямую; LockIME не будет его перехватывать."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "语音输入法与全局默认输入法相同。请在该输入法内部设置语音快捷键，然后直接使用；LockIME 不会拦截它。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "語音輸入法與全域預設輸入法相同。請在該輸入法內部設定語音快捷鍵，然後直接使用；LockIME 不會攔截它。"}}}},
-    "Record the selected input method's voice shortcut here. It must match the shortcut configured inside that input method.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zeichnen Sie hier den Sprachkurzbefehl der ausgewählten Eingabemethode auf. Er muss mit dem Kurzbefehl übereinstimmen, der in dieser Eingabemethode eingerichtet ist."}}, "es": {"stringUnit": {"state": "translated", "value": "Graba aquí el atajo de voz del método de entrada seleccionado. Debe coincidir con el atajo configurado dentro de ese método de entrada."}}, "fr": {"stringUnit": {"state": "translated", "value": "Enregistrez ici le raccourci vocal de la méthode de saisie sélectionnée. Il doit correspondre au raccourci configuré dans cette méthode de saisie."}}, "ja": {"stringUnit": {"state": "translated", "value": "選択した入力メソッドの音声ショートカットをここで記録してください。その入力メソッド内で設定したショートカットと一致している必要があります。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Grave aqui o atalho de voz do método de entrada selecionado. Ele deve corresponder ao atalho configurado dentro desse método de entrada."}}, "ru": {"stringUnit": {"state": "translated", "value": "Запишите здесь голосовое сочетание выбранного метода ввода. Оно должно совпадать с сочетанием, настроенным внутри этого метода ввода."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "请在这里录入所选输入法的语音快捷键。它必须与该输入法内部配置的语音快捷键保持一致。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "請在這裡錄入所選輸入法的語音快捷鍵。它必須與該輸入法內部設定的語音快捷鍵保持一致。"}}}},
-    "The last voice input workflow failed. Check that the configured input sources are still available.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Der letzte Spracheingabe-Workflow ist fehlgeschlagen. Prüfen Sie, ob die konfigurierten Eingabequellen noch verfügbar sind."}}, "es": {"stringUnit": {"state": "translated", "value": "El último flujo de entrada de voz falló. Comprueba que las fuentes de entrada configuradas sigan disponibles."}}, "fr": {"stringUnit": {"state": "translated", "value": "Le dernier workflow de saisie vocale a échoué. Vérifiez que les sources de saisie configurées sont toujours disponibles."}}, "ja": {"stringUnit": {"state": "translated", "value": "前回の音声入力ワークフローに失敗しました。設定済みの入力ソースがまだ利用できるか確認してください。"}}, "pt": {"stringUnit": {"state": "translated", "value": "O último fluxo de entrada por voz falhou. Verifique se as fontes de entrada configuradas ainda estão disponíveis."}}, "ru": {"stringUnit": {"state": "translated", "value": "Последний голосовой сценарий завершился ошибкой. Проверьте, что настроенные источники ввода всё ещё доступны."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "上一次语音输入工作流失败。请检查配置的输入法是否仍然可用。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "上一次語音輸入工作流程失敗。請檢查設定的輸入法是否仍然可用。"}}}},
-    "Because the selected input method is already the global default, LockIME does not intercept its voice shortcut.": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Da die ausgewählte Eingabemethode bereits der globale Standard ist, fängt LockIME ihren Spracheingabe-Kurzbefehl nicht ab."}}, "es": {"stringUnit": {"state": "translated", "value": "Como el método de entrada seleccionado ya es el predeterminado global, LockIME no intercepta su atajo de voz."}}, "fr": {"stringUnit": {"state": "translated", "value": "Comme la méthode de saisie sélectionnée est déjà la valeur par défaut globale, LockIME n’intercepte pas son raccourci vocal."}}, "ja": {"stringUnit": {"state": "translated", "value": "選択した入力メソッドはすでにグローバルデフォルトのため、LockIME はその音声ショートカットを捕捉しません。"}}, "pt": {"stringUnit": {"state": "translated", "value": "Como o método de entrada selecionado já é o padrão global, o LockIME não intercepta seu atalho de voz."}}, "ru": {"stringUnit": {"state": "translated", "value": "Поскольку выбранный метод ввода уже является глобальным по умолчанию, LockIME не перехватывает его голосовое сочетание."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "由于所选输入法已经是全局默认输入法，LockIME 不会拦截它的语音快捷键。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "由於所選輸入法已經是全域預設輸入法，LockIME 不會攔截它的語音快捷鍵。"}}}},
-    "Click to set": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Zum Festlegen klicken"}}, "es": {"stringUnit": {"state": "translated", "value": "Haz clic para configurar"}}, "fr": {"stringUnit": {"state": "translated", "value": "Cliquez pour définir"}}, "ja": {"stringUnit": {"state": "translated", "value": "クリックして設定"}}, "pt": {"stringUnit": {"state": "translated", "value": "Clique para definir"}}, "ru": {"stringUnit": {"state": "translated", "value": "Нажмите для настройки"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "点击设置"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "點按設定"}}}},
-    "Left": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Links"}}, "es": {"stringUnit": {"state": "translated", "value": "Izquierda"}}, "fr": {"stringUnit": {"state": "translated", "value": "Gauche"}}, "ja": {"stringUnit": {"state": "translated", "value": "左"}}, "pt": {"stringUnit": {"state": "translated", "value": "Esquerda"}}, "ru": {"stringUnit": {"state": "translated", "value": "Лев."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "左"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "左"}}}},
-    "Right": {"localizations": {"de": {"stringUnit": {"state": "translated", "value": "Rechts"}}, "es": {"stringUnit": {"state": "translated", "value": "Derecha"}}, "fr": {"stringUnit": {"state": "translated", "value": "Droite"}}, "ja": {"stringUnit": {"state": "translated", "value": "右"}}, "pt": {"stringUnit": {"state": "translated", "value": "Direita"}}, "ru": {"stringUnit": {"state": "translated", "value": "Прав."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "右"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "右"}}}}
+    "Voice Input": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabe"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada de voz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisie vocale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada por voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовой ввод"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入"
+          }
+        }
+      }
+    },
+    "Enable Voice Input Workflow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabe-Workflow aktivieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar flujo de entrada de voz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer le workflow de saisie vocale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力ワークフローを有効にする"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar fluxo de entrada por voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включить голосовой сценарий"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启用语音输入工作流"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟用語音輸入工作流程"
+          }
+        }
+      }
+    },
+    "Input Sources": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingabequellen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuentes de entrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources de saisie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力ソース"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fontes de entrada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источники ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入法"
+          }
+        }
+      }
+    },
+    "Voice input source": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabequelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuente de entrada de voz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source de saisie vocale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力ソース"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte de entrada por voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источник голосового ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入法"
+          }
+        }
+      }
+    },
+    "Voice Trigger": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprachauslöser"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activador de voz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déclencheur vocal"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声トリガー"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acionador de voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запуск голоса"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音触发"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音觸發"
+          }
+        }
+      }
+    },
+    "Restore input source": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingabequelle wiederherstellen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar fuente de entrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurer la source de saisie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "復元する入力ソース"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar fonte de entrada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Восстановить источник ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復輸入法"
+          }
+        }
+      }
+    },
+    "Automatic restore timeout": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitlimit für automatische Wiederherstellung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiempo de espera de restauración automática"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Délai de restauration automatique"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動復元タイムアウト"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo limite de restauração automática"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тайм-аут автовосстановления"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动恢复超时"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動恢復逾時"
+          }
+        }
+      }
+    },
+    "10 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 秒"
+          }
+        }
+      }
+    },
+    "20 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "20 秒"
+          }
+        }
+      }
+    },
+    "30 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 秒"
+          }
+        }
+      }
+    },
+    "60 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 秒"
+          }
+        }
+      }
+    },
+    "120 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 秒"
+          }
+        }
+      }
+    },
+    "300 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 Sekunden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 secondes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 秒"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 segundos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 секунд"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 秒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 秒"
+          }
+        }
+      }
+    },
+    "Press shortcut…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurzbefehl drücken …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulsa el atajo…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyez sur le raccourci…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ショートカットを押す…"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pressione o atalho…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажмите сочетание…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按下快捷键…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按下快捷鍵…"
+          }
+        }
+      }
+    },
+    "Record shortcut": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurzbefehl aufzeichnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grabar atajo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le raccourci"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ショートカットを記録"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gravar atalho"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Записать сочетание"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录入快捷键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "錄入快捷鍵"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリア"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limpar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除"
+          }
+        }
+      }
+    },
+    "Key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tecla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touche"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キー"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tecla"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Клавиша"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按鍵"
+          }
+        }
+      }
+    },
+    "Key code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastencode"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de tecla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code de touche"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーコード"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código da tecla"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Код клавиши"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鍵碼"
+          }
+        }
+      }
+    },
+    "Set": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Festlegen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definir"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Задать"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
+          }
+        }
+      }
+    },
+    "Command": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Befehl"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commande"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        }
+      }
+    },
+    "Control": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrôle"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        }
+      }
+    },
+    "Option": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opción"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        }
+      }
+    },
+    "Shift": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umschalt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mayús"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Majuscule"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        }
+      }
+    },
+    "Grant once to unlock three optional features:": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授权一次即可解锁三项可选功能："
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授權一次即可解鎖三項選用功能："
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一度許可すると 3 つの任意機能が使えます："
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez une fois pour débloquer trois fonctions optionnelles :"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einmal erlauben, um drei optionale Funktionen freizuschalten:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concede una vez para desbloquear tres funciones opcionales:"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conceda uma vez para desbloquear três recursos opcionais:"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешите один раз, чтобы открыть три дополнительные функции:"
+          }
+        }
+      }
+    },
+    "Sending the voice input shortcut": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senden des Spracheingabe-Kurzbefehls"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar el atajo de entrada de voz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoi du raccourci de saisie vocale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力ショートカットの送信"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar o atalho de entrada por voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправка сочетания голосового ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送语音输入快捷键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳送語音輸入快捷鍵"
+          }
+        }
+      }
+    },
+    "Voice input is active. End the current session before changing these settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabe ist aktiv. Beenden Sie die aktuelle Sitzung, bevor Sie diese Einstellungen ändern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La entrada de voz está activa. Finaliza la sesión actual antes de cambiar estos ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La saisie vocale est active. Terminez la session en cours avant de modifier ces réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力が有効です。これらの設定を変更する前に、現在のセッションを終了してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A entrada por voz está ativa. Encerre a sessão atual antes de alterar esses ajustes."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовой ввод активен. Завершите текущий сеанс, прежде чем менять эти настройки."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入正在进行。请先结束当前会话，再修改这些设置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入正在進行。請先結束目前工作階段，再修改這些設定。"
+          }
+        }
+      }
+    },
+    "Select a voice input source before using voice input.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wählen Sie eine Spracheingabequelle aus, bevor Sie die Spracheingabe verwenden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona una fuente de entrada de voz antes de usar la entrada de voz."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionnez une source de saisie vocale avant d’utiliser la saisie vocale."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力を使う前に、音声入力ソースを選択してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecione uma fonte de entrada por voz antes de usar a entrada por voz."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите источник голосового ввода перед использованием голосового ввода."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用语音输入前，请先选择语音输入法。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用語音輸入前，請先選擇語音輸入法。"
+          }
+        }
+      }
+    },
+    "Set a global default input source in App Rules before using voice input.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legen Sie in den App-Regeln eine globale Standard-Eingabequelle fest, bevor Sie die Spracheingabe verwenden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura una fuente de entrada predeterminada global en Reglas de apps antes de usar la entrada de voz."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définissez une source de saisie par défaut globale dans les règles d’apps avant d’utiliser la saisie vocale."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力を使う前に、アプリルールでグローバルデフォルト入力ソースを設定してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Defina uma fonte de entrada padrão global em Regras de apps antes de usar a entrada por voz."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перед использованием голосового ввода задайте глобальный источник ввода по умолчанию в правилах приложений."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用语音输入前，请先在「应用规则」中设置全局默认输入法。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用語音輸入前，請先在「應用程式規則」中設定全域預設輸入法。"
+          }
+        }
+      }
+    },
+    "The configured global default input source is unavailable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die konfigurierte globale Standard-Eingabequelle ist nicht verfügbar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La fuente de entrada predeterminada global configurada no está disponible."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La source de saisie par défaut globale configurée est indisponible."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定済みのグローバルデフォルト入力ソースは利用できません。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fonte de entrada padrão global configurada não está disponível."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настроенный глобальный источник ввода по умолчанию недоступен."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已配置的全局默认输入法不可用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已設定的全域預設輸入法無法使用。"
+          }
+        }
+      }
+    },
+    "The configured voice input source is unavailable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die konfigurierte Spracheingabequelle ist nicht verfügbar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La fuente de entrada de voz configurada no está disponible."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La source de saisie vocale configurée est indisponible."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定済みの音声入力ソースは利用できません。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fonte de entrada por voz configurada não está disponível."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настроенный источник голосового ввода недоступен."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已配置的语音输入法不可用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已設定的語音輸入法無法使用。"
+          }
+        }
+      }
+    },
+    "Unavailable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indisponible"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用不可"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indisponível"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Недоступно"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不可用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法使用"
+          }
+        }
+      }
+    },
+    "Not set": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht festgelegt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin configurar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non défini"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未設定"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não definido"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не задано"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未設定"
+          }
+        }
+      }
+    },
+    "Not required": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht erforderlich"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No requerido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non requis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不要"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não necessário"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не требуется"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無需設定"
+          }
+        }
+      }
+    },
+    "Record the selected input method's voice shortcut here. It must match the shortcut configured inside that input method.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeichnen Sie hier den Sprachkurzbefehl der ausgewählten Eingabemethode auf. Er muss mit dem Kurzbefehl übereinstimmen, der in dieser Eingabemethode eingerichtet ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graba aquí el atajo de voz del método de entrada seleccionado. Debe coincidir con el atajo configurado dentro de ese método de entrada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez ici le raccourci vocal de la méthode de saisie sélectionnée. Il doit correspondre au raccourci configuré dans cette méthode de saisie."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択した入力メソッドの音声ショートカットをここで記録してください。その入力メソッド内で設定したショートカットと一致している必要があります。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grave aqui o atalho de voz do método de entrada selecionado. Ele deve corresponder ao atalho configurado dentro desse método de entrada."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запишите здесь голосовое сочетание выбранного метода ввода. Оно должно совпадать с сочетанием, настроенным внутри этого метода ввода."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在这里录入所选输入法的语音快捷键。它必须与该输入法内部配置的语音快捷键保持一致。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請在這裡錄入所選輸入法的語音快捷鍵。它必須與該輸入法內部設定的語音快捷鍵保持一致。"
+          }
+        }
+      }
+    },
+    "The last voice input workflow failed. Check that the configured input sources are still available.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der letzte Spracheingabe-Workflow ist fehlgeschlagen. Prüfen Sie, ob die konfigurierten Eingabequellen noch verfügbar sind."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El último flujo de entrada de voz falló. Comprueba que las fuentes de entrada configuradas sigan disponibles."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le dernier workflow de saisie vocale a échoué. Vérifiez que les sources de saisie configurées sont toujours disponibles."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前回の音声入力ワークフローに失敗しました。設定済みの入力ソースがまだ利用できるか確認してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O último fluxo de entrada por voz falhou. Verifique se as fontes de entrada configuradas ainda estão disponíveis."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Последний голосовой сценарий завершился ошибкой. Проверьте, что настроенные источники ввода всё ещё доступны."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一次语音输入工作流失败。请检查配置的输入法是否仍然可用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一次語音輸入工作流程失敗。請檢查設定的輸入法是否仍然可用。"
+          }
+        }
+      }
+    },
+    "Click to set": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Festlegen klicken"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz clic para configurar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cliquez pour définir"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリックして設定"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clique para definir"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажмите для настройки"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點按設定"
+          }
+        }
+      }
+    },
+    "Left": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Izquierda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gauche"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquerda"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лев."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左"
+          }
+        }
+      }
+    },
+    "Right": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derecha"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Droite"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direita"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прав."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右"
+          }
+        }
+      }
+    },
+    "The upper shortcut is LockIME's own trigger; the lower one is configured inside the selected input method. LockIME sends that one for you.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上面的快捷键是 LockIME 自己的触发键；下面的是在所选输入法内部配置的快捷键，LockIME 会替你发送它。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上面的快捷鍵是 LockIME 自己的觸發鍵；下面的是在所選輸入法內部設定的快捷鍵，LockIME 會代你送出它。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上のショートカットは LockIME 自身のトリガー、下は選択した入力メソッド内部で設定するものです。LockIME がそちらを代わりに送信します。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le raccourci du haut est le déclencheur propre à LockIME ; celui du bas se configure dans la méthode de saisie choisie. C'est ce dernier que LockIME envoie pour vous."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der obere Kurzbefehl ist LockIMEs eigener Auslöser, der untere ist in der gewählten Eingabemethode konfiguriert. Diesen sendet LockIME für Sie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El atajo de arriba es el activador propio de LockIME; el de abajo se configura dentro del método de entrada elegido. Ese es el que LockIME envía por ti."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O atalho de cima é o gatilho próprio do LockIME; o de baixo é configurado dentro do método de entrada escolhido. É esse que o LockIME envia por você."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Верхняя комбинация — собственный триггер LockIME, нижняя задаётся внутри выбранного метода ввода. Именно её LockIME отправляет за вас."
+          }
+        }
+      }
+    },
+    "The voice input source is already the global default, so no switch is needed and its shortcut is sent directly.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入法已经是全局默认输入法，无需切换，直接发送它的快捷键即可。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入法已經是全域預設輸入法，無需切換，直接送出它的快捷鍵即可。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力用の入力ソースはすでにグローバル既定なので切り替えは不要で、そのショートカットを直接送信します。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La source de saisie vocale est déjà la source par défaut globale : aucun changement n'est nécessaire, son raccourci est envoyé directement."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Spracheingabe-Quelle ist bereits die globale Standardquelle; ein Wechsel ist unnötig, ihr Kurzbefehl wird direkt gesendet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La fuente de entrada por voz ya es la predeterminada global, así que no hace falta cambiar y su atajo se envía directamente."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fonte de entrada por voz já é a padrão global, então não é preciso trocar e o atalho dela é enviado diretamente."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Источник голосового ввода уже является глобальным по умолчанию, поэтому переключение не нужно — его комбинация отправляется напрямую."
+          }
+        }
+      }
+    },
+    "Keyboard event posting granted": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已获得键盘事件发送权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已取得鍵盤事件傳送權限"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーボードイベントの送信が許可されています"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoi d'événements clavier autorisé"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senden von Tastaturereignissen erlaubt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envío de eventos de teclado concedido"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envio de eventos de teclado concedido"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправка событий клавиатуры разрешена"
+          }
+        }
+      }
+    },
+    "Grant to let LockIME send the voice input shortcut:": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授权后 LockIME 才能发送语音输入快捷键："
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授權後 LockIME 才能傳送語音輸入快捷鍵："
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME が音声入力のショートカットを送信できるように許可します："
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez LockIME à envoyer le raccourci de saisie vocale :"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlauben Sie LockIME, den Spracheingabe-Kurzbefehl zu senden:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concede permiso para que LockIME envíe el atajo de entrada de voz:"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conceda permissão para o LockIME enviar o atalho de entrada por voz:"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешите LockIME отправлять комбинацию голосового ввода:"
+          }
+        }
+      }
+    },
+    "Voice input requires permission to send keyboard events": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入需要发送键盘事件的权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入需要傳送鍵盤事件的權限"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力にはキーボードイベントを送信する権限が必要です"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La saisie vocale nécessite l'autorisation d'envoyer des événements clavier"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabe benötigt die Berechtigung, Tastaturereignisse zu senden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La entrada de voz requiere permiso para enviar eventos de teclado"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A entrada por voz precisa de permissão para enviar eventos de teclado"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для голосового ввода нужно разрешение на отправку событий клавиатуры"
+          }
+        }
+      }
+    },
+    "Input method voice shortcut": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprachkurzbefehl der Eingabemethode"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajo de voz del método de entrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourci vocal de la méthode de saisie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力メソッド内の音声ショートカット"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atalho de voz do método de entrada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовое сочетание метода ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入法内部语音快捷键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入法內部語音快捷鍵"
+          }
+        }
+      }
+    },
+    "Grant Event Posting Access": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zugriff auf Eingabeüberwachung gewähren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conceder acceso a Monitorización de entrada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser la surveillance de l’entrée"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力監視アクセスを許可"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conceder acesso ao Monitoramento de Entrada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предоставить доступ к мониторингу ввода"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授予输入监控权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授予輸入監控權限"
+          }
+        }
+      }
+    },
+    "The shortcut below is the one configured inside the selected input method. LockIME sends it for you; it never listens for your keys.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下面的快捷键需要在所选输入法内部设置。LockIME 会替你发送它，不会监听你的按键。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下面的快捷鍵需要在所選輸入法內部設定。LockIME 會代你送出它，不會監聽你的按鍵。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下のショートカットは選択した入力メソッド内部で設定するものです。LockIME が代わりに送信し、キー入力を監視することはありません。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le raccourci du bas se configure dans la méthode de saisie choisie. LockIME l'envoie pour vous et n'écoute jamais vos frappes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der untere Kurzbefehl wird in der gewählten Eingabemethode festgelegt. LockIME sendet ihn für Sie und liest Ihre Tastenanschläge nie mit."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El atajo de abajo se configura dentro del método de entrada elegido. LockIME lo envía por ti y nunca escucha tus pulsaciones."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O atalho de baixo é configurado dentro do método de entrada escolhido. O LockIME o envia por você e nunca escuta suas teclas."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нижняя комбинация задаётся внутри выбранного метода ввода. LockIME отправляет её за вас и никогда не перехватывает ваши нажатия."
+          }
+        }
+      }
+    },
+    "LockIME voice shortcut": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME 语音快捷键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME 語音快捷鍵"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME の音声ショートカット"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourci vocal de LockIME"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME-Sprachkurzbefehl"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajo de voz de LockIME"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atalho de voz do LockIME"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовая комбинация LockIME"
+          }
+        }
+      }
+    },
+    "Switch input source automatically": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动切换输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動切換輸入法"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力ソースを自動で切り替える"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer automatiquement de source de saisie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingabequelle automatisch wechseln"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar de fuente de entrada automáticamente"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trocar a fonte de entrada automaticamente"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Автоматически переключать источник ввода"
+          }
+        }
+      }
+    },
+    "LockIME sends the voice shortcut for you; it never listens for your keys. Keep the two shortcuts below different from each other.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音快捷键由 LockIME 代发，它不会监听你的按键。下面两个快捷键务必不要相同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音快捷鍵由 LockIME 代為送出，它不會監聽你的按鍵。下面兩個快捷鍵務必不要相同。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声ショートカットは LockIME が代わりに送信します。キー入力を監視することはありません。下の 2 つは必ず別の組み合わせにしてください。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME envoie le raccourci vocal à votre place ; il n'écoute jamais vos frappes. Les deux raccourcis ci-dessous doivent être différents."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME sendet den Sprachkurzbefehl für Sie; Ihre Tastenanschläge werden nie mitgelesen. Die beiden Kurzbefehle unten müssen sich unterscheiden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME envía el atajo de voz por ti; nunca escucha tus pulsaciones. Los dos atajos de abajo deben ser distintos."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O LockIME envia o atalho de voz por você; ele nunca escuta suas teclas. Os dois atalhos abaixo precisam ser diferentes."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME отправляет голосовую комбинацию за вас и никогда не перехватывает ваши нажатия. Две комбинации ниже должны различаться."
+          }
+        }
+      }
+    },
+    "This is the same combination as LockIME's voice shortcut. Use two different shortcuts, or the key is handled twice and macOS reports a shortcut conflict.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与 LockIME 的语音快捷键相同。请使用两个不同的组合键，否则同一个按键会被处理两次，macOS 会提示快捷键冲突。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "與 LockIME 的語音快捷鍵相同。請使用兩個不同的組合鍵，否則同一個按鍵會被處理兩次，macOS 會提示快捷鍵衝突。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME の音声ショートカットと同じ組み合わせです。別々のショートカットにしてください。同じままだと 1 回の押下が二重に処理され、macOS がショートカットの競合を通知します。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identique au raccourci vocal de LockIME. Utilisez deux raccourcis différents : sinon la touche est traitée deux fois et macOS signale un conflit de raccourci."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieselbe Kombination wie der LockIME-Sprachkurzbefehl. Verwenden Sie zwei verschiedene Kurzbefehle — sonst wird die Taste zweimal verarbeitet und macOS meldet einen Kurzbefehlskonflikt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es la misma combinación que el atajo de voz de LockIME. Usa dos atajos distintos; si no, la tecla se procesa dos veces y macOS avisa de un conflicto de atajos."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "É a mesma combinação do atalho de voz do LockIME. Use dois atalhos diferentes; caso contrário, a tecla é processada duas vezes e o macOS avisa de um conflito de atalhos."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Та же комбинация, что и голосовая комбинация LockIME. Задайте две разные комбинации — иначе нажатие обрабатывается дважды, и macOS сообщает о конфликте сочетаний."
+          }
+        }
+      }
+    },
+    "Off: the shortcut alone starts voice input in whichever input method is active, and your input source is never changed.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭：仅靠快捷键就能在当前输入法中开始语音输入，不会切换你的输入法。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉：僅靠快捷鍵就能在目前輸入法中開始語音輸入，不會切換你的輸入法。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オフ：ショートカットだけで、現在の入力メソッドの音声入力を開始します。入力ソースは切り替わりません。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé : le raccourci suffit à lancer la saisie vocale dans la méthode de saisie active, sans changer votre source de saisie."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus: Der Kurzbefehl allein startet die Spracheingabe in der gerade aktiven Eingabemethode; Ihre Eingabequelle wird nie gewechselt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado: el atajo por sí solo inicia la entrada de voz en el método de entrada activo y tu fuente de entrada no cambia nunca."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativado: o atalho sozinho inicia a entrada por voz no método de entrada ativo, e a sua fonte de entrada nunca muda."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выкл.: одна комбинация запускает голосовой ввод в активном методе ввода, а источник ввода не меняется."
+          }
+        }
+      }
+    },
+    "Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and restores your global default afterwards.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有当语音输入法不是你日常使用的输入法时才需要打开：LockIME 会切到它，结束后再恢复你的全局默认输入法。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有當語音輸入法不是你日常使用的輸入法時才需要開啟：LockIME 會切到它，結束後再還原你的全域預設輸入法。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力用の入力メソッドが普段使うものではない場合だけオンにしてください。LockIME がそこへ切り替え、終了後にグローバル既定の入力ソースへ戻します。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À activer uniquement si la méthode de saisie vocale n'est pas celle que vous utilisez au quotidien : LockIME y bascule puis rétablit votre source par défaut."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur einschalten, wenn die Spracheingabe-Methode nicht Ihre alltägliche ist: LockIME wechselt dorthin und stellt danach Ihre globale Standardquelle wieder her."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actívalo solo si el método de entrada por voz no es el que usas a diario: LockIME cambiará a él y luego restaurará tu fuente predeterminada global."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ative apenas se o método de entrada por voz não for o que você usa no dia a dia: o LockIME troca para ele e depois restaura a sua fonte padrão global."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включайте только если голосовой метод ввода — не тот, которым вы обычно печатаете: LockIME переключится на него, а затем вернёт ваш глобальный источник ввода."
+          }
+        }
+      }
+    },
+    "The upper shortcut is LockIME's own trigger; the lower one is the shortcut configured inside the selected input method. Set that one in the input method first, and never bind both to the same combination.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上面的快捷键是 LockIME 自己的触发键；下面的是所选输入法内部配置的快捷键。请先在输入法里设好它，并且不要把两者设成同一个组合。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上面的快捷鍵是 LockIME 自己的觸發鍵；下面的是所選輸入法內部設定的快捷鍵。請先在輸入法裡設好它，並且不要把兩者設成同一個組合。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上のショートカットは LockIME 自身のトリガー、下は選択した入力メソッド内部で設定するショートカットです。まず入力メソッド側で設定し、両方を同じ組み合わせにしないでください。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le raccourci du haut est le déclencheur propre à LockIME ; celui du bas est configuré dans la méthode de saisie choisie. Réglez d'abord ce dernier dans la méthode de saisie, et ne les liez jamais à la même combinaison."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der obere Kurzbefehl ist LockIMEs eigener Auslöser, der untere ist in der gewählten Eingabemethode konfiguriert. Legen Sie diesen zuerst dort fest und belegen Sie niemals beide mit derselben Kombination."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El atajo de arriba es el activador propio de LockIME; el de abajo se configura dentro del método de entrada elegido. Configura ese primero en el método de entrada y no asignes la misma combinación a los dos."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O atalho de cima é o gatilho próprio do LockIME; o de baixo é configurado dentro do método de entrada escolhido. Defina esse primeiro no método de entrada e nunca use a mesma combinação nos dois."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Верхняя комбинация — собственный триггер LockIME, нижняя настраивается внутри выбранного метода ввода. Сначала задайте её в методе ввода и никогда не назначайте одну и ту же комбинацию на обе."
+          }
+        }
+      }
+    },
+    "Event Posting": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键盘事件发送"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鍵盤事件傳送"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キーボードイベントの送信"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoi d'événements clavier"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastaturereignisse senden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envío de eventos de teclado"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envio de eventos de teclado"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправка событий клавиатуры"
+          }
+        }
+      }
+    },
+    "macOS may ask for permission when LockIME sends the voice input shortcut. LockIME only sends that one key; it never listens for your typing.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME 发送语音输入快捷键时，macOS 可能会要求授权。LockIME 只发送这一个按键，不会监听你的输入。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME 傳送語音輸入快捷鍵時，macOS 可能會要求授權。LockIME 只傳送這一個按鍵，不會監聽你的輸入。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LockIME が音声入力のショートカットを送信する際、macOS が許可を求めることがあります。LockIME が送るのはその 1 キーだけで、入力を監視することはありません。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS peut demander une autorisation lorsque LockIME envoie le raccourci de saisie vocale. LockIME n'envoie que cette touche et n'écoute jamais votre frappe."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS fragt möglicherweise nach einer Berechtigung, wenn LockIME den Spracheingabe-Kurzbefehl sendet. LockIME sendet nur diese eine Taste und liest Ihre Eingabe nie mit."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS puede pedir permiso cuando LockIME envía el atajo de entrada de voz. LockIME solo envía esa tecla y nunca escucha lo que escribes."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O macOS pode pedir permissão quando o LockIME envia o atalho de entrada por voz. O LockIME envia apenas essa tecla e nunca escuta o que você digita."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS может запросить разрешение, когда LockIME отправляет комбинацию голосового ввода. LockIME отправляет только эту клавишу и никогда не перехватывает ваш ввод."
+          }
+        }
+      }
+    },
+    "Voice input": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisie vocale"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spracheingabe"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada de voz"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada por voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовой ввод"
+          }
+        }
+      }
+    },
+    "Works anywhere. Prefer a Command- or Control-based combination. The voice input shortcut must differ from the one set inside your voice input method.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在任何地方都生效。建议使用 Command 或 Control 组合键。语音输入快捷键必须与你在语音输入法内部设置的快捷键不同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在任何地方都生效。建議使用 Command 或 Control 組合鍵。語音輸入快捷鍵必須與你在語音輸入法內部設定的快捷鍵不同。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どこでも有効です。Command か Control を含む組み合わせを推奨します。音声入力のショートカットは、入力メソッド内部で設定したものと別にしてください。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonctionne partout. Préférez une combinaison avec Commande ou Contrôle. Le raccourci de saisie vocale doit différer de celui défini dans votre méthode de saisie vocale."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Funktioniert überall. Bevorzugen Sie eine Kombination mit Befehl oder Control. Der Spracheingabe-Kurzbefehl muss sich von dem in Ihrer Eingabemethode unterscheiden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Funciona en cualquier parte. Prefiere una combinación con Comando o Control. El atajo de entrada de voz debe ser distinto del definido dentro de tu método de entrada por voz."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Funciona em qualquer lugar. Prefira uma combinação com Comando ou Control. O atalho de entrada por voz precisa ser diferente do definido dentro do seu método de entrada por voz."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Работает везде. Предпочитайте комбинацию с Command или Control. Комбинация голосового ввода должна отличаться от заданной внутри метода ввода."
+          }
+        }
+      }
+    },
+    "After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before turning this on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Ende der Spracheingabe stellt LockIME die globale Standard-Eingabequelle aus den App-Regeln wieder her. Legen Sie diese Standardregel fest, bevor Sie den Workflow aktivieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando termina la entrada de voz, LockIME restaura la fuente de entrada predeterminada global de Reglas de apps. Configura esa regla predeterminada antes de activar el flujo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À la fin de la saisie vocale, LockIME restaure la source de saisie par défaut globale définie dans les règles d’apps. Définissez cette règle par défaut avant d’activer le workflow."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力が終了すると、LockIME はアプリルールのグローバルデフォルト入力ソースを復元します。ワークフローを有効にする前に、そのデフォルトルールを設定してください。"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando a entrada por voz termina, o LockIME restaura a fonte de entrada padrão global das Regras de apps. Defina essa regra padrão antes de ativar o fluxo."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "После завершения голосового ввода LockIME восстанавливает глобальный источник ввода по умолчанию из правил приложений. Настройте это правило по умолчанию перед включением сценария."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入结束后，LockIME 会恢复「应用规则」里的全局默认输入法。打开本开关前，请先在那里设置默认规则。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入結束後，LockIME 會還原「App Rules」裡的全域預設輸入法。開啟本開關前，請先在那裡設定預設規則。"
+          }
+        }
+      }
+    },
+    "Record a shortcut here first. It is LockIME's own trigger and must differ from the input method's voice shortcut below.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先在这里录入一个快捷键。它是 LockIME 自己的触发键，必须与下面输入法的语音快捷键不同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請先在這裡錄入一個快速鍵。它是 LockIME 自己的觸發鍵，必須與下面輸入法的語音快速鍵不同。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まずここでショートカットを記録してください。これは LockIME 自身のトリガーで、下の入力メソッドの音声ショートカットとは別にする必要があります。"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez d'abord un raccourci ici : c'est le déclencheur propre à LockIME, et il doit différer du raccourci vocal de la méthode de saisie ci-dessous."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfassen Sie hier zuerst einen Kurzbefehl: Er ist LockIMEs eigener Auslöser und muss sich vom Sprachkurzbefehl der Eingabemethode unten unterscheiden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graba primero un atajo aquí: es el activador propio de LockIME y debe ser distinto del atajo de voz del método de entrada de abajo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grave primeiro um atalho aqui: é o gatilho próprio do LockIME e precisa ser diferente do atalho de voz do método de entrada abaixo."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала запишите здесь комбинацию: это собственный триггер LockIME, и он должен отличаться от голосовой комбинации метода ввода ниже."
+          }
+        }
+      }
+    }
   }
 }

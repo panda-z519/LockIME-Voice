@@ -40,7 +40,7 @@ Um app de barra de menus para macOS que **bloqueia a sua fonte de entrada do tec
 
 ## Changes in LockIME Voice
 
-Em relação ao upstream, este fork adiciona fonte de voz configurável, um único atalho gravado com modificadores esquerdo/direito, três modos de término, substituição temporária compatível com as regras, restauração do padrão global de **App Rules**, sessões repetíveis com timeout e filtro de eventos, e a fonte padrão primeiro com um marcador de alfinete.
+Em relação ao upstream, este fork adiciona fonte de voz configurável, atalhos separados para o LockIME e o método de entrada, troca temporária da fonte de entrada durante a voz (opcional, desativada por padrão), restauração do padrão global de **App Rules**, sessões repetíveis com timeout e a fonte padrão primeiro com um marcador de alfinete.
 
 ![Configurações de entrada por voz do LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -92,20 +92,17 @@ Após reinstalar ou recompilar, talvez seja necessário conceder as permissões 
 
 A fonte de entrada por voz é totalmente configurável; o LockIME Voice não fixa Doubao, WeChat nem qualquer outro método de entrada.
 
-1. Defina a fonte global padrão em **Settings ▸ App Rules**; ela será restaurada após a voz.
-2. Abra **Settings ▸ Voice Input**, ative o fluxo e escolha uma fonte compatível com voz.
-3. Grave o atalho de voz do próprio método e escolha o mesmo encerramento: pressionar novamente, manter pressionado ou qualquer tecla.
-4. Conceda **Accessibility** e **Input Monitoring** quando solicitado.
+1. Abra **Settings ▸ Voice Input** e ative o fluxo de trabalho.
+2. Grave o **atalho de voz do método de entrada** — o atalho que o seu método de entrada usa para a própria função de voz. Defina-o primeiro dentro do método de entrada e mantenha-o diferente do atalho do LockIME.
+3. Grave o **atalho de voz do LockIME** (em **Settings ▸ Shortcuts ▸ Global shortcuts** ou no mesmo painel). É essa a tecla que você realmente pressiona.
+4. Opcional: ative **Trocar a fonte de entrada automaticamente** e escolha a fonte com voz, caso não seja a que você usa no dia a dia. Defina antes a fonte padrão global em **Settings ▸ App Rules**: é ela que o LockIME restaura depois.
+5. Conceda permissão para enviar eventos de teclado quando for solicitado.
 
-Se a fonte de voz for igual à fonte global padrão, o LockIME Voice a trata como
-modo direto: nenhum atalho do LockIME é necessário, e o atalho de voz do próprio
-método continua sendo o acionador. Configure esse atalho dentro do método de
-entrada antes de usar o modo direto.
+Pressionar o atalho do LockIME envia o atalho de voz do método de entrada, então a entrada por voz começa no método ativo. Com a troca automática ativada, o LockIME muda primeiro para a fonte de voz configurada, aguarda a confirmação do macOS e restaura a fonte padrão global quando a voz termina ou o tempo limite de segurança dispara.
 
-O atalho pausa as regras normais, muda para a fonte de voz, aguarda a confirmação do macOS e envia o atalho interno. Ao terminar ou atingir o tempo de segurança, o LockIME Voice restaura a fonte global e retoma as regras.
+Como o LockIME apenas *envia* esse atalho e nunca escuta suas teclas, os dois atalhos precisam ser combinações diferentes. Usar uma única combinação traz o conflito de volta: a tecla é processada duas vezes e o macOS ou o método de entrada avisa de um conflito de atalhos.
 
-Teste no TextEdit ou em outro campo de texto simples. Mostrar o painel de voz não basta: o texto reconhecido precisa aparecer de fato no cursor.
-
+Teste o fluxo no TextEdit ou em outro campo de texto simples. Ver o painel de voz não basta: o texto reconhecido precisa aparecer na posição atual do cursor.
 ## Comparison
 
 As duas alternativas ao LockIME mais usadas são o **[Input Source Pro](https://github.com/runjuu/InputSourcePro)** e o **[KeyboardHolder](https://github.com/leaves615/KeyboardHolder)**, ao lado de uma longa cauda de ferramentas menores de código aberto e de linha de comando. Todas elas *alternam* a fonte de entrada conforme você se move entre apps ou sites; o LockIME é construído em torno de um **bloqueio** contínuo que a reaplica no momento em que ela desvia — ao mesmo tempo em que qualquer regra ainda pode recorrer a uma *alternância* única.

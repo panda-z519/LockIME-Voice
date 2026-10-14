@@ -6,6 +6,7 @@ import Testing
 @Suite("VoiceInputConfiguration")
 struct VoiceInputConfigurationTests {
     private let voice: InputSourceID = "voice.source"
+    private let daily: InputSourceID = "daily.source"
 
     @Test("disabled configuration is valid without sources or shortcuts")
     func disabledConfigurationIsValid() {
@@ -13,135 +14,105 @@ struct VoiceInputConfigurationTests {
         #expect(config.validationErrors(defaultSourceID: nil, installedSources: []).isEmpty)
     }
 
-    @Test("enabled configuration requires voice source and voice shortcut")
-    func enabledConfigurationRequiresCoreFields() {
+    @Test("an enabled workflow only hard-requires the voice shortcut")
+    func enabledConfigurationRequiresOnlyTheVoiceShortcut() {
+        // Everything else is optional: with automatic switching off, the
+        // synthesized shortcut is the whole workflow, so a missing source must
+        // not block it — otherwise a one-key setup would be unusable.
         let config = VoiceInputConfiguration(isEnabled: true)
         #expect(config.validationErrors(defaultSourceID: nil, installedSources: []) == [
-            .missingVoiceSource,
-            .missingVoiceShortcut,
-            .missingDefaultSource
+            .missingVoiceShortcut
         ])
     }
 
-    @Test("workflow mode distinguishes disabled direct and bridged operation")
-    func workflowModeUsesDefaultAndVoiceSources() {
-        #expect(VoiceInputConfiguration(isEnabled: false).workflowMode(defaultSourceID: voice) == .disabled)
-        #expect(VoiceInputConfiguration(
-            isEnabled: true,
-            voiceSourceID: voice
-        ).workflowMode(defaultSourceID: voice) == .direct)
-        #expect(VoiceInputConfiguration(
-            isEnabled: true,
-            voiceSourceID: voice
-        ).workflowMode(defaultSourceID: "daily.source") == .bridged)
-    }
-
-    @Test("direct mode requires no shortcut and installs no workflow monitor")
-    func directModeRequiresNoShortcutOrMonitor() {
-        let config = VoiceInputConfiguration(isEnabled: true, voiceSourceID: voice)
-        let sources: [InputSource] = [.stub(voice.rawValue)]
-
-        #expect(config.validationErrors(defaultSourceID: voice, installedSources: sources).isEmpty)
-        #expect(config.shortcutForMonitoring(
-            defaultSourceID: voice,
-            installedSources: sources,
-            hasInputMonitoringAccess: true,
-            hasEventPostingAccess: true
-        ) == nil)
-    }
-
-    @Test("invalid or removed sources prevent global shortcut monitoring")
-    func unavailableSourcesPreventMonitoring() {
+    @Test("automatic switching turns missing and unavailable sources into errors")
+    func automaticSwitchingRequiresRealSources() {
         let config = VoiceInputConfiguration(
             isEnabled: true,
             voiceSourceID: voice,
-            voiceShortcut: VoiceShortcut(keyCode: 61, modifiers: [.option])
+            voiceShortcut: VoiceShortcut(keyCode: 49, modifiers: [.control]),
+            switchesVoiceSourceAutomatically: true
         )
 
-        #expect(config.shortcutForMonitoring(
-            defaultSourceID: "daily.source",
-            installedSources: [.stub("daily.source")],
-            hasInputMonitoringAccess: true,
-            hasEventPostingAccess: true
-        ) == nil)
+        #expect(config.validationErrors(defaultSourceID: daily, installedSources: []) == [
+            .voiceSourceUnavailable(voice),
+            .defaultSourceUnavailable(daily)
+        ])
+        #expect(config.validationErrors(
+            defaultSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        ).isEmpty)
     }
 
-    @Test("monitoring requires enabled configuration and both keyboard permissions")
-    func monitoringRequiresEnabledConfigurationAndKeyboardPermissions() {
-        let shortcut = VoiceShortcut(keyCode: 61, modifiers: [.option])
-        let daily: InputSourceID = "daily.source"
-        let sources: [InputSource] = [.stub(daily.rawValue), .stub(voice.rawValue)]
-
-        #expect(VoiceInputConfiguration(
-            isEnabled: false,
-            voiceSourceID: voice,
-            voiceShortcut: shortcut
-        ).shortcutForMonitoring(
-            defaultSourceID: daily,
-            installedSources: sources,
-            hasInputMonitoringAccess: true,
-            hasEventPostingAccess: true
-        ) == nil)
-        #expect(VoiceInputConfiguration(
+    @Test("a source-less configuration with automatic switching on asks for the voice source")
+    func automaticSwitchingRequiresAVoiceSource() {
+        let config = VoiceInputConfiguration(
             isEnabled: true,
-            voiceSourceID: voice,
-            voiceShortcut: shortcut
-        ).shortcutForMonitoring(
+            voiceShortcut: VoiceShortcut(keyCode: 49, modifiers: [.control]),
+            switchesVoiceSourceAutomatically: true
+        )
+        #expect(config.validationErrors(
             defaultSourceID: daily,
-            installedSources: sources,
-            hasInputMonitoringAccess: false,
-            hasEventPostingAccess: true
-        ) == nil)
-        #expect(VoiceInputConfiguration(
-            isEnabled: true,
-            voiceSourceID: voice,
-            voiceShortcut: shortcut
-        ).shortcutForMonitoring(
-            defaultSourceID: daily,
-            installedSources: sources,
-            hasInputMonitoringAccess: true,
-            hasEventPostingAccess: false
-        ) == nil)
-        #expect(VoiceInputConfiguration(
-            isEnabled: true,
-            voiceSourceID: voice,
-            voiceShortcut: shortcut
-        ).shortcutForMonitoring(
-            defaultSourceID: daily,
-            installedSources: sources,
-            hasInputMonitoringAccess: true,
-            hasEventPostingAccess: true
-        ) == shortcut)
+            installedSources: [.stub(daily.rawValue)]
+        ) == [.missingVoiceSource])
     }
 
-    @Test("voice workflow permission status uses the same two permissions as monitoring")
-    func voiceWorkflowPermissionStatusMatchesMonitoring() {
-        #expect(!VoiceInputConfiguration.hasRequiredSystemPermissions(
-            inputMonitoringGranted: false,
-            eventPostingGranted: true
-        ))
-        #expect(!VoiceInputConfiguration.hasRequiredSystemPermissions(
-            inputMonitoringGranted: true,
-            eventPostingGranted: false
-        ))
-        #expect(VoiceInputConfiguration.hasRequiredSystemPermissions(
-            inputMonitoringGranted: true,
-            eventPostingGranted: true
-        ))
-    }
-
-    @Test("enabled configuration rejects missing installed sources")
-    func enabledConfigurationRejectsMissingSources() {
+    @Test("an unavailable voice input method that is the global default is still an error")
+    func voiceSourceMatchingTheDefaultIsStillValidated() {
+        // The workflow sends the shortcut straight into this input method, so it
+        // has to be real even though nothing is switched.
         let config = VoiceInputConfiguration(
             isEnabled: true,
             voiceSourceID: voice,
             voiceShortcut: VoiceShortcut(keyCode: 49, modifiers: [.control])
         )
-        let daily: InputSourceID = "daily.source"
-        #expect(config.validationErrors(defaultSourceID: daily, installedSources: []) == [
+        #expect(config.validationErrors(defaultSourceID: voice, installedSources: []) == [
             .voiceSourceUnavailable(voice),
-            .defaultSourceUnavailable(daily)
+            .defaultSourceUnavailable(voice)
         ])
+        #expect(config.validationErrors(
+            defaultSourceID: voice,
+            installedSources: [.stub(voice.rawValue)]
+        ).isEmpty)
+    }
+
+    @Test("workflow mode is direct unless automatic switching leaves the default source")
+    func workflowModeUsesAutomaticSwitching() {
+        #expect(VoiceInputConfiguration(isEnabled: false).workflowMode(defaultSourceID: voice) == .disabled)
+
+        // Off (the default): never switches, whatever the sources are.
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice
+        ).workflowMode(defaultSourceID: daily) == .direct)
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice
+        ).workflowMode(defaultSourceID: nil) == .direct)
+
+        // On: bridged only when there is somewhere else to go.
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice,
+            switchesVoiceSourceAutomatically: true
+        ).workflowMode(defaultSourceID: daily) == .bridged)
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            voiceSourceID: voice,
+            switchesVoiceSourceAutomatically: true
+        ).workflowMode(defaultSourceID: voice) == .direct)
+        #expect(VoiceInputConfiguration(
+            isEnabled: true,
+            switchesVoiceSourceAutomatically: true
+        ).workflowMode(defaultSourceID: daily) == .direct)
+    }
+
+    @Test("sending the voice shortcut needs only the event posting permission")
+    func eventPostingIsTheOnlyRequiredPermission() {
+        // Listening for the input method's key is gone, so Input Monitoring is
+        // irrelevant — the workflow only posts one synthetic key.
+        #expect(VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: true))
+        #expect(!VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: false))
     }
 
     @Test("default timeout is a sixty-second safety fallback")
@@ -176,40 +147,19 @@ struct VoiceInputConfigurationTests {
         #expect(VoiceInputConfiguration.default.restoreDelay == .seconds(2))
     }
 
-    @Test("conservative capabilities expose only press once behavior")
-    func conservativeCapabilitiesExposeOnlyPressOnceBehavior() {
-        #expect(VoiceInputBehavior.available(capabilities: .conservativeDefault) == [
-            .pressOncePressAgainEnds
-        ])
-    }
-
-    @Test("hold capabilities expose hold to speak behavior")
-    func holdCapabilitiesExposeHoldToSpeakBehavior() {
-        let capabilities = VoiceInputCapabilities(supportsHoldToSpeak: true)
-        #expect(VoiceInputBehavior.available(capabilities: capabilities) == [
-            .pressOncePressAgainEnds,
-            .holdToSpeak
-        ])
-    }
-
-    @Test("any key capabilities expose any key termination behavior")
-    func anyKeyCapabilitiesExposeAnyKeyTerminationBehavior() {
-        #expect(VoiceInputBehavior.available(capabilities: .anyKeyTerminationValidated) == [
-            .pressOncePressAgainEnds,
-            .pressOnceAnyKeyEnds
-        ])
-    }
-
     @Test("disabled configuration has no required notices")
     func disabledConfigurationHasNoRequiredNotices() {
         let config = VoiceInputConfiguration(isEnabled: false)
         #expect(config.requiredNotices().isEmpty)
     }
 
-    @Test("enabled configuration requires matching input method settings notice")
-    func enabledConfigurationRequiresMatchingSettingsNotice() {
+    @Test("an enabled configuration asks for the matching-settings and separate-shortcut notices")
+    func enabledConfigurationRequiresBothNotices() {
         let config = VoiceInputConfiguration(isEnabled: true)
-        #expect(config.requiredNotices() == [.settingsMustMatchInputMethod])
+        #expect(config.requiredNotices() == [
+            .settingsMustMatchInputMethod,
+            .separateTriggerShortcut
+        ])
     }
 
     @Test("all voice behaviors are codable by stable raw value")
@@ -226,12 +176,50 @@ struct VoiceInputConfigurationTests {
             voiceSourceID: voice,
             voiceShortcut: VoiceShortcut(keyCode: 62, modifiers: [.control, .shift]),
             behavior: .pressOnceAnyKeyEnds,
+            switchesVoiceSourceAutomatically: true,
             restoreTimeout: .seconds(120),
             restoreDelay: .seconds(3)
         )
         let encoded = try JSONEncoder().encode(config)
         let decoded = try JSONDecoder().decode(VoiceInputConfiguration.self, from: encoded)
         #expect(decoded == config)
+        #expect(decoded.switchesVoiceSourceAutomatically)
+    }
+
+    @Test("a configuration stored before automatic switching existed keeps switching")
+    func legacyConfigurationKeepsSwitchingTheSource() throws {
+        // v0.1.2 always switched the input source as part of the workflow, so an
+        // upgraded configuration must keep behaving that way instead of silently
+        // stopping the switch.
+        let stored = """
+        {"isEnabled":true,"voiceSourceID":"voice.source",
+         "voiceShortcut":{"keyCode":49,"modifiers":4}}
+        """
+        let decoded = try JSONDecoder().decode(
+            VoiceInputConfiguration.self,
+            from: Data(stored.utf8)
+        )
+        #expect(decoded.switchesVoiceSourceAutomatically)
+        #expect(decoded.workflowMode(defaultSourceID: daily) == .bridged)
+        #expect(decoded.voiceShortcut == VoiceShortcut(keyCode: 49, modifiers: [.option]))
+    }
+
+    @Test("a configuration stored with no voice source does not switch the source")
+    func legacyConfigurationWithoutAVoiceSourceDoesNotSwitch() throws {
+        let stored = """
+        {"isEnabled":true,"voiceShortcut":{"keyCode":49,"modifiers":4}}
+        """
+        let decoded = try JSONDecoder().decode(
+            VoiceInputConfiguration.self,
+            from: Data(stored.utf8)
+        )
+        #expect(!decoded.switchesVoiceSourceAutomatically)
+        #expect(decoded.workflowMode(defaultSourceID: daily) == .direct)
+    }
+
+    @Test("a fresh configuration is conflict-free by default")
+    func freshConfigurationDoesNotSwitchTheSource() {
+        #expect(!VoiceInputConfiguration.default.switchesVoiceSourceAutomatically)
     }
 
     @Test("legacy workflow shortcut migrates into the single voice shortcut")
@@ -248,11 +236,47 @@ struct VoiceInputConfigurationTests {
         let encoded = try JSONEncoder().encode(legacy)
         let decoded = try JSONDecoder().decode(VoiceInputConfiguration.self, from: encoded)
         #expect(decoded.voiceShortcut == legacy.workflowShortcut)
-        let daily: InputSourceID = "daily.source"
         #expect(decoded.validationErrors(
             defaultSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         ).isEmpty)
+    }
+}
+
+@Suite("Voice input shortcut presets")
+struct SystemVoiceShortcutPresetTests {
+    @Test("CoreGraphics modifiers map onto the Carbon mask KeyboardShortcuts stores")
+    func modifierRepresentationsConvert() {
+        // cmdKey | shiftKey | optionKey | controlKey.
+        let allMask = (1 << 8) | (1 << 9) | (1 << 11) | (1 << 12)
+        #expect(VoiceShortcut.Modifiers([.command, .control, .option, .shift]).carbonFlags == allMask)
+        #expect(VoiceShortcut.Modifiers([.option]).carbonFlags == (1 << 11))
+        #expect(VoiceShortcut.Modifiers([]).carbonFlags == 0)
+    }
+
+    @Test("input methods without a known default have no preset")
+    func unknownInputMethodsHaveNoPreset() {
+        // WeChat Input Method's voice key is user-chosen, so it must stay blank
+        // rather than being filled with a guess.
+        #expect(SystemVoiceShortcutPreset.shortcut(
+            forInputMethodBundleID: "com.tencent.inputmethod.wetype"
+        ) == nil)
+        #expect(SystemVoiceShortcutPreset.shortcut(forInputMethodBundleID: nil) == nil)
+        #expect(SystemVoiceShortcutPreset.shortcut(forInputMethodBundleID: "") == nil)
+    }
+
+    @Test("Carbon and CoreGraphics modifier representations convert both ways")
+    func modifierRepresentationsConvertBothWays() {
+        // cmdKey | controlKey | shiftKey
+        let carbon = (1 << 8) | (1 << 12) | (1 << 9)
+        #expect(VoiceShortcut.Modifiers([.command, .control, .shift]).carbonFlags == carbon)
+
+        var expected: VoiceShortcut.Modifiers = [.command, .control, .shift]
+        let rebuilt = VoiceShortcut(keyCode: 0, modifiers: VoiceShortcut.Modifiers(rawValue: 0))
+        #expect(rebuilt.modifiers.isEmpty)
+        expected.insert(.option)
+        #expect(VoiceShortcut.Modifiers([.command, .control, .shift, .option]).carbonFlags
+            == carbon | (1 << 11))
     }
 }
 

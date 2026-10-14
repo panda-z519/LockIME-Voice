@@ -40,7 +40,7 @@ Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann i
 
 ## Changes in LockIME Voice
 
-Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequelle, einen gemeinsam aufgezeichneten Kurzbefehl mit Links-/Rechts-Modifikatoren, drei Beendigungsarten, eine temporäre regelsichere Eingabequellen-Übernahme, Wiederherstellung der globalen Standardquelle aus **App Rules**, zuverlässige Wiederholungen mit Timeout und Ereignisfilterung sowie eine zuerst angezeigte, mit einer Nadel markierte Standardquelle.
+Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequelle, getrennte Kurzbefehle für LockIME und die Eingabemethode, einen optionalen temporären Wechsel der Eingabequelle während der Spracheingabe (standardmäßig aus), Wiederherstellung der globalen Standardquelle aus **App Rules**, zuverlässige Wiederholungen mit Timeout sowie eine zuerst angezeigte, mit einer Nadel markierte Standardquelle.
 
 ![LockIME Voice Spracheingabe-Einstellungen](../images/settings-voice-input-zh-CN.png)
 
@@ -90,23 +90,19 @@ Nach einer Neuinstallation oder einem neuen Build können macOS-Berechtigungen e
 
 ## Voice Input Workflow
 
-Die Spracheingabequelle ist vollständig konfigurierbar; LockIME Voice legt weder Doubao noch WeChat oder eine andere Eingabemethode fest.
+Die Spracheingabequelle ist frei wählbar; LockIME Voice legt weder Doubao noch WeChat oder eine andere Eingabemethode fest.
 
-1. Lege unter **Settings ▸ App Rules** die globale Standardquelle fest; sie wird nach der Spracheingabe wiederhergestellt.
-2. Öffne **Settings ▸ Voice Input**, aktiviere den Ablauf und wähle eine sprachfähige Quelle.
-3. Zeichne den internen Sprachkurzbefehl dieser Eingabemethode auf und wähle dasselbe Ende: erneut drücken, halten oder beliebige Taste.
-4. Erteile bei Aufforderung **Accessibility** und **Input Monitoring**.
+1. Öffnen Sie **Settings ▸ Voice Input** und aktivieren Sie den Workflow.
+2. Erfassen Sie den **Sprachkurzbefehl der Eingabemethode** — den Kurzbefehl, den Ihre Eingabemethode für ihre eigene Spracheingabe verwendet. Legen Sie ihn zuerst dort fest und halten Sie ihn vom Kurzbefehl von LockIME getrennt.
+3. Erfassen Sie den **LockIME-Sprachkurzbefehl** (unter **Settings ▸ Shortcuts ▸ Global shortcuts** oder im selben Bereich). Das ist die Taste, die Sie tatsächlich drücken.
+4. Optional: Schalten Sie **Eingabequelle automatisch wechseln** ein und wählen Sie die sprachfähige Eingabequelle, wenn diese nicht Ihre alltägliche ist. Legen Sie vorher unter **Settings ▸ App Rules** die globale Standardquelle fest — dorthin stellt LockIME danach zurück.
+5. Erlauben Sie bei Aufforderung das Senden von Tastaturereignissen.
 
-Wenn die Spracheingabequelle der globalen Standardquelle entspricht, behandelt
-LockIME Voice sie als Direktmodus: Es ist kein LockIME-Kurzbefehl erforderlich,
-und der eigene Sprachkurzbefehl der Eingabemethode bleibt der Auslöser.
-Konfigurieren Sie diesen Kurzbefehl in der Eingabemethode, bevor Sie den
-Direktmodus verwenden.
+Ein Druck auf den LockIME-Kurzbefehl sendet den Sprachkurzbefehl der Eingabemethode, sodass die Spracheingabe in der gerade aktiven Eingabemethode startet. Mit eingeschaltetem automatischem Wechsel wechselt LockIME zuerst zur konfigurierten Spracheingabequelle, wartet auf die Bestätigung von macOS und stellt nach dem Ende der Spracheingabe oder dem Sicherheits-Timeout die globale Standardquelle wieder her.
 
-Der Kurzbefehl pausiert normale Regeln, wechselt zur Sprachquelle, wartet auf die macOS-Bestätigung und sendet dann den internen Kurzbefehl. Nach Ende oder Sicherheits-Timeout stellt LockIME Voice die globale Standardquelle wieder her und setzt die Regeln fort.
+Da LockIME diesen Kurzbefehl nur *sendet* und Ihre Tastenanschläge nie mitliest, müssen die beiden Kurzbefehle verschieden sein. Eine einzige gemeinsame Kombination bringt den Konflikt zurück: Die Taste wird zweimal verarbeitet und macOS oder die Eingabemethode meldet einen Kurzbefehlskonflikt.
 
-Teste in TextEdit oder einem einfachen Textfeld. Das Sprachfenster allein reicht nicht; der erkannte Text muss tatsächlich an der Cursorposition erscheinen.
-
+Testen Sie den Workflow in TextEdit oder einem anderen einfachen Textfeld. Das Sprachfenster zu sehen genügt nicht: Der erkannte Text muss an der aktuellen Cursorposition erscheinen.
 ## Comparison
 
 Die zwei am weitesten verbreiteten Alternativen zu LockIME sind

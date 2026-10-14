@@ -30,19 +30,23 @@ struct GrantAccessibilityButton: View {
     }
 }
 
-struct GrantInputMonitoringButton: View {
+/// Opens System Settings to the permission that lets LockIME post synthetic key
+/// events — what the voice workflow needs to send the input method's own voice
+/// shortcut. Kept as one shared button because two panes (Permissions, Voice
+/// Input) route here rather than each prompting separately.
+struct GrantEventPostingButton: View {
     @Environment(AppState.self) private var state
     @Environment(\.locale) private var locale
 
     var body: some View {
         Button {
-            state.requestInputMonitoringAccess(
+            state.requestEventPostingAccess(
                 localeIdentifier: locale.identifier,
                 suggestedAppURLs: [Bundle.main.bundleURL],
                 sourceFrame: Self.clickSourceFrame()
             )
         } label: {
-            Label("Grant Input Monitoring Access", systemImage: "arrow.right.circle.fill")
+            Label("Grant Event Posting Access", systemImage: "arrow.right.circle.fill")
         }
     }
 

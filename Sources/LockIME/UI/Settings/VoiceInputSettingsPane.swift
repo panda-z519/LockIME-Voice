@@ -1,21 +1,28 @@
 import AppKit
+import KeyboardShortcuts
 import LockIMEKit
 import SwiftUI
 
+/// The voice-input workflow's configuration.
+///
+/// The model here is the *split* one: LockIME owns a global trigger shortcut of
+/// its own (`KeyboardShortcuts.Name.voiceInput`) and synthesizes the selected
+/// input method's own voice key. The two must be different combinations — when
+/// they were one and the same, each press was handled twice (once by the input
+/// method, once by LockIME's synthetic copy) and macOS reported a shortcut
+/// conflict.
 struct VoiceInputSettingsPane: View {
     @Environment(AppState.self) private var state
 
     var body: some View {
-        @Bindable var state = state
         let workflowMode = state.voiceInputConfig.workflowMode(
             defaultSourceID: state.config.defaultSourceID
         )
-        let validationErrors = state.voiceInputConfig.validationErrors(
+        let errors = state.voiceInputConfig.validationErrors(
             defaultSourceID: state.config.defaultSourceID,
             installedSources: state.availableSources
         )
         let settingsLocked = state.voiceInputSessionInProgress
-        let triggerDisabled = workflowMode != .bridged || settingsLocked
         Form {
             Section {
                 Toggle("Enable Voice Input Workflow", isOn: Binding(
@@ -33,109 +40,55 @@ struct VoiceInputSettingsPane: View {
             } header: {
                 Text("Voice Input")
             } footer: {
-                SectionFooter("Use this shortcut in any app to start or end the configured voice input workflow.")
+                SectionFooter("LockIME sends the voice shortcut for you; it never listens for your keys. Keep the two shortcuts below different from each other.")
             }
 
             Section {
-                Picker("Voice input source", selection: Binding(
-                    get: { state.voiceInputConfig.voiceSourceID },
-                    set: { newValue in state.updateVoiceInputConfig { $0.voiceSourceID = newValue } }
-                )) {
-                    Text("None").tag(InputSourceID?.none)
-                    if let id = state.voiceInputConfig.voiceSourceID,
-                       !state.availableSources.contains(where: { $0.id == id }) {
-                        Text(verbatim: "\(id.rawValue) — \(state.loc("Unavailable"))")
-                            .tag(Optional(id))
-                    }
-                    ForEach(state.availableSources) { source in
-                        Text(verbatim: source.localizedName).tag(Optional(source.id))
-                    }
-                }
-                .disabled(settingsLocked)
+                // LockIME's own trigger — a real global shortcut, recorded and
+                // dispatched by KeyboardShortcuts. This is the key the user presses.
+                KeyboardShortcuts.Recorder(
+                    LocalizedStringKey("LockIME voice shortcut"),
+                    name: .voiceInput
+                )
 
-                LabeledContent("Restore input source") {
-                    Text(verbatim: restoreSourceName)
-                }
-
-                if state.voiceInputConfig.isEnabled {
-                    if validationErrors.contains(.missingVoiceSource) {
-                        VoiceInputStatusNote(
-                            "Select a voice input source before using voice input.",
-                            systemImage: "exclamationmark.triangle"
-                        )
-                    }
-
-                    if validationErrors.contains(.missingDefaultSource) {
-                        VoiceInputStatusNote(
-                            "Set a global default input source in App Rules before using voice input.",
-                            systemImage: "exclamationmark.triangle"
-                        )
-                    } else if validationErrors.contains(where: { error in
-                        if case .defaultSourceUnavailable = error { return true }
-                        return false
-                    }) {
-                        VoiceInputStatusNote(
-                            "The configured global default input source is unavailable.",
-                            systemImage: "exclamationmark.triangle"
-                        )
-                    }
-
-                    if validationErrors.contains(where: { error in
-                        if case .voiceSourceUnavailable = error { return true }
-                        return false
-                    }) {
-                        VoiceInputStatusNote(
-                            "The configured voice input source is unavailable.",
-                            systemImage: "exclamationmark.triangle"
-                        )
-                    }
-                }
-            } header: {
-                Text("Input Sources")
-            } footer: {
-                SectionFooter("After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before enabling the workflow.")
-            }
-
-            Section {
-                Picker("Voice behavior", selection: Binding(
-                    get: { state.voiceInputConfig.behavior },
-                    set: { newValue in state.updateVoiceInputConfig { $0.behavior = newValue } }
-                )) {
-                    Text("Press once, press again to end").tag(VoiceInputBehavior.pressOncePressAgainEnds)
-                    Text("Hold to speak").tag(VoiceInputBehavior.holdToSpeak)
-                    Text("Press once, any key to end").tag(VoiceInputBehavior.pressOnceAnyKeyEnds)
-                }
-                .disabled(triggerDisabled)
-
+                // The input method's own voice key — only ever synthesized, so
+                // LockIME never also receives it. Pointing both at one
+                // combination is exactly what produced the conflict prompt.
                 VoiceShortcutEditor(
-                    title: "Voice input method shortcut",
+                    title: "Input method voice shortcut",
                     shortcut: Binding(
                         get: { state.voiceInputConfig.voiceShortcut },
                         set: { newValue in state.updateVoiceInputConfig { $0.voiceShortcut = newValue } }
                     ),
-                    isDisabled: triggerDisabled,
-                    disabledDisplayText: workflowMode == .direct ? state.loc("Not required") : nil
+                    isDisabled: settingsLocked
                 )
                 .id(state.voiceInputConfig.voiceSourceID)
 
-                if workflowMode == .direct, validationErrors.isEmpty {
+                if clashesWithTriggerShortcut {
                     VoiceInputStatusNote(
-                        "The voice input source matches the global default. Set the voice shortcut in that input method, then use it directly; LockIME will not intercept it.",
-                        systemImage: "info.circle"
+                        "This is the same combination as LockIME's voice shortcut. Use two different shortcuts, or the key is handled twice and macOS reports a shortcut conflict.",
+                        systemImage: "exclamationmark.triangle"
                     )
                 }
 
-                if workflowMode == .bridged, validationErrors.contains(.missingVoiceShortcut) {
+                // The trigger is LockIME's own key and has no legacy value to
+                // carry over, so an upgraded user arrives here with it unset.
+                if KeyboardShortcuts.getShortcut(for: .voiceInput) == nil {
+                    VoiceInputStatusNote(
+                        "Record a shortcut here first. It is LockIME's own trigger and must differ from the input method's voice shortcut below.",
+                        systemImage: "exclamationmark.triangle"
+                    )
+                }
+
+                if errors.contains(.missingVoiceShortcut) {
                     VoiceInputStatusNote(
                         "Record the selected input method's voice shortcut here. It must match the shortcut configured inside that input method.",
                         systemImage: "exclamationmark.triangle"
                     )
                 }
 
-                if workflowMode == .bridged,
-                   validationErrors.isEmpty,
-                   !state.voiceInputPermissionsGranted {
-                    AccessibilityRequiredNote("Voice input requires Accessibility and Input Monitoring")
+                if !canSendShortcut {
+                    AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
                 }
 
                 if state.voiceInputRuntimeError != nil {
@@ -144,23 +97,77 @@ struct VoiceInputSettingsPane: View {
                         systemImage: "exclamationmark.triangle"
                     )
                 }
-
-                Picker("Automatic restore timeout", selection: Binding(
-                    get: { state.voiceInputConfig.restoreTimeout },
-                    set: { newValue in state.updateVoiceInputConfig { $0.restoreTimeout = newValue } }
-                )) {
-                    Text("60 seconds").tag(VoiceRestoreTimeout.seconds(60))
-                    Text("120 seconds").tag(VoiceRestoreTimeout.seconds(120))
-                    Text("300 seconds").tag(VoiceRestoreTimeout.seconds(300))
-                }
-                .disabled(triggerDisabled)
             } header: {
                 Text("Voice Trigger")
             } footer: {
-                if workflowMode == .direct {
-                    SectionFooter("Because the selected input method is already the global default, LockIME does not intercept its voice shortcut.")
+                SectionFooter("The upper shortcut is LockIME's own trigger; the lower one is the shortcut configured inside the selected input method. Set that one in the input method first, and never bind both to the same combination.")
+            }
+
+            Section {
+                Toggle("Switch input source automatically", isOn: Binding(
+                    get: { state.voiceInputConfig.switchesVoiceSourceAutomatically },
+                    set: { newValue in
+                        state.updateVoiceInputConfig { $0.switchesVoiceSourceAutomatically = newValue }
+                    }
+                ))
+                .disabled(settingsLocked)
+
+                if state.voiceInputConfig.switchesVoiceSourceAutomatically {
+                    Picker("Voice input source", selection: Binding(
+                        get: { state.voiceInputConfig.voiceSourceID },
+                        set: { newValue in state.updateVoiceInputConfig { $0.voiceSourceID = newValue } }
+                    )) {
+                        Text("None").tag(InputSourceID?.none)
+                        if let id = state.voiceInputConfig.voiceSourceID,
+                           !state.availableSources.contains(where: { $0.id == id }) {
+                            Text(verbatim: "\(id.rawValue) — \(state.loc("Unavailable"))")
+                                .tag(Optional(id))
+                        }
+                        ForEach(state.availableSources) { source in
+                            Text(verbatim: source.localizedName).tag(Optional(source.id))
+                        }
+                    }
+                    .disabled(settingsLocked)
+
+                    LabeledContent("Restore input source") {
+                        Text(verbatim: restoreSourceName)
+                    }
+
+                    if workflowMode == .direct {
+                        VoiceInputStatusNote(
+                            "The voice input source is already the global default, so no switch is needed and its shortcut is sent directly.",
+                            systemImage: "info.circle"
+                        )
+                    }
                 } else {
-                    SectionFooter("The voice behavior and shortcut here must match the voice input settings in the selected input method. LockIME only switches to that input method and sends this configured shortcut.")
+                    VoiceInputStatusNote(
+                        "Off: the shortcut alone starts voice input in whichever input method is active, and your input source is never changed.",
+                        systemImage: "info.circle"
+                    )
+                }
+
+                ForEach(sourceProblems) { problem in
+                    VoiceInputStatusNote(problem.message, systemImage: "exclamationmark.triangle")
+                }
+
+                if state.voiceInputConfig.switchesVoiceSourceAutomatically {
+                    Picker("Automatic restore timeout", selection: Binding(
+                        get: { state.voiceInputConfig.restoreTimeout },
+                        set: { newValue in state.updateVoiceInputConfig { $0.restoreTimeout = newValue } }
+                    )) {
+                        Text("60 seconds").tag(VoiceRestoreTimeout.seconds(60))
+                        Text("120 seconds").tag(VoiceRestoreTimeout.seconds(120))
+                        Text("300 seconds").tag(VoiceRestoreTimeout.seconds(300))
+                    }
+                    .disabled(settingsLocked)
+                }
+            } header: {
+                Text("Input Sources")
+            } footer: {
+                if state.voiceInputConfig.switchesVoiceSourceAutomatically {
+                    SectionFooter("After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before turning this on.")
+                } else {
+                    SectionFooter("Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and restores your global default afterwards.")
                 }
             }
         }
@@ -168,11 +175,53 @@ struct VoiceInputSettingsPane: View {
         .navigationTitle(state.loc("Voice Input"))
     }
 
+    /// Whether both shortcuts are bound to the same combination — the exact
+    /// configuration that made a single press count twice.
+    private var clashesWithTriggerShortcut: Bool {
+        guard let configured = state.voiceInputConfig.voiceShortcut,
+              let trigger = KeyboardShortcuts.getShortcut(for: .voiceInput)
+        else { return false }
+        return configured.recordedShortcut == trigger
+    }
+
+    private var canSendShortcut: Bool {
+VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: state.eventPostingGranted)
+    }
+
+    /// Source-related validation problems, in user-facing form and stable order.
+    private var sourceProblems: [VoiceInputSourceProblem] {
+        let errors = state.voiceInputConfig.validationErrors(
+            defaultSourceID: state.config.defaultSourceID,
+            installedSources: state.availableSources
+        )
+        var problems: [VoiceInputSourceProblem] = []
+        if errors.contains(.missingVoiceSource) {
+            problems.append(VoiceInputSourceProblem(id: 0, message: "Select a voice input source before using voice input."))
+        }
+        if errors.contains(.missingDefaultSource) {
+            problems.append(VoiceInputSourceProblem(id: 1, message: "Set a global default input source in App Rules before using voice input."))
+        }
+        if errors.contains(where: { if case .voiceSourceUnavailable = $0 { true } else { false } }) {
+            problems.append(VoiceInputSourceProblem(id: 2, message: "The configured voice input source is unavailable."))
+        }
+        if errors.contains(where: { if case .defaultSourceUnavailable = $0 { true } else { false } }) {
+            problems.append(VoiceInputSourceProblem(id: 3, message: "The configured global default input source is unavailable."))
+        }
+        return problems
+    }
+
     private var restoreSourceName: String {
         guard let id = state.config.defaultSourceID else { return state.loc("Not set") }
         return state.availableSources.first { $0.id == id }?.localizedName
             ?? "\(id.rawValue) — \(state.loc("Unavailable"))"
     }
+}
+
+/// One source-validation note. The `id` keeps the `ForEach` order stable and
+/// gives the list an identity SwiftUI can diff.
+private struct VoiceInputSourceProblem: Identifiable {
+    let id: Int
+    let message: LocalizedStringKey
 }
 
 private struct VoiceInputStatusNote: View {
@@ -197,7 +246,6 @@ private struct VoiceShortcutEditor: View {
     let title: LocalizedStringKey
     @Binding var shortcut: VoiceShortcut?
     let isDisabled: Bool
-    let disabledDisplayText: String?
     @State private var isRecording = false
     @State private var monitor: Any?
     @State private var recorder = VoiceShortcutRecorder()
@@ -250,7 +298,6 @@ private struct VoiceShortcutEditor: View {
     }
 
     private var displayText: String {
-        if let disabledDisplayText { return disabledDisplayText }
         guard let shortcut else { return state.loc("Click to set") }
         return shortcut.displayText(
             leftLabel: state.loc("Left"),
@@ -310,3 +357,4 @@ private extension VoiceShortcut.Modifiers {
         if flags.contains(.shift) { insert(.shift) }
     }
 }
+
