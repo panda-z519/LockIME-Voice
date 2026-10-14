@@ -11,7 +11,9 @@ key, public update feed, or Homebrew cask.
 ```sh
 # 1. Bump the version in project.yml (MARKETING_VERSION, CURRENT_PROJECT_VERSION)
 #    and update the download links in the READMEs to match.
-# 2. Commit, then tag and push:
+# 2. Write the release notes at docs/release-notes/<version>.md — the workflow
+#    refuses to publish without them (see below).
+# 3. Commit, then tag and push:
 git tag v0.1.3
 git push origin v0.1.3
 ```
@@ -37,6 +39,22 @@ That triggers the `Release` workflow:
    It combines the per-arch checksums into `SHA256SUMS.txt` and creates the
    Release, re-uploading with `--clobber` so re-running the same tag is
    idempotent.
+
+## Release notes are part of the release
+
+The GitHub Release body comes from `docs/release-notes/<version>.md`, plus an
+installer table and the checksum instructions the workflow appends. A missing
+file fails the run rather than publishing a body that only says "ad-hoc signed,
+not notarized" — a Release that does not tell users what changed is worse than a
+failed pipeline.
+
+Because the notes live in the tagged commit, they are reviewed in the same diff
+as the code they describe. See `docs/release-notes/README.md` for what to include
+(lead with user-visible changes, flag anything the user must reconfigure, leave
+out the install boilerplate).
+
+User-facing highlights should also be reflected in the READMEs' feature lists —
+the Release notes explain *this* version, the README describes the product.
 
 ## Version numbers
 

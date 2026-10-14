@@ -1,5 +1,6 @@
 name: Release
 
+
 # Tag a commit (`git tag v0.1.3 && git push origin v0.1.3`) and this builds both
 # architectures, verifies them, and attaches the installers plus a checksum file
 # to the GitHub Release. Publishing is fully automated; see docs/RELEASING.md.
@@ -207,33 +208,46 @@ jobs:
           cat *.sha256 | sort -k2 > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Extract the release notes from the changelog
-        id: notes
+      - name: Assemble the release notes
         run: |
-          # README keeps the user-facing "Changes in LockIME Voice" list; reuse it
-          # so the Release body never drifts from the documented behavior.
           version="${GITHUB_REF_NAME#v}"
+          notes="docs/release-notes/${version}.md"
+
+          # The notes are written by hand in the tagged commit, so they are
+          # reviewable in the same diff as the change they describe. A missing
+          # file is a hard failure: publishing a Release with only boilerplate
+          # hides what actually changed.
+          if [ ! -f "$notes" ]; then
+            echo "::error::$notes not found. Add the release notes in the same commit as the version bump."
+            exit 1
+          fi
+
           {
             echo "## LockIME Voice ${version}"
             echo
-            echo "Ad-hoc signed, **not notarized**. The first launch is blocked by"
-            echo "Gatekeeper: open **System Settings ▸ Privacy & Security**, click"
-            echo "**Open Anyway** for LockIME Voice, then confirm. See the README."
+            cat "$notes"
+            echo
+            echo "---"
             echo
             echo "### Installers"
             echo
-            echo "| Architecture | Download |"
+            echo "| Architecture | File |"
             echo "|---|---|"
             for arch in arm64 x86_64; do
-              echo "| $arch | \`LockIME-Voice-${version}-${arch}.dmg\` |"
+              echo "| ${arch} | \`LockIME-Voice-${version}-${arch}.dmg\` |"
             done
             echo
-            echo "Verify with \`SHA256SUMS.txt\` from this release's assets:"
+            echo "Checksums are listed in \`SHA256SUMS.txt\` in this release's assets."
+            echo "Verify a download before opening it:"
             echo
             echo '```sh'
+            echo "# put the .dmg and SHA256SUMS.txt in one directory, then:"
             echo "shasum -a 256 -c SHA256SUMS.txt"
             echo '```'
-          } > notes.md
+          } > release-body.md
+
+          echo "--- release body ---"
+          cat release-body.md
 
       - name: Create or update the Release
         env:
@@ -244,7 +258,7 @@ jobs:
           # on the already-uploaded assets.
           gh release create "$GITHUB_REF_NAME" \
             --title "LockIME Voice $version" \
-            --notes-file notes.md \
+            --notes-file release-body.md \
             --verify-tag \
             dist/*.dmg dist/SHA256SUMS.txt \
             || gh release upload "$GITHUB_REF_NAME" \
