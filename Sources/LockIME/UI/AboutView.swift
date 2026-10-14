@@ -8,7 +8,7 @@ struct AboutView: View {
     @Environment(\.openURL) private var openURL
     @State private var showingAcknowledgements = false
 
-    private static let repoURL = URL(string: "https://github.com/zhangsiqiang519/LockIME-Voice")!
+    private static let repoURL = URL(string: "https://github.com/panda-z519/LockIME-Voice")!
 
     var body: some View {
         VStack(spacing: 0) {

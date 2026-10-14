@@ -6,14 +6,14 @@
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Español** · [Português](README.pt.md) · [Русский](README.ru.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/zhangsiqiang519/LockIME-Voice/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/panda-z519/LockIME-Voice/actions/workflows/ci.yml)
 [![Licencia: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
 
-> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.2` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
+> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.3` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
 
 Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada de teclado**. Cada vez que tú (u otra aplicación) cambias el método de entrada, LockIME vuelve inmediatamente al bloqueado — globalmente, por aplicación en primer plano, o (con el modo mejorado opcional) por URL del navegador.
 
@@ -48,13 +48,22 @@ Frente al proyecto upstream, este fork añade una fuente de voz configurable, at
 
 Descarga el instalador correspondiente:
 
-- [Apple silicon (arm64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-arm64.dmg)
-- [Intel (x86_64)](https://github.com/zhangsiqiang519/LockIME-Voice/releases/download/v0.1.2/LockIME-Voice-0.1.2-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
 
-Sumas SHA-256:
+Verifica la descarga antes de abrirla. Cada release publica un `SHA256SUMS.txt`,
+así que la suma de comprobación siempre coincide con el artefacto compilado para
+ese tag (el DMG no es reproducible, por eso aquí no se fija ninguna):
 
-- `LockIME-Voice-0.1.2-arm64.dmg`: `acd3602c05428d38e0713e186757b25bce1d57df0410039ae147431d5c18e780`
-- `LockIME-Voice-0.1.2-x86_64.dmg`: `914338ea7295d5a0713168035f1618cdb2004cd782ab24a5a1ef2b4c8a6d0d9f`
+```sh
+gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+shasum -a 256 -c SHA256SUMS.txt
+```
+
+Esa verificación es lo que hace seguro pulsar **Abrir igualmente** en una
+compilación sin notarizar: nunca omitas Gatekeeper para una descarga sin comprobar.
+
 
 Abre el DMG y arrastra **LockIME Voice** a Aplicaciones. Esta versión preliminar solo está firmada ad-hoc y **no está notarizada**, así que Gatekeeper bloquea el primer inicio:
 

@@ -227,7 +227,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         case .russian: file = "README.ru.md"
         }
         // A constant, URL-safe GitHub address — not user-facing copy.
-        return URL(string: "https://github.com/zhangsiqiang519/LockIME-Voice/blob/main/docs/URL-Scheme-API/\(file)")!
+        return URL(string: "https://github.com/panda-z519/LockIME-Voice/blob/main/docs/URL-Scheme-API/\(file)")!
     }
 
     func setLanguagePreference(_ preference: LanguagePreference) {

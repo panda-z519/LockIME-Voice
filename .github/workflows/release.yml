@@ -1,0 +1,259 @@
+name: Release
+
+# Tag a commit (`git tag v0.1.3 && git push origin v0.1.3`) and this builds both
+# architectures, verifies them, and attaches the installers plus a checksum file
+# to the GitHub Release. Publishing is fully automated; see docs/RELEASING.md.
+#
+# Version numbers come from `project.yml` (MARKETING_VERSION), not from the tag,
+# so the tag and the built app can never disagree silently — the "Verify tag
+# matches the built version" step below fails the run if they do.
+
+on:
+  push:
+    tags: ["v*"]
+  # Allow a dry run from the Actions tab: builds and verifies everything, then
+  # uploads the installers as workflow artifacts instead of creating a Release.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and verify only (no GitHub Release)"
+        type: boolean
+        default: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  # The installers are ad-hoc signed, so a Release is only trustworthy if the
+  # tests behind it passed. Reuse CI's suite rather than trusting the tag's
+  # commit to have been tested elsewhere.
+  test:
+    name: Build & Test
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode 26
+        run: |
+          if [ -d /Applications/Xcode_26.app ]; then
+            sudo xcode-select -s /Applications/Xcode_26.app
+          fi
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Run the test suite
+        run: |
+          set -o pipefail
+          xcodebuild -project LockIMEVoice.xcodeproj -scheme LockIMEVoice -configuration Debug \
+            -derivedDataPath build/DerivedData \
+            -destination 'platform=macOS,arch=arm64' \
+            test | xcbeautify
+
+  build:
+    name: Build ${{ matrix.arch }}
+    needs: test
+    runs-on: macos-26
+    strategy:
+      # Both installers must come from the same commit; stop the second build if
+      # the first one fails so a partial Release can never be published.
+      fail-fast: true
+      matrix:
+        include:
+          - arch: arm64
+            destination: "platform=macOS,arch=arm64"
+          - arch: x86_64
+            destination: "generic/platform=macOS"
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode 26
+        run: |
+          if [ -d /Applications/Xcode_26.app ]; then
+            sudo xcode-select -s /Applications/Xcode_26.app
+          fi
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build Release
+        run: |
+          set -o pipefail
+          # Multi-arch builds are suppressed because each installer ships only
+          # its own slice (download size); the project defaults to arm64, so the
+          # Intel pass has to override both settings explicitly.
+          if [ "${{ matrix.arch }}" = "x86_64" ]; then
+            ARCH_FLAGS="ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO"
+          else
+            ARCH_FLAGS="ARCHS=arm64"
+          fi
+          xcodebuild -project LockIMEVoice.xcodeproj -scheme LockIMEVoice -configuration Release \
+            -derivedDataPath build/DerivedData \
+            -destination '${{ matrix.destination }}' \
+            $ARCH_FLAGS \
+            build | xcbeautify
+
+      - name: Verify the built app
+        id: verify
+        run: |
+          APP="build/DerivedData/Build/Products/Release/LockIME Voice.app"
+          [ -d "$APP" ] || { echo "::error::app not found at $APP"; exit 1; }
+
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")
+          bundle_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # The app identity other tooling and the docs rely on.
+          [ "$bundle_id" = "com.zhangsiqiang519.LockIMEVoice" ] \
+            || { echo "::error::unexpected bundle id: $bundle_id"; exit 1; }
+
+          # Single-arch by design — a fat binary means the arch override was lost.
+          archs=$(lipo -archs "$APP/Contents/MacOS/LockIME Voice")
+          [ "$archs" = "${{ matrix.arch }}" ] \
+            || { echo "::error::expected ${{ matrix.arch }}, got: $archs"; exit 1; }
+
+          # Ad-hoc signature, and specifically WITHOUT get-task-allow: that key
+          # marks a build as debuggable and must not ship (see project.yml).
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          codesign -dv --verbose=4 "$APP" 2>&1 | grep -q 'Signature=adhoc' \
+            || { echo "::error::app is not ad-hoc signed"; exit 1; }
+          if codesign -d --entitlements - "$APP" 2>/dev/null | grep -q 'get-task-allow'; then
+            echo "::error::app carries get-task-allow (debuggable build)"
+            exit 1
+          fi
+
+          echo "verified: $bundle_id $version $archs (adhoc, no get-task-allow)"
+
+      - name: Fail if the tag does not match the built version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          built="${{ steps.verify.outputs.version }}"
+          [ "$tag_version" = "$built" ] || {
+            echo "::error::tag $GITHUB_REF_NAME does not match MARKETING_VERSION $built in project.yml"
+            exit 1
+          }
+
+      - name: Package DMG
+        run: |
+          APP="build/DerivedData/Build/Products/Release/LockIME Voice.app"
+          version="${{ steps.verify.outputs.version }}"
+          scripts/make-dmg.sh "$APP" "build/dmg/LockIME-Voice-$version-${{ matrix.arch }}.dmg"
+
+      - name: Verify the DMG
+        run: |
+          version="${{ steps.verify.outputs.version }}"
+          dmg="build/dmg/LockIME-Voice-$version-${{ matrix.arch }}.dmg"
+          [ -f "$dmg" ] || { echo "::error::dmg not found at $dmg"; exit 1; }
+          # Mount it and confirm the app inside is the one we verified: catching a
+          # bad copy into the image is the whole point of signing the installer.
+          mount=$(mktemp -d)
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$mount" >/dev/null
+          trap 'hdiutil detach "$mount" >/dev/null 2>&1 || true' EXIT
+          codesign --verify --deep --strict "$mount/LockIME Voice.app"
+          inner=$(lipo -archs "$mount/LockIME Voice.app/Contents/MacOS/LockIME Voice")
+          [ "$inner" = "${{ matrix.arch }}" ] || { echo "::error::dmg contains $inner"; exit 1; }
+          echo "dmg verified: $dmg"
+
+      - name: Write checksums
+        run: |
+          version="${{ steps.verify.outputs.version }}"
+          cd build/dmg
+          shasum -a 256 "LockIME-Voice-$version-${{ matrix.arch }}.dmg" \
+            > "LockIME-Voice-$version-${{ matrix.arch }}.dmg.sha256"
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v7
+        with:
+          name: dmg-${{ matrix.arch }}
+          path: |
+            build/dmg/*.dmg
+            build/dmg/*.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Publish Release
+    needs: build
+    # A manual run only ever produces artifacts, never a public Release.
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download installers
+        uses: actions/download-artifact@v6
+        with:
+          pattern: dmg-*
+          merge-multiple: true
+          path: dist
+
+      - name: Combine checksums
+        run: |
+          cd dist
+          # One SHA256SUMS.txt covering both installers, so a user can verify a
+          # download with a single file (and the release notes link to it).
+          cat *.sha256 | sort -k2 > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Extract the release notes from the changelog
+        id: notes
+        run: |
+          # README keeps the user-facing "Changes in LockIME Voice" list; reuse it
+          # so the Release body never drifts from the documented behavior.
+          version="${GITHUB_REF_NAME#v}"
+          {
+            echo "## LockIME Voice ${version}"
+            echo
+            echo "Ad-hoc signed, **not notarized**. The first launch is blocked by"
+            echo "Gatekeeper: open **System Settings ▸ Privacy & Security**, click"
+            echo "**Open Anyway** for LockIME Voice, then confirm. See the README."
+            echo
+            echo "### Installers"
+            echo
+            echo "| Architecture | Download |"
+            echo "|---|---|"
+            for arch in arm64 x86_64; do
+              echo "| $arch | \`LockIME-Voice-${version}-${arch}.dmg\` |"
+            done
+            echo
+            echo "Verify with \`SHA256SUMS.txt\` from this release's assets:"
+            echo
+            echo '```sh'
+            echo "shasum -a 256 -c SHA256SUMS.txt"
+            echo '```'
+          } > notes.md
+
+      - name: Create or update the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # --clobber makes a re-run of the same tag idempotent instead of failing
+          # on the already-uploaded assets.
+          gh release create "$GITHUB_REF_NAME" \
+            --title "LockIME Voice $version" \
+            --notes-file notes.md \
+            --verify-tag \
+            dist/*.dmg dist/SHA256SUMS.txt \
+            || gh release upload "$GITHUB_REF_NAME" \
+                 dist/*.dmg dist/SHA256SUMS.txt --clobber
+
+      - name: Summary
+        run: |
+          {
+            echo "### Released $GITHUB_REF_NAME"
+            echo
+            cat dist/SHA256SUMS.txt
+          } >> "$GITHUB_STEP_SUMMARY"
