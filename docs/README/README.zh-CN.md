@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.3` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
+> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.4` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
 
 一款 macOS 菜单栏应用，用于**锁定你的键盘输入源**。每当你（或其他应用）切换输入法时，LockIME 会立即切回被锁定的那个——可以是全局的、按前台应用区分的，或者（在可选的增强模式下）按浏览器 URL 区分的。
 
@@ -43,7 +43,7 @@
 相比上游 LockIME，本分支包含以下具体改动：
 
 - **语音输入法可配置**——不写死任何输入法，可选择豆包、微信或其他已安装输入法。
-- **两个独立快捷键**——LockIME 有自己的全局语音快捷键，并代你发送输入法内部配置的那个快捷键。两者必须不同，否则同一个组合键会被处理两次，macOS 就会提示快捷键冲突；支持左右修饰键和多键组合。
+- **一个快捷键，由 LockIME 接管**——录入你在输入法里使用的同一个语音快捷键。LockIME 会吃掉这个按键，让输入法收不到物理按下（这正是 macOS 不再提示快捷键冲突的原因），再把同一个键发回去以开始和结束录音。支持左右修饰键和多键组合。
 - **三种语音行为**——再次按下结束、按住说话、任意键结束，与输入法自身设置保持一致。
 - **临时接管输入法**——语音期间暂停普通锁定规则，避免刚切到语音输入法就被切回默认输入法。
 - **恢复全局默认输入法**——恢复目标直接取自 **App Rules** 的全局默认规则，不再重复设置“日常输入法”。
@@ -56,14 +56,14 @@
 
 下载与你的 Mac 匹配的安装包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 打开前请先校验下载文件。每个 Release 都会发布 `SHA256SUMS.txt`，因此校验和始终与该 tag 构建出的产物一致（DMG 不是可复现构建，所以本文件里不写死哈希）：
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -112,14 +112,15 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 语音输入法完全可配置；LockIME Voice 不会写死豆包、微信或其他输入法。
 
 1. 打开 **Settings ▸ Voice Input**，启用工作流。
-2. 录入 **输入法语音快捷键**——即该输入法自身语音功能所用的快捷键。请先在输入法内部设好它，并让它与 LockIME 自己的快捷键不同。
-3. 录入 **LockIME 语音快捷键**（在 **Settings ▸ Shortcuts ▸ Global shortcuts** 或同一面板中）。这才是你实际按下的那个键。
-4. 可选：如果语音输入法不是你日常使用的输入法，打开 **自动切换输入法** 并选中该输入法。请先在 **Settings ▸ App Rules** 设好全局默认输入法——语音结束后 LockIME 会恢复它。
-5. 按提示授予发送键盘事件的权限。
+2. 录入 **语音快捷键**——就是你在输入法里使用的那个语音快捷键。LockIME 会接管这个按键。
+3. 可选：选择语音输入法并打开自动切换。
+4. 授予**辅助功能**权限。LockIME 需要它才能接管语音快捷键；没有权限时按键会落回输入法，macOS 又会提示快捷键冲突。核心锁定功能依然不需要任何权限。
 
-按下 LockIME 的快捷键后，它会发送输入法的语音快捷键，因此语音输入会在当前输入法中启动。打开自动切换时，LockIME 会先切到设定的语音输入法，等待 macOS 确认切换，并在语音结束或安全超时后恢复全局默认输入法。
+### 为什么不再冲突
 
-由于 LockIME 只**发送**该快捷键、从不监听你的按键，两个快捷键必须是不同的组合。把它们设成同一个组合会让冲突重新出现：同一个按键被处理两次，macOS 或输入法就会提示快捷键冲突。
+LockIME 会吃掉语音按键，所以你的输入法收不到物理按下——它没有可冲突的对象。随后 LockIME 把同一个按键发回去，用于开始和结束录音；该事件带有标记，LockIME 自己的监听会忽略它。
+
+这正是与早期「两个快捷键」方案的区别：那种方案要求你维护两个不同的组合，却仍让输入法对属于它的按键做出反应。
 
 请在 TextEdit 等普通文本框中验证。只看到语音面板不算成功，识别文字必须实际插入当前光标位置。
 ## Comparison

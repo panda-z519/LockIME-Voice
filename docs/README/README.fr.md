@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork source LockIME Voice.** Ce dérivé GPL-3.0 ajoute le workflow de saisie vocale configurable. `v0.1.3` fournit des installateurs de préversion signés ad-hoc, sans Developer ID, notarisation, Sparkle ni Homebrew.
+> **Fork source LockIME Voice.** Ce dérivé GPL-3.0 ajoute le workflow de saisie vocale configurable. `v0.1.4` fournit des installateurs de préversion signés ad-hoc, sans Developer ID, notarisation, Sparkle ni Homebrew.
 
 Une application de barre de menus macOS qui **verrouille votre source de saisie clavier**. Chaque fois que vous (ou une autre application) changez de méthode de saisie, LockIME rebascule immédiatement vers celle qui est verrouillée — globalement, par application au premier plan, ou (avec le mode renforcé optionnel) par URL de navigateur.
 
@@ -40,7 +40,7 @@ Une application de barre de menus macOS qui **verrouille votre source de saisie 
 
 ## Changes in LockIME Voice
 
-Par rapport à l'upstream, ce fork ajoute une source vocale configurable, des raccourcis distincts pour LockIME et la méthode de saisie, un changement temporaire de source de saisie pendant la dictée (optionnel, désactivé par défaut), la restauration de la valeur globale **App Rules**, des sessions répétables avec délai de sécurité, ainsi que la source par défaut placée en tête avec une épingle.
+Par rapport à l'upstream, ce fork ajoute une source vocale configurable, un seul raccourci vocal pris en charge par LockIME (la touche est consommée, donc aucun conflit), un changement temporaire de source de saisie pendant la dictée (optionnel, désactivé par défaut), la restauration de la valeur globale **App Rules**, des sessions répétables avec délai de sécurité, ainsi que la source par défaut placée en tête avec une épingle.
 
 ![Réglages de saisie vocale LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -48,8 +48,8 @@ Par rapport à l'upstream, ce fork ajoute une source vocale configurable, des ra
 
 Téléchargez l'installateur correspondant :
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 Vérifiez le téléchargement avant de l'ouvrir. Chaque release publie un
 `SHA256SUMS.txt` : l'empreinte correspond donc toujours à l'artefact compilé pour
@@ -57,7 +57,7 @@ ce tag (le DMG n'est pas reproductible, aucune empreinte n'est donc figée ici).
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -108,14 +108,15 @@ Après réinstallation ou reconstruction, les autorisations peuvent être redema
 La source de saisie vocale est entièrement configurable ; LockIME Voice n'impose ni Doubao, ni WeChat, ni aucune autre méthode de saisie.
 
 1. Ouvrez **Settings ▸ Voice Input** et activez le workflow.
-2. Enregistrez le **raccourci vocal de la méthode de saisie** — celui que votre méthode de saisie utilise pour sa propre dictée. Définissez-le d'abord dans la méthode de saisie et gardez-le distinct du raccourci propre à LockIME.
-3. Enregistrez le **raccourci vocal de LockIME** (dans **Settings ▸ Shortcuts ▸ Global shortcuts** ou dans le même panneau). C'est la touche que vous pressez réellement.
-4. Facultatif : activez **Changer automatiquement de source de saisie** et choisissez la source vocale si ce n'est pas celle que vous utilisez au quotidien. Définissez d'abord la source par défaut globale dans **Settings ▸ App Rules** : c'est elle que LockIME rétablira ensuite.
-5. Accordez l'autorisation d'envoyer des événements clavier lorsque macOS la demande.
+2. Enregistrez le **raccourci vocal** — celui que vous utilisez pour la dictée dans votre méthode de saisie. LockIME prend cette touche en charge.
+3. Facultatif : choisissez une source vocale et activez le changement automatique.
+4. Accordez **Accessibilité**. Elle est nécessaire pour que LockIME prenne le raccourci vocal en charge ; sans elle, la touche parvient à la méthode de saisie et macOS signale de nouveau un conflit de raccourcis. Le verrouillage principal reste sans autorisation.
 
-Appuyer sur le raccourci de LockIME envoie le raccourci vocal de la méthode de saisie : la dictée démarre donc dans la méthode active. Avec le changement automatique activé, LockIME bascule d'abord vers la source vocale configurée, attend la confirmation de macOS, puis rétablit la source par défaut globale à la fin de la dictée ou au déclenchement du délai de sécurité.
+### Pourquoi il n'y a plus de conflit
 
-Comme LockIME ne fait qu'*envoyer* ce raccourci et n'écoute jamais vos frappes, les deux raccourcis doivent être des combinaisons distinctes. Une seule combinaison partagée fait revenir le conflit : la touche est traitée deux fois et macOS ou la méthode de saisie signale un conflit de raccourcis.
+LockIME consomme la touche vocale : votre méthode de saisie ne voit donc jamais l'appui physique — il n'y a plus rien avec quoi entrer en conflit. LockIME renvoie ensuite cette même touche pour démarrer et arrêter la dictée, marquée afin que son propre écouteur ignore l'écho.
+
+C'est la différence avec l'ancien modèle à deux raccourcis, qui vous demandait d'en maintenir deux distincts tout en laissant la méthode de saisie réagir à sa propre touche.
 
 Testez le workflow dans TextEdit ou un autre champ de texte simple. Voir le panneau vocal ne suffit pas : le texte reconnu doit apparaître à la position du curseur.
 ## Comparison

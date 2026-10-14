@@ -44,63 +44,52 @@ struct VoiceInputSettingsPane: View {
             }
 
             Section {
-                // LockIME's own trigger — a real global shortcut, recorded and
-                // dispatched by KeyboardShortcuts. This is the key the user presses.
+                // ONE shortcut, and it is the input method's own voice key. The
+                // user records the same key they already configured inside the
+                // input method; LockIME owns that key (consuming the press so the
+                // input method never sees it) and echoes it back to start and end
+                // the recording. Recording it here is what lets LockIME know which
+                // key to own — there is no second shortcut to keep in sync.
                 KeyboardShortcuts.Recorder(
-                    LocalizedStringKey("LockIME voice shortcut"),
+                    LocalizedStringKey("Voice shortcut"),
                     name: .voiceInput
                 )
+                // The consuming tap owns this key, so it stands down while this
+                // pane is open: otherwise it would swallow the press the recorder
+                // is waiting to read. The cost is that the voice key is inactive
+                // while Settings sits on this pane — an acceptable trade, since
+                // the user is configuring rather than dictating, and it is the
+                // only way to keep recording possible at all.
+                .onAppear { state.isRecordingShortcut = true }
+                .onDisappear { state.isRecordingShortcut = false }
 
-                // The input method's own voice key — only ever synthesized, so
-                // LockIME never also receives it. Pointing both at one
-                // combination is exactly what produced the conflict prompt.
-                VoiceShortcutEditor(
-                    title: "Input method voice shortcut",
-                    shortcut: Binding(
-                        get: { state.voiceInputConfig.voiceShortcut },
-                        set: { newValue in state.updateVoiceInputConfig { $0.voiceShortcut = newValue } }
-                    ),
-                    isDisabled: settingsLocked
-                )
-                .id(state.voiceInputConfig.voiceSourceID)
-
-                if clashesWithTriggerShortcut {
+                if !state.voiceKeyConfigured {
                     VoiceInputStatusNote(
-                        "This is the same combination as LockIME's voice shortcut. Use two different shortcuts, or the key is handled twice and macOS reports a shortcut conflict.",
+                        "Record your input method's voice shortcut here. It must be the same shortcut that starts voice input inside your input method.",
                         systemImage: "exclamationmark.triangle"
                     )
                 }
 
-                // The trigger is LockIME's own key and has no legacy value to
-                // carry over, so an upgraded user arrives here with it unset.
-                if KeyboardShortcuts.getShortcut(for: .voiceInput) == nil {
-                    VoiceInputStatusNote(
-                        "Record a shortcut here first. It is LockIME's own trigger and must differ from the input method's voice shortcut below.",
-                        systemImage: "exclamationmark.triangle"
-                    )
-                }
-
-                if errors.contains(.missingVoiceShortcut) {
-                    VoiceInputStatusNote(
-                        "Record the selected input method's voice shortcut here. It must match the shortcut configured inside that input method.",
-                        systemImage: "exclamationmark.triangle"
-                    )
-                }
-
-                if !canSendShortcut {
+                // A consuming tap needs Accessibility: it is what lets LockIME
+                // take the key away from the input method. Saying so is not
+                // optional — without the grant the tap cannot install and the key
+                // falls through to the input method, which is the conflict again.
+                if !state.accessibilityGranted {
+                    AccessibilityRequiredNote("Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict")
+                } else if !canSendShortcut {
                     AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
                 }
 
                 if state.voiceInputRuntimeError != nil {
                     VoiceInputStatusNote(
-                        "The last voice input workflow failed. Check that the configured input sources are still available.",
+                        "The last voice input workflow failed. Check that the configured input source is still available and that the shortcut matches your input method.",
                         systemImage: "exclamationmark.triangle"
                     )
                 }
             } header: {
                 Text("Voice Trigger")
             } footer: {
-                SectionFooter("The upper shortcut is LockIME's own trigger; the lower one is the shortcut configured inside the selected input method. Set that one in the input method first, and never bind both to the same combination.")
+                SectionFooter("Set this to the same shortcut you use for voice input inside your input method. LockIME takes over that key, so macOS no longer reports a shortcut conflict, and pressing it starts or ends voice input.")
             }
 
             Section {
@@ -175,15 +164,6 @@ struct VoiceInputSettingsPane: View {
         .navigationTitle(state.loc("Voice Input"))
     }
 
-    /// Whether both shortcuts are bound to the same combination — the exact
-    /// configuration that made a single press count twice.
-    private var clashesWithTriggerShortcut: Bool {
-        guard let configured = state.voiceInputConfig.voiceShortcut,
-              let trigger = KeyboardShortcuts.getShortcut(for: .voiceInput)
-        else { return false }
-        return configured.recordedShortcut == trigger
-    }
-
     private var canSendShortcut: Bool {
 VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: state.eventPostingGranted)
     }
@@ -240,121 +220,3 @@ private struct VoiceInputStatusNote: View {
             .padding(.vertical, DS.Spacing.xxs)
     }
 }
-
-private struct VoiceShortcutEditor: View {
-    @Environment(AppState.self) private var state
-    let title: LocalizedStringKey
-    @Binding var shortcut: VoiceShortcut?
-    let isDisabled: Bool
-    @State private var isRecording = false
-    @State private var monitor: Any?
-    @State private var recorder = VoiceShortcutRecorder()
-
-    var body: some View {
-        LabeledContent(title) {
-            ZStack {
-                Button {
-                    isRecording ? stopRecording() : startRecording()
-                } label: {
-                    Text(isRecording ? state.loc("Press shortcut…") : displayText)
-                        .foregroundStyle(shortcut == nil ? .secondary : .primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(isDisabled)
-
-                if shortcut != nil, !isDisabled {
-                    HStack {
-                        Spacer()
-                        Button {
-                            shortcut = nil
-                            stopRecording()
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.tertiary)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Clear")
-                        .accessibilityLabel("Clear")
-                    }
-                    .padding(.trailing, DS.Spacing.xs)
-                }
-            }
-            .frame(width: 126, height: 28)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.separator.opacity(0.45), lineWidth: 0.5)
-            }
-            .opacity(isDisabled ? 0.55 : 1)
-        }
-        .onChange(of: isDisabled) { _, disabled in
-            if disabled { stopRecording() }
-        }
-        .onDisappear(perform: stopRecording)
-    }
-
-    private var displayText: String {
-        guard let shortcut else { return state.loc("Click to set") }
-        return shortcut.displayText(
-            leftLabel: state.loc("Left"),
-            rightLabel: state.loc("Right")
-        )
-    }
-
-    private func startRecording() {
-        guard !isDisabled else { return }
-        stopRecording()
-        recorder.reset()
-        isRecording = true
-        monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .flagsChanged]) { event in
-            if event.type == .keyDown, event.keyCode == 53 {
-                stopRecording()
-                return nil
-            }
-            let modifiers = VoiceShortcut.Modifiers(event.modifierFlags)
-            let recorded: VoiceShortcut? = switch event.type {
-            case .keyDown:
-                Optional(recorder.handleKeyDown(keyCode: event.keyCode, modifiers: modifiers))
-            case .flagsChanged:
-                recorder.handleModifierChange(
-                    keyCode: VoiceShortcut.canonicalModifierKeyCode(
-                        eventKeyCode: event.keyCode,
-                        deviceFlagsRawValue: UInt64(event.modifierFlags.rawValue)
-                    ),
-                    modifiers: modifiers
-                )
-            default:
-                nil
-            }
-            if let recorded {
-                shortcut = recorded
-                stopRecording()
-            }
-            return nil
-        }
-    }
-
-    private func stopRecording() {
-        if let monitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        monitor = nil
-        isRecording = false
-        recorder.reset()
-    }
-}
-
-private extension VoiceShortcut.Modifiers {
-    init(_ flags: NSEvent.ModifierFlags) {
-        self.init()
-        if flags.contains(.command) { insert(.command) }
-        if flags.contains(.control) { insert(.control) }
-        if flags.contains(.option) { insert(.option) }
-        if flags.contains(.shift) { insert(.shift) }
-    }
-}
-

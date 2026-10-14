@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.3` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
+> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.4` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
 
 一款 macOS 選單列應用程式，用於**鎖定你的鍵盤輸入法**。每當你（或其他應用程式）切換輸入法時，LockIME 會立即切回被鎖定的那個——可以是全域的、依最前方應用程式區分的，或者（在可選的增強模式下）依瀏覽器 URL 區分的。
 
@@ -43,7 +43,7 @@
 相較於上游 LockIME，本分支包含以下具體改動：
 
 - **語音輸入法可設定**——不寫死任何輸入法，可選擇豆包、微信或其他已安裝輸入法。
-- **兩個獨立快速鍵**——LockIME 有自己的全域語音快速鍵，並代你送出輸入法內部設定的那個快速鍵。兩者必須不同，否則同一個組合鍵會被處理兩次，macOS 就會提示快速鍵衝突；支援左右修飾鍵與多鍵組合。
+- **一個快速鍵，由 LockIME 接管**——錄入你在輸入法裡使用的同一個語音快速鍵。LockIME 會吃掉這個按鍵，讓輸入法收不到實際按下（這正是 macOS 不再提示快速鍵衝突的原因），再把同一個鍵送回去以開始與結束錄音。支援左右修飾鍵與多鍵組合。
 - **三種語音行為**——再次按下結束、按住說話、任意鍵結束，與輸入法自身設定保持一致。
 - **暫時接管輸入法**——語音期間暫停普通鎖定規則，避免剛切到語音輸入法就被切回預設輸入法。
 - **恢復全域預設輸入法**——恢復目標直接取自 **App Rules** 的全域預設規則，不再重複設定「日常輸入法」。
@@ -56,14 +56,14 @@
 
 下載與你的 Mac 相符的安裝包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 開啟前請先校驗下載檔案。每個 Release 都會發布 `SHA256SUMS.txt`，因此校驗和始終與該 tag 建置出的產物一致（DMG 不是可重現建置，所以本檔案裡不寫死雜湊）：
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -112,14 +112,15 @@ open "build/DerivedData/Build/Products/Debug/LockIME Voice Dev.app"
 語音輸入法完全可設定；LockIME Voice 不會寫死豆包、微信或其他輸入法。
 
 1. 開啟 **Settings ▸ Voice Input**，啟用工作流程。
-2. 錄入 **輸入法語音快速鍵**——即該輸入法自身語音功能所用的快速鍵。請先在輸入法內部設好它，並讓它與 LockIME 自己的快速鍵不同。
-3. 錄入 **LockIME 語音快速鍵**（在 **Settings ▸ Shortcuts ▸ Global shortcuts** 或同一面板中）。這才是你實際按下的那個鍵。
-4. 選用：如果語音輸入法不是你日常使用的輸入法，開啟 **自動切換輸入法** 並選中該輸入法。請先在 **Settings ▸ App Rules** 設好全域預設輸入法——語音結束後 LockIME 會還原它。
-5. 依提示授予傳送鍵盤事件的權限。
+2. 錄入 **語音快速鍵**——就是你在輸入法裡使用的那個語音快速鍵。LockIME 會接管這個按鍵。
+3. 選用：選擇語音輸入法並開啟自動切換。
+4. 授予**輔助使用**權限。LockIME 需要它才能接管語音快速鍵；沒有權限時按鍵會落回輸入法，macOS 又會提示快速鍵衝突。核心鎖定功能依然不需要任何權限。
 
-按下 LockIME 的快速鍵後，它會送出輸入法的語音快速鍵，因此語音輸入會在目前輸入法中啟動。開啟自動切換時，LockIME 會先切到設定的語音輸入法，等待 macOS 確認切換，並在語音結束或安全逾時後還原全域預設輸入法。
+### 為什麼不再衝突
 
-由於 LockIME 只**送出**該快速鍵、從不監聽你的按鍵，兩個快速鍵必須是不同的組合。把它們設成同一個組合會讓衝突重新出現：同一個按鍵被處理兩次，macOS 或輸入法就會提示快速鍵衝突。
+LockIME 會吃掉語音按鍵，所以你的輸入法收不到實際按下——它沒有可衝突的對象。隨後 LockIME 把同一個按鍵送回去，用於開始與結束錄音；該事件帶有標記，LockIME 自己的監聽會忽略它。
+
+這正是與早期「兩個快速鍵」方案的差別：那種方案要求你維護兩個不同的組合，卻仍讓輸入法對屬於它的按鍵做出反應。
 
 請在 TextEdit 等一般文字框中驗證。只看到語音面板不算成功，辨識文字必須實際插入目前游標位置。
 ## Comparison

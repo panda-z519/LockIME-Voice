@@ -14,7 +14,7 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. `v0.1.3` provides ad-hoc-signed preview installers, but
+> voice-input workflow. `v0.1.4` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
 > are not available.
 
@@ -50,10 +50,11 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 - **Configurable voice input source** — no input method is hard-coded; Doubao,
   WeChat, or another installed input source can be selected.
-- **Two separate shortcuts** — LockIME owns a global voice shortcut of its own
-  and sends the one configured inside your input method. Keeping them different
-  is what avoids the shortcut-conflict prompt that a single shared combination
-  causes; left/right modifiers and multi-key combinations are supported.
+- **One shortcut, taken over** — record the same voice shortcut your input
+  method uses. LockIME consumes that key so the input method never sees the
+  press (which is what stops macOS reporting a shortcut conflict), then sends it
+  back to start and stop recording. Left/right modifiers and multi-key
+  combinations are supported.
 - **Three voice behaviors** — press again to end, hold to speak, or press any
   key to end, matching the selected input method's own setting.
 - **Rule-safe temporary override** — normal LockIME enforcement pauses while
@@ -72,8 +73,8 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 Download the installer matching your Mac:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 Verify your download before opening it. Each Release publishes a
 `SHA256SUMS.txt`, so the checksum always matches the artifact built for that tag
@@ -81,7 +82,7 @@ Verify your download before opening it. Each Release publishes a
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -176,30 +177,25 @@ The voice input source is fully configurable; LockIME Voice does not hard-code
 Doubao, WeChat, or any other input method.
 
 1. Open **Settings ▸ Voice Input** and enable the workflow.
-2. Record **Input method voice shortcut** — the exact shortcut your input method
-   uses for its own voice feature. Set that shortcut inside the input method
-   first, and keep it different from LockIME's own shortcut.
-3. Record **LockIME voice shortcut** under **Settings ▸ Shortcuts ▸ Global
-   shortcuts** (or in the same pane). This is the key you actually press.
-4. Optional: turn on **Switch input source automatically** and choose the
-   voice-capable input source if it is not the one you normally type in. Set the
-   global default under **Settings ▸ App Rules** first — that is what LockIME
-   restores afterwards.
-5. Grant permission to send keyboard events when prompted.
+2. Record **Voice shortcut** — the same shortcut you use for voice input inside
+   your input method. LockIME takes that key over.
+3. Optionally choose a voice input source and turn on automatic switching.
+4. Grant **Accessibility**. It is required for LockIME to take the voice shortcut
+   over; without it the key falls through to the input method and macOS reports a
+   shortcut conflict again. The core lock still needs no permissions.
 
-Pressing LockIME's shortcut sends the input method's voice shortcut, so voice
-input starts in whichever input method is active. With automatic switching on,
-LockIME first moves to the configured voice input source, waits for macOS to
-confirm the switch, and restores the global default source when voice input ends
-or the safety timeout fires.
+### Why there is no conflict
 
-Because LockIME only *sends* that shortcut and never listens for your keys, the
-two shortcuts must be different combinations. Using one single combination
-reintroduces the conflict: the key is handled twice, and macOS or the input
-method reports a shortcut conflict.
+LockIME consumes the voice key, so your input method never sees the physical
+press — it has nothing to conflict with. LockIME then sends that same key back to
+start and stop recording, marked so its own listener ignores the echo.
 
-Test the workflow in TextEdit or another plain text field. Seeing the voice
-panel is not enough: recognized text must appear at the current cursor position.
+This is the difference from the earlier two-shortcut design, which asked you to
+keep two different combinations and still left the input method reacting to its
+own key.
+
+Test the workflow in TextEdit or another plain text field. Seeing the voice panel
+is not enough: recognized text must appear at the current cursor position.
 ## Comparison
 
 The two most widely-used alternatives to LockIME are

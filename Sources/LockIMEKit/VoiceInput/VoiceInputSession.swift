@@ -23,4 +23,7 @@ public enum VoiceInputCoordinatorError: Error, Equatable, Sendable {
     case switchToVoiceFailed(InputSourceID)
     case restoreDefaultFailed(InputSourceID)
     case shortcutSendFailed
+    /// The consuming voice-key tap could not be installed (missing Accessibility
+    /// grant), so the key cannot be owned and the workflow cannot run.
+    case eventTapUnavailable
 }

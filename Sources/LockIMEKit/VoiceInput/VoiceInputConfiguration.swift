@@ -88,6 +88,11 @@ public enum VoiceInputConfigurationNotice: Equatable, Sendable {
 public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
     public var isEnabled: Bool
     public var voiceSourceID: InputSourceID?
+    /// The voice key, kept for reading configurations written by v0.1.3 and
+    /// earlier. Since 0.1.4 the key is a single recorded shortcut owned by the
+    /// app (see `KeyboardShortcuts.Name.voiceInput`), because the key the user
+    /// presses is also the key the input method uses — storing it in two places
+    /// is what let the displayed value drift from the effective one.
     public var voiceShortcut: VoiceShortcut?
     public var behavior: VoiceInputBehavior
     /// Whether a trigger switches the Mac to `voiceSourceID` for the session and
@@ -145,9 +150,6 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         guard isEnabled else { return [] }
         let installed = Set(installedSources.map(\.id))
         var errors: [VoiceInputValidationError] = []
-        if voiceShortcut == nil {
-            errors.append(.missingVoiceShortcut)
-        }
         // Source problems only block the workflow when it actually has to touch
         // the input source: automatic switching is on, or the selected voice
         // input method is the global default (the workflow then still needs that

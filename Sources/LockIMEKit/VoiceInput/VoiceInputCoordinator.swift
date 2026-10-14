@@ -61,6 +61,10 @@ public final class VoiceInputCoordinator {
     private var didScheduleVoiceShortcut = false
     private var sessionShortcut: VoiceShortcut?
     private var sessionBehavior: VoiceInputBehavior?
+    /// The voice key the session echoes back to the input method. In the
+    /// single-shortcut model this is the key LockIME consumed, so it is known
+    /// for the whole session and does not depend on a separately recorded value.
+    public var voiceShortcutProvider: (@MainActor () -> VoiceShortcut?)?
 
     public private(set) var state: VoiceInputSessionState = .idle {
         didSet {
@@ -165,7 +169,9 @@ public final class VoiceInputCoordinator {
         restoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
-        guard let voiceShortcut = config.voiceShortcut else {
+        // The key to echo is the one the user pressed (LockIME consumed it), so a
+        // separate recording is no longer required — only a resolved value.
+        guard let voiceShortcut = voiceShortcutProvider?() ?? config.voiceShortcut else {
             state = .failed(.validationFailed([.missingVoiceShortcut]))
             throw VoiceInputCoordinatorError.validationFailed([.missingVoiceShortcut])
         }

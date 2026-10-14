@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. `v0.1.3` bietet ad-hoc signierte Vorschau-Installer, jedoch keine Developer-ID-Signierung, Notarisierung, Sparkle-Updates oder Homebrew-Verteilung.
+> **LockIME Voice Quellcode-Fork.** Diese GPL-3.0-Ableitung ergänzt den konfigurierbaren Spracheingabe-Workflow. `v0.1.4` bietet ad-hoc signierte Vorschau-Installer, jedoch keine Developer-ID-Signierung, Notarisierung, Sparkle-Updates oder Homebrew-Verteilung.
 
 Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann immer du (oder eine andere App) die Eingabemethode wechselst, schaltet LockIME sofort auf die gesperrte zurück — global, pro Vordergrund-App oder (mit dem optionalen erweiterten Modus) pro Browser-URL.
 
@@ -40,7 +40,7 @@ Eine macOS-Menüleisten-App, die **deine Tastatur-Eingabequelle sperrt**. Wann i
 
 ## Changes in LockIME Voice
 
-Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequelle, getrennte Kurzbefehle für LockIME und die Eingabemethode, einen optionalen temporären Wechsel der Eingabequelle während der Spracheingabe (standardmäßig aus), Wiederherstellung der globalen Standardquelle aus **App Rules**, zuverlässige Wiederholungen mit Timeout sowie eine zuerst angezeigte, mit einer Nadel markierte Standardquelle.
+Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequelle, ein einziger Sprachkurzbefehl, den LockIME übernimmt (die Taste wird konsumiert, daher kein Konflikt), einen optionalen temporären Wechsel der Eingabequelle während der Spracheingabe (standardmäßig aus), Wiederherstellung der globalen Standardquelle aus **App Rules**, zuverlässige Wiederholungen mit Timeout sowie eine zuerst angezeigte, mit einer Nadel markierte Standardquelle.
 
 ![LockIME Voice Spracheingabe-Einstellungen](../images/settings-voice-input-zh-CN.png)
 
@@ -48,8 +48,8 @@ Gegenüber dem Upstream ergänzt dieser Fork eine frei wählbare Spracheingabequ
 
 Lade den passenden Installer:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 Prüfen Sie den Download, bevor Sie ihn öffnen. Jedes Release veröffentlicht eine
 `SHA256SUMS.txt`, damit die Prüfsumme immer zum für den Tag gebauten Artefakt passt
@@ -57,7 +57,7 @@ Prüfen Sie den Download, bevor Sie ihn öffnen. Jedes Release veröffentlicht e
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -108,14 +108,15 @@ Nach einer Neuinstallation oder einem neuen Build können macOS-Berechtigungen e
 Die Spracheingabequelle ist frei wählbar; LockIME Voice legt weder Doubao noch WeChat oder eine andere Eingabemethode fest.
 
 1. Öffnen Sie **Settings ▸ Voice Input** und aktivieren Sie den Workflow.
-2. Erfassen Sie den **Sprachkurzbefehl der Eingabemethode** — den Kurzbefehl, den Ihre Eingabemethode für ihre eigene Spracheingabe verwendet. Legen Sie ihn zuerst dort fest und halten Sie ihn vom Kurzbefehl von LockIME getrennt.
-3. Erfassen Sie den **LockIME-Sprachkurzbefehl** (unter **Settings ▸ Shortcuts ▸ Global shortcuts** oder im selben Bereich). Das ist die Taste, die Sie tatsächlich drücken.
-4. Optional: Schalten Sie **Eingabequelle automatisch wechseln** ein und wählen Sie die sprachfähige Eingabequelle, wenn diese nicht Ihre alltägliche ist. Legen Sie vorher unter **Settings ▸ App Rules** die globale Standardquelle fest — dorthin stellt LockIME danach zurück.
-5. Erlauben Sie bei Aufforderung das Senden von Tastaturereignissen.
+2. Erfassen Sie den **Sprachkurzbefehl** — denselben, den Sie in Ihrer Eingabemethode für die Spracheingabe verwenden. LockIME übernimmt diese Taste.
+3. Optional: Wählen Sie eine Spracheingabequelle und schalten Sie den automatischen Wechsel ein.
+4. Erlauben Sie **Bedienungshilfen**. LockIME braucht sie, um den Sprachkurzbefehl zu übernehmen; ohne sie fällt die Taste an die Eingabemethode zurück und macOS meldet wieder einen Kurzbefehlskonflikt. Die Kern-Sperrfunktion bleibt weiterhin ohne Berechtigungen.
 
-Ein Druck auf den LockIME-Kurzbefehl sendet den Sprachkurzbefehl der Eingabemethode, sodass die Spracheingabe in der gerade aktiven Eingabemethode startet. Mit eingeschaltetem automatischem Wechsel wechselt LockIME zuerst zur konfigurierten Spracheingabequelle, wartet auf die Bestätigung von macOS und stellt nach dem Ende der Spracheingabe oder dem Sicherheits-Timeout die globale Standardquelle wieder her.
+### Warum es keinen Konflikt mehr gibt
 
-Da LockIME diesen Kurzbefehl nur *sendet* und Ihre Tastenanschläge nie mitliest, müssen die beiden Kurzbefehle verschieden sein. Eine einzige gemeinsame Kombination bringt den Konflikt zurück: Die Taste wird zweimal verarbeitet und macOS oder die Eingabemethode meldet einen Kurzbefehlskonflikt.
+LockIME konsumiert die Sprachtaste, sodass Ihre Eingabemethode den physischen Tastendruck nie sieht — es gibt nichts, womit sie kollidieren könnte. Anschließend sendet LockIME dieselbe Taste zurück, um die Aufnahme zu starten und zu beenden; das Ereignis ist markiert, damit LockIMEs eigener Listener das Echo ignoriert.
+
+Das ist der Unterschied zum früheren Zwei-Kurzbefehl-Modell, das zwei verschiedene Kombinationen verlangte und die Eingabemethode dennoch auf ihre eigene Taste reagieren ließ.
 
 Testen Sie den Workflow in TextEdit oder einem anderen einfachen Textfeld. Das Sprachfenster zu sehen genügt nicht: Der erkannte Text muss an der aktuellen Cursorposition erscheinen.
 ## Comparison

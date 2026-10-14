@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork de código-fonte LockIME Voice.** Este derivado GPL-3.0 adiciona o fluxo configurável de entrada por voz. `v0.1.3` oferece instaladores de prévia com assinatura ad-hoc, sem Developer ID, notarização, Sparkle ou Homebrew.
+> **Fork de código-fonte LockIME Voice.** Este derivado GPL-3.0 adiciona o fluxo configurável de entrada por voz. `v0.1.4` oferece instaladores de prévia com assinatura ad-hoc, sem Developer ID, notarização, Sparkle ou Homebrew.
 
 Um app de barra de menus para macOS que **bloqueia a sua fonte de entrada do teclado**. Sempre que você (ou outro app) troca o método de entrada, o LockIME volta imediatamente para o que está bloqueado — globalmente, por app em primeiro plano, ou (com o modo aprimorado opcional) por URL do navegador.
 
@@ -40,7 +40,7 @@ Um app de barra de menus para macOS que **bloqueia a sua fonte de entrada do tec
 
 ## Changes in LockIME Voice
 
-Em relação ao upstream, este fork adiciona fonte de voz configurável, atalhos separados para o LockIME e o método de entrada, troca temporária da fonte de entrada durante a voz (opcional, desativada por padrão), restauração do padrão global de **App Rules**, sessões repetíveis com timeout e a fonte padrão primeiro com um marcador de alfinete.
+Em relação ao upstream, este fork adiciona fonte de voz configurável, um único atalho de voz assumido pelo LockIME (a tecla é consumida, por isso não há conflito), troca temporária da fonte de entrada durante a voz (opcional, desativada por padrão), restauração do padrão global de **App Rules**, sessões repetíveis com timeout e a fonte padrão primeiro com um marcador de alfinete.
 
 ![Configurações de entrada por voz do LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -48,8 +48,8 @@ Em relação ao upstream, este fork adiciona fonte de voz configurável, atalhos
 
 Baixe o instalador correspondente:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.3/LockIME-Voice-0.1.3-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.4/LockIME-Voice-0.1.4-x86_64.dmg)
 
 Verifique o download antes de abri-lo. Cada release publica um `SHA256SUMS.txt`,
 então o checksum sempre corresponde ao artefato compilado para aquela tag (o DMG
@@ -57,7 +57,7 @@ não é reproduzível, por isso nenhum fica fixado aqui):
 
 ```sh
 gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.3-*.dmg' --pattern SHA256SUMS.txt
+  --pattern 'LockIME-Voice-0.1.4-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
@@ -108,14 +108,15 @@ Após reinstalar ou recompilar, talvez seja necessário conceder as permissões 
 A fonte de entrada por voz é totalmente configurável; o LockIME Voice não fixa Doubao, WeChat nem qualquer outro método de entrada.
 
 1. Abra **Settings ▸ Voice Input** e ative o fluxo de trabalho.
-2. Grave o **atalho de voz do método de entrada** — o atalho que o seu método de entrada usa para a própria função de voz. Defina-o primeiro dentro do método de entrada e mantenha-o diferente do atalho do LockIME.
-3. Grave o **atalho de voz do LockIME** (em **Settings ▸ Shortcuts ▸ Global shortcuts** ou no mesmo painel). É essa a tecla que você realmente pressiona.
-4. Opcional: ative **Trocar a fonte de entrada automaticamente** e escolha a fonte com voz, caso não seja a que você usa no dia a dia. Defina antes a fonte padrão global em **Settings ▸ App Rules**: é ela que o LockIME restaura depois.
-5. Conceda permissão para enviar eventos de teclado quando for solicitado.
+2. Grave o **atalho de voz** — o mesmo que você usa para entrada por voz dentro do seu método de entrada. O LockIME assume essa tecla.
+3. Opcional: escolha uma fonte de entrada por voz e ative a troca automática.
+4. Conceda **Acessibilidade**. Ela é necessária para o LockIME assumir o atalho de voz; sem ela a tecla chega ao método de entrada e o macOS volta a avisar de um conflito de atalhos. O bloqueio principal continua sem exigir permissões.
 
-Pressionar o atalho do LockIME envia o atalho de voz do método de entrada, então a entrada por voz começa no método ativo. Com a troca automática ativada, o LockIME muda primeiro para a fonte de voz configurada, aguarda a confirmação do macOS e restaura a fonte padrão global quando a voz termina ou o tempo limite de segurança dispara.
+### Por que não há mais conflito
 
-Como o LockIME apenas *envia* esse atalho e nunca escuta suas teclas, os dois atalhos precisam ser combinações diferentes. Usar uma única combinação traz o conflito de volta: a tecla é processada duas vezes e o macOS ou o método de entrada avisa de um conflito de atalhos.
+O LockIME consome a tecla de voz, então o seu método de entrada nunca vê o toque físico — não há com o que colidir. Em seguida o LockIME envia essa mesma tecla de volta para iniciar e encerrar a gravação, marcada para que o próprio monitor dele ignore o eco.
+
+É essa a diferença do modelo anterior de dois atalhos, que exigia manter duas combinações distintas e ainda deixava o método de entrada reagir à própria tecla.
 
 Teste o fluxo no TextEdit ou em outro campo de texto simples. Ver o painel de voz não basta: o texto reconhecido precisa aparecer na posição atual do cursor.
 ## Comparison

@@ -29,6 +29,13 @@ final class AppState {
     /// the shortcut-conflict prompts).
     private(set) var eventPostingGranted: Bool = false
 
+    /// Whether the voice key has been recorded. The pane and the monitor both ask
+    /// this one question, so the displayed state cannot drift from the value the
+    /// tap actually owns.
+    var voiceKeyConfigured: Bool {
+        KeyboardShortcuts.getShortcut(for: .voiceInput) != nil
+    }
+
     var voiceInputPermissionsGranted: Bool {
 VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventPostingGranted)
     }
@@ -108,6 +115,21 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     @ObservationIgnored let logStore = LogStore()
     @ObservationIgnored private var engine: LockEngine?
     @ObservationIgnored private var voiceInputCoordinator: VoiceInputCoordinator?
+    /// Owns the voice key: it consumes the press so the input method never sees
+    /// it, then LockIME echoes that same key to start/end recording. Replaces the
+    /// old KeyboardShortcuts trigger, which could not stop the key reaching the
+    /// input method and so produced the shortcut-conflict prompt.
+    @ObservationIgnored private var voiceKeyMonitor: CGConsumingVoiceKeyMonitor?
+    /// True while the user is recording a shortcut in Settings. The consuming tap
+    /// must stand down: it would otherwise swallow the very key the recorder is
+    /// waiting to read. Recording is inherently a moment when the key should go to
+    /// LockIME's recorder, not to the session.
+    var isRecordingShortcut = false {
+        didSet {
+            guard isRecordingShortcut != oldValue else { return }
+            refreshVoiceKeyMonitor()
+        }
+    }
     @ObservationIgnored private var purgeTask: Task<Void, Never>?
     @ObservationIgnored private var shortcutObserver: (any NSObjectProtocol)?
 
@@ -191,7 +213,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         self.voiceInputConfig = config
         voiceInputRuntimeError = nil
         persistVoiceInputConfig()
-        refreshVoiceInputShortcutFromPresetIfNeeded()
+        refreshVoiceKeyMonitor()
     }
 
     private static func loadVoiceInputConfig() -> VoiceInputConfiguration {
@@ -276,10 +298,20 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
                 break
             }
         }
+        voiceInputCoordinator.voiceShortcutProvider = { [weak self] in
+            self?.voiceKeyShortcut
+        }
+        voiceInputCoordinator.voiceShortcutProvider = { [weak self] in
+            self?.voiceKeyShortcut
+        }
         self.voiceInputCoordinator = voiceInputCoordinator
+        voiceKeyMonitor = CGConsumingVoiceKeyMonitor()
         accessibilityGranted = AXIsProcessTrusted()
         eventPostingGranted = CGPreflightPostEventAccess()
-        seedVoiceInputShortcutIfUnset()
+        // Arm the consuming tap now that it exists. Without this the voice key
+        // would be recorded but never owned, and pressing it would fall through
+        // to the input method — the original conflict.
+        refreshVoiceKeyMonitor()
         engine.onActivation = { [weak self] event in
             guard let self else { return }
             // `.conflictPaused` is the one diagnostic (non-switch) event: log it
@@ -308,7 +340,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             guard let self else { return }
             self.availableSources = sources
             self.voiceInputRuntimeError = nil
-            self.refreshVoiceInputShortcutFromPresetIfNeeded()
+            self.refreshVoiceKeyMonitor()
         }
         engine.start()
 
@@ -358,13 +390,9 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             self?.removeFrontmostAppRule()
         }
 
-        // Global voice-input trigger. A key-up handler, so a single tap toggles
-        // the session: LockIME hears this key only (it is its own shortcut),
-        // switches/sends as configured, and the input method hears only the
-        // synthesized key.
-        KeyboardShortcuts.onKeyUp(for: .voiceInput) { [weak self] in
-            self?.handleVoiceInputWorkflowPressed()
-        }
+        // The voice key is owned by a consuming event tap, not by
+        // KeyboardShortcuts: the tap must swallow the press so the input method
+        // never reacts to it. See `refreshVoiceKeyMonitor()`.
 
         // Mirror the configured shortcut into observable state, and keep it in
         // sync so the menu header reflects binds/clears made in Settings live.
@@ -394,6 +422,8 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         // coordinator's cleanup callback re-runs the pending state refresh, so
         // doing it in this order leaves the observable flags consistent instead
         // of letting the callback re-set them from the dying session.
+        voiceKeyMonitor?.stop()
+        voiceKeyMonitor = nil
         voiceInputCoordinator?.stopActiveSession()
         voiceInputCoordinator = nil
         voiceInputSessionInProgress = false
@@ -837,7 +867,46 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// LockIME's own voice trigger fired. One click, one handler: the session is
     /// toggled and the input method's own key is only ever *synthesized* — never
     /// also delivered to us — which is what removes the conflict prompt.
-    private func handleVoiceInputWorkflowPressed() {
+    /// The single voice key, recorded by the user. It is both the key LockIME
+    /// consumes and the key it echoes to the input method, so there is nothing to
+    /// keep in sync and no chance of the two drifting apart.
+    private var voiceKeyShortcut: VoiceShortcut? {
+        guard let recorded = KeyboardShortcuts.getShortcut(for: .voiceInput) else { return nil }
+        return VoiceShortcut(recorded: recorded)
+    }
+
+    /// Install (or tear down) the consuming tap that owns the voice key.
+    ///
+    /// The tap swallows the key so the input method never sees the physical
+    /// press — that is what removes the conflict prompt — and LockIME then sends
+    /// the same key back, marked so the tap ignores its own output.
+    func refreshVoiceKeyMonitor() {
+        guard let voiceKeyMonitor else { return }
+        guard !isRecordingShortcut, voiceInputConfig.isEnabled, let shortcut = voiceKeyShortcut else {
+            voiceKeyMonitor.stop()
+            return
+        }
+        do {
+            try voiceKeyMonitor.start(keyCode: shortcut.keyCode) { [weak self] event in
+                switch event {
+                case .pressed:
+                    self?.handleVoiceInputWorkflowToggled()
+                case .released:
+                    // The single-key behavior ends on a second press, so a release
+                    // carries no action of its own.
+                    break
+                }
+            }
+        } catch {
+            // No Accessibility grant means no tap, so the key cannot be owned and
+            // the workflow cannot run. Surfaced rather than failing silently.
+            voiceInputRuntimeError = .eventTapUnavailable
+            Self.log.error("Voice key monitor failed to start: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    /// A voice-key press: start a session, or end the running one.
+    private func handleVoiceInputWorkflowToggled() {
         guard let voiceInputCoordinator else { return }
         Self.log.notice("Voice workflow trigger pressed")
         do {
@@ -851,45 +920,6 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             Self.log.error("Voice input workflow press failed: \(String(describing: error), privacy: .public)")
         }
     }
-    /// Keep the configured voice shortcut pointing at something usable. Runs
-    /// after any configuration edit: if the user selected an input method with a
-    /// known default voice key (see `SystemVoiceShortcutPreset`) and has not set
-    /// one yet, seed it. Only ever fills a blank — a recorded shortcut is never
-    /// overwritten.
-    private func refreshVoiceInputShortcutFromPresetIfNeeded() {
-        guard voiceInputConfig.voiceShortcut == nil,
-              let preset = SystemVoiceShortcutPreset.shortcut(
-                  forInputMethodBundleID: voiceInputConfig.voiceSourceID?.rawValue
-              )
-        else { return }
-        voiceInputConfig.voiceShortcut = preset
-        persistVoiceInputConfig()
-    }
-
-    /// One-shot launch migration for the shortcut-conflict fix.
-    ///
-    /// Through v0.1.2 the platform's *own* voice key was both the monitored
-    /// trigger and the synthesized key, so a single combination was handled
-    /// twice and macOS/the input method reported a conflict. This build splits
-    /// the two: LockIME gets its own global shortcut (`voiceInput`), and the
-    /// configured voice key is now only ever synthesized. Carry the user's
-    /// existing key over so nothing has to be re-recorded — but only once, and
-    /// only when they have not already chosen a trigger of their own.
-    private func seedVoiceInputShortcutIfUnset() {
-        let migratedKey = "voiceInputShortcutMigrated"
-        guard !UserDefaults.standard.bool(forKey: migratedKey) else { return }
-        UserDefaults.standard.set(true, forKey: migratedKey)
-        guard KeyboardShortcuts.getShortcut(for: .voiceInput) == nil else { return }
-        // Deliberately do NOT copy the configured voice key into LockIME's own
-        // trigger: that would recreate the very conflict this build removes (one
-        // combination handled twice). The user's existing voice key stays as the
-        // synthesized key, and LockIME's trigger is left unset for them to record
-        // in Settings — the pane says exactly that.
-        Self.log.notice(
-            "Voice workflow split into two shortcuts: the existing voice key is now only synthesized; LockIME's own trigger still needs recording"
-        )
-    }
-
     private func persistVoiceInputConfig() {
         do {
             let data = try JSONEncoder().encode(voiceInputConfig)
@@ -903,7 +933,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         if let engine {
             availableSources = engine.selectableSources()
             voiceInputRuntimeError = nil
-            refreshVoiceInputShortcutFromPresetIfNeeded()
+            refreshVoiceKeyMonitor()
         }
     }
 
@@ -914,7 +944,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         voiceInputRuntimeError = nil
         engine?.apply(config, reason: reason)
         store.save(config)
-        refreshVoiceInputShortcutFromPresetIfNeeded()
+        refreshVoiceKeyMonitor()
     }
 
     // MARK: - Backup (export / import)

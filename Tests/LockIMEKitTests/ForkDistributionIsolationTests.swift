@@ -75,17 +75,17 @@ struct ForkDistributionIsolationTests {
         #expect(readme.contains("Settings ▸ Voice Input"))
     }
 
-    @Test("v0.1.3 release documentation includes changes screenshot and installers")
+    @Test("v0.1.4 release documentation includes changes screenshot and installers")
     func releaseDocumentationIsComplete() throws {
         let project = try Self.read("project.yml")
         let readme = try Self.read("README.md")
         let screenshot = Self.path("docs/images/settings-voice-input-zh-CN.png")
 
-        #expect(project.contains(#"MARKETING_VERSION: "0.1.3""#))
+        #expect(project.contains(#"MARKETING_VERSION: "0.1.4""#))
         #expect(readme.contains("## Changes in LockIME Voice"))
         #expect(readme.contains("docs/images/settings-voice-input-zh-CN.png"))
-        #expect(readme.contains("LockIME-Voice-0.1.3-arm64.dmg"))
-        #expect(readme.contains("LockIME-Voice-0.1.3-x86_64.dmg"))
+        #expect(readme.contains("LockIME-Voice-0.1.4-arm64.dmg"))
+        #expect(readme.contains("LockIME-Voice-0.1.4-x86_64.dmg"))
         #expect(FileManager.default.fileExists(atPath: screenshot))
 
         let translations = try FileManager.default.contentsOfDirectory(

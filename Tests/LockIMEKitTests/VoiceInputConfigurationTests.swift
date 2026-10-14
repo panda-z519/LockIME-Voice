@@ -14,15 +14,18 @@ struct VoiceInputConfigurationTests {
         #expect(config.validationErrors(defaultSourceID: nil, installedSources: []).isEmpty)
     }
 
-    @Test("an enabled workflow only hard-requires the voice shortcut")
-    func enabledConfigurationRequiresOnlyTheVoiceShortcut() {
-        // Everything else is optional: with automatic switching off, the
-        // synthesized shortcut is the whole workflow, so a missing source must
-        // not block it — otherwise a one-key setup would be unusable.
+    @Test("an enabled workflow validates no shortcut at all")
+    func enabledConfigurationRequiresNoStoredShortcut() {
+        // Since the single-key model moved the voice key out of the stored
+        // configuration (it lives in KeyboardShortcuts, where the app both
+        // consumes and echoes it), the config must never demand one — otherwise
+        // the pane would show a permanent false "record a shortcut" warning.
         let config = VoiceInputConfiguration(isEnabled: true)
-        #expect(config.validationErrors(defaultSourceID: nil, installedSources: []) == [
-            .missingVoiceShortcut
-        ])
+        #expect(config.validationErrors(defaultSourceID: nil, installedSources: []).isEmpty)
+
+        // Validation of the shortcut belongs to the session, which is the only
+        // thing that actually needs a key to send.
+        #expect(config.voiceShortcut == nil)
     }
 
     @Test("automatic switching turns missing and unavailable sources into errors")
@@ -240,43 +243,6 @@ struct VoiceInputConfigurationTests {
             defaultSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         ).isEmpty)
-    }
-}
-
-@Suite("Voice input shortcut presets")
-struct SystemVoiceShortcutPresetTests {
-    @Test("CoreGraphics modifiers map onto the Carbon mask KeyboardShortcuts stores")
-    func modifierRepresentationsConvert() {
-        // cmdKey | shiftKey | optionKey | controlKey.
-        let allMask = (1 << 8) | (1 << 9) | (1 << 11) | (1 << 12)
-        #expect(VoiceShortcut.Modifiers([.command, .control, .option, .shift]).carbonFlags == allMask)
-        #expect(VoiceShortcut.Modifiers([.option]).carbonFlags == (1 << 11))
-        #expect(VoiceShortcut.Modifiers([]).carbonFlags == 0)
-    }
-
-    @Test("input methods without a known default have no preset")
-    func unknownInputMethodsHaveNoPreset() {
-        // WeChat Input Method's voice key is user-chosen, so it must stay blank
-        // rather than being filled with a guess.
-        #expect(SystemVoiceShortcutPreset.shortcut(
-            forInputMethodBundleID: "com.tencent.inputmethod.wetype"
-        ) == nil)
-        #expect(SystemVoiceShortcutPreset.shortcut(forInputMethodBundleID: nil) == nil)
-        #expect(SystemVoiceShortcutPreset.shortcut(forInputMethodBundleID: "") == nil)
-    }
-
-    @Test("Carbon and CoreGraphics modifier representations convert both ways")
-    func modifierRepresentationsConvertBothWays() {
-        // cmdKey | controlKey | shiftKey
-        let carbon = (1 << 8) | (1 << 12) | (1 << 9)
-        #expect(VoiceShortcut.Modifiers([.command, .control, .shift]).carbonFlags == carbon)
-
-        var expected: VoiceShortcut.Modifiers = [.command, .control, .shift]
-        let rebuilt = VoiceShortcut(keyCode: 0, modifiers: VoiceShortcut.Modifiers(rawValue: 0))
-        #expect(rebuilt.modifiers.isEmpty)
-        expected.insert(.option)
-        #expect(VoiceShortcut.Modifiers([.command, .control, .shift, .option]).carbonFlags
-            == carbon | (1 << 11))
     }
 }
 
