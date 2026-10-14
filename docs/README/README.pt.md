@@ -53,10 +53,16 @@ Baixe o instalador correspondente:
 
 Checksums SHA-256:
 
-- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
-- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `acd3602c05428d38e0713e186757b25bce1d57df0410039ae147431d5c18e780`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `914338ea7295d5a0713168035f1618cdb2004cd782ab24a5a1ef2b4c8a6d0d9f`
 
-Abra o DMG e arraste **LockIME Voice** para Applications. Como a prévia tem assinatura ad-hoc e não é notarizada, use clique direito → **Open**. Se o macOS mostrar "Apple could not verify...", abra **System Settings ▸ Privacy & Security**, clique em **Open Anyway** para **LockIME Voice**, confirme o início e depois conceda **Accessibility** e **Input Monitoring**.
+Abra o DMG e arraste **LockIME Voice** para Aplicativos. Esta pré-visualização é apenas assinada ad-hoc e **não notarizada**, então o Gatekeeper bloqueia a primeira inicialização:
+
+1. Dê um duplo clique em **LockIME Voice**. O macOS recusa com *"A Apple não pôde verificar se o LockIME Voice está livre de malware"* — isso é esperado e não indica um download corrompido.
+2. Abra **Ajustes do Sistema ▸ Privacidade e Segurança** e role até a seção **Segurança**. O **LockIME Voice** aparece lá com o botão **Abrir Mesmo Assim**.
+3. Clique em **Abrir Mesmo Assim**, autentique-se e confirme com **Abrir** na caixa de diálogo seguinte. A partir daí o app inicia normalmente.
+
+Confie apenas em uma cópia baixada da página de releases deste repositório e cujo SHA-256 corresponda ao checksum acima — é isso que torna seguro clicar em "Abrir Mesmo Assim" em uma compilação sem notarização. Após iniciar, conceda **Acessibilidade** quando solicitado (o fluxo de entrada por voz precisa dela; a mesma janela também cobre o envio de eventos de teclado).
 
 Também é possível compilar do código:
 

@@ -77,15 +77,26 @@ Download the installer matching your Mac:
 
 SHA-256 checksums:
 
-- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
-- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `acd3602c05428d38e0713e186757b25bce1d57df0410039ae147431d5c18e780`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `914338ea7295d5a0713168035f1618cdb2004cd782ab24a5a1ef2b4c8a6d0d9f`
 
-Open the DMG and drag **LockIME Voice** to Applications. Because this preview is
-ad-hoc signed and not notarized, macOS may block the first launch. Right-click
-the app and choose **Open**. If macOS shows "Apple could not verify...", open
-**System Settings ▸ Privacy & Security**, click **Open Anyway** for
-**LockIME Voice**, confirm the launch, then grant **Accessibility** and
-**Input Monitoring**.
+Open the DMG and drag **LockIME Voice** to Applications. This preview is
+ad-hoc signed and **not notarized**, so the first launch is blocked by
+Gatekeeper:
+
+1. Double-click **LockIME Voice**. macOS refuses it with *"Apple could not
+   verify that LockIME Voice is free of malware"* — that is expected, not a
+   sign of a broken download.
+2. Open **System Settings ▸ Privacy & Security** and scroll to the
+   **Security** section. **LockIME Voice** is listed there with an
+   **Open Anyway** button.
+3. Click **Open Anyway**, authenticate, then confirm with **Open** in the
+   follow-up dialog. The app now starts normally on every later launch.
+
+Only trust a copy you downloaded from this repository's release page and whose
+SHA-256 matches the checksum above — that is what makes "Open Anyway" safe for
+an unnotarized build. After launching, grant **Accessibility** when asked (the
+voice workflow needs it; the same dialog also covers sending keyboard events).
 
 To build from source instead:
 

@@ -53,10 +53,16 @@ Lade den passenden Installer:
 
 SHA-256-Pruefsummen:
 
-- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
-- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `acd3602c05428d38e0713e186757b25bce1d57df0410039ae147431d5c18e780`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `914338ea7295d5a0713168035f1618cdb2004cd782ab24a5a1ef2b4c8a6d0d9f`
 
-Öffne das DMG und ziehe **LockIME Voice** nach Applications. Da die Vorschau ad-hoc signiert und nicht notarisiert ist, öffne die App beim ersten Mal per Rechtsklick → **Open**. Wenn macOS „Apple could not verify..." anzeigt, öffne **System Settings ▸ Privacy & Security**, klicke für **LockIME Voice** auf **Open Anyway**, bestätige den Start und erteile danach **Accessibility** und **Input Monitoring**.
+Öffnen Sie die DMG und ziehen Sie **LockIME Voice** in „Programme". Diese Vorschauversion ist nur ad-hoc signiert und **nicht notarisiert**, daher blockiert Gatekeeper den ersten Start:
+
+1. Doppelklicken Sie auf **LockIME Voice**. macOS lehnt mit *„Apple konnte nicht überprüfen, ob LockIME Voice frei von Malware ist"* ab — das ist zu erwarten und kein Zeichen eines defekten Downloads.
+2. Öffnen Sie **Systemeinstellungen ▸ Datenschutz & Sicherheit** und scrollen Sie zum Abschnitt **Sicherheit**. Dort ist **LockIME Voice** mit der Schaltfläche **Dennoch öffnen** aufgeführt.
+3. Klicken Sie auf **Dennoch öffnen**, authentifizieren Sie sich und bestätigen Sie im folgenden Dialog mit **Öffnen**. Danach startet die App bei jedem weiteren Start normal.
+
+Vertrauen Sie nur einer Kopie, die Sie von der Release-Seite dieses Repositorys geladen haben und deren SHA-256 mit der obigen Prüfsumme übereinstimmt — das ist die Voraussetzung dafür, dass „Dennoch öffnen" bei einem nicht notarisierten Build sicher ist. Erlauben Sie nach dem Start **Bedienungshilfen**, wenn danach gefragt wird (der Spracheingabe-Workflow benötigt sie; dasselbe Fenster deckt auch das Senden von Tastaturereignissen ab).
 
 Alternativ aus dem Quellcode bauen:
 

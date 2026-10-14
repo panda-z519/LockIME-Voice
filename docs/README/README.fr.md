@@ -53,10 +53,16 @@ Téléchargez l'installateur correspondant :
 
 Sommes SHA-256 :
 
-- `LockIME-Voice-0.1.2-arm64.dmg`: `228beeede12dda7f40b3a06da766ee55c1bd356fce889546052d216eaa6e49cd`
-- `LockIME-Voice-0.1.2-x86_64.dmg`: `a3359323bf72569dc5885d1c710101651bb4edb052ee38f604bc7a96f43009fa`
+- `LockIME-Voice-0.1.2-arm64.dmg`: `acd3602c05428d38e0713e186757b25bce1d57df0410039ae147431d5c18e780`
+- `LockIME-Voice-0.1.2-x86_64.dmg`: `914338ea7295d5a0713168035f1618cdb2004cd782ab24a5a1ef2b4c8a6d0d9f`
 
-Ouvrez le DMG et glissez **LockIME Voice** dans Applications. La préversion étant signée ad-hoc et non notariée, utilisez clic droit → **Open**. Si macOS affiche « Apple could not verify... », ouvrez **System Settings ▸ Privacy & Security**, cliquez sur **Open Anyway** pour **LockIME Voice**, confirmez le lancement, puis accordez **Accessibility** et **Input Monitoring**.
+Ouvrez le DMG et glissez **LockIME Voice** dans Applications. Cet aperçu est uniquement signé ad-hoc et **non notarié** : Gatekeeper bloque donc le premier lancement.
+
+1. Double-cliquez sur **LockIME Voice**. macOS refuse avec *« Apple n'a pas pu vérifier que LockIME Voice ne contient pas de logiciel malveillant »* — c'est normal et ne signifie pas que le téléchargement est corrompu.
+2. Ouvrez **Réglages Système ▸ Confidentialité et sécurité** et faites défiler jusqu'à la section **Sécurité**. **LockIME Voice** y figure avec un bouton **Ouvrir malgré tout**.
+3. Cliquez sur **Ouvrir malgré tout**, authentifiez-vous, puis confirmez avec **Ouvrir** dans la boîte de dialogue. L'app se lancera normalement par la suite.
+
+Ne faites confiance qu'à une copie téléchargée depuis la page des versions de ce dépôt et dont le SHA-256 correspond à l'empreinte ci-dessus : c'est la condition pour que « Ouvrir malgré tout » soit sûr sur une version non notariée. Après le lancement, accordez **Accessibilité** lorsque macOS le demande (le workflow de saisie vocale en a besoin ; la même fenêtre couvre l'envoi d'événements clavier).
 
 Vous pouvez aussi construire depuis les sources :
 
