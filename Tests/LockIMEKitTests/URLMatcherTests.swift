@@ -239,4 +239,13 @@ struct URLMatcherTests {
         #expect(!BrowserBundleIDs.isGecko("com.apple.Safari"))
         #expect(!BrowserBundleIDs.isGecko(nil))
     }
+
+    @Test("a regex pattern is compiled once and reused")
+    func regexIsCached() {
+        let pattern = "^https://cache-test\\.example/"
+        let first = URLMatcher.compiledRegex(pattern)
+        #expect(first != nil)
+        #expect(first === URLMatcher.compiledRegex(pattern))
+        #expect(URLMatcher.compiledRegex("(") == nil)
+    }
 }

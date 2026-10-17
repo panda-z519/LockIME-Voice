@@ -129,11 +129,25 @@ struct LogStoreTests {
         let store = LogStore(directoryOverride: directory)
         store.record(event(ageHours: 0, now: .now))
         store.record(event(ageHours: 0, now: .now))
-        #expect(store.count() == 2)
+        #expect(store.count() == 2)   // unsaved inserts are already visible
+        store.flush()
 
         // A fresh store over the same on-disk file sees the persisted entries.
         let reopened = LogStore(directoryOverride: directory)
         #expect(reopened.count() == 2)
+    }
+
+    @Test("recorded entries reach disk on flush, not on every record")
+    func recordsAreCoalescedUntilFlush() {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "lockime-tests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let store = LogStore(directoryOverride: directory)
+        store.record(event(ageHours: 0, now: .now))
+        #expect(LogStore(directoryOverride: directory).count() == 0)
+        store.flush()
+        #expect(LogStore(directoryOverride: directory).count() == 1)
     }
 
     @Test("default disk directory preserves release storage and isolates dev builds")

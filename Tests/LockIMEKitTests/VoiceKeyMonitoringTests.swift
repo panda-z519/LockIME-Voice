@@ -5,73 +5,136 @@ import Testing
 
 /// The consuming voice-key tap is what removes the conflict: it *takes* the key
 /// so the input method never sees the physical press, and LockIME then echoes the
-/// same key back. These tests pin the two properties that make that safe —
-/// anything else here would reintroduce either the conflict (by letting the key
-/// through) or an infinite loop (by reacting to our own output).
-@MainActor
+/// same key back. These tests drive the tap's real decision (`VoiceKeyMatcher`)
+/// and pin the properties that make that safe — anything else would reintroduce
+/// the conflict (letting the key through), an infinite loop (reacting to our own
+/// output), or swallow ordinary typing.
 @Suite("Voice key consumption")
 struct VoiceKeyMonitoringTests {
-    /// Mirrors the tap's decision: consume only the physical voice key.
-    private func consumes(
-        shortcut: VoiceShortcut,
-        keyCode: UInt16,
-        modifiers: VoiceShortcut.Modifiers,
-        marked: Bool
-    ) -> Bool {
-        guard !marked else { return false }
-        if shortcut.isModifierKey {
-            let changed = VoiceShortcut(keyCode: keyCode).modifierKey
-            return !changed.isEmpty && changed == shortcut.modifierKey
-        }
-        return keyCode == shortcut.keyCode && modifiers.isSuperset(of: shortcut.modifiers)
+    private enum Step {
+        case down(UInt16, VoiceShortcut.Modifiers = [], repeat: Bool = false, marked: Bool = false)
+        case up(UInt16, VoiceShortcut.Modifiers = [])
+        case flags(UInt16, VoiceShortcut.Modifiers)
     }
+
+    /// Feeds `steps` through one matcher and returns each decision.
+    private func run(
+        _ shortcut: VoiceShortcut,
+        _ steps: [Step],
+        yield: Bool = false
+    ) -> [VoiceKeyMatcher.Decision] {
+        var matcher = VoiceKeyMatcher(shortcut: shortcut)
+        return steps.map { step in
+            switch step {
+            case let .down(key, modifiers, isRepeat, marked):
+                matcher.decide(
+                    kind: .keyDown, keyCode: key, modifiers: modifiers,
+                    isAutorepeat: isRepeat, isMarked: marked, yield: { yield }
+                )
+            case let .up(key, modifiers):
+                matcher.decide(
+                    kind: .keyUp, keyCode: key, modifiers: modifiers,
+                    isAutorepeat: false, isMarked: false, yield: { yield }
+                )
+            case let .flags(key, modifiers):
+                matcher.decide(
+                    kind: .flagsChanged, keyCode: key, modifiers: modifiers,
+                    isAutorepeat: false, isMarked: false, yield: { yield }
+                )
+            }
+        }
+    }
+
+    private let pressed = VoiceKeyMatcher.Decision(consume: true, event: .pressed)
+    private let released = VoiceKeyMatcher.Decision(consume: true, event: .released)
 
     @Test("the physical voice key is consumed so the input method cannot react")
     func voiceKeyIsConsumed() {
-        let shortcut = VoiceShortcut(keyCode: 105)  // F13
-        #expect(consumes(shortcut: shortcut, keyCode: 105, modifiers: [], marked: false))
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(105), .up(105)]) == [pressed, released])
     }
 
     @Test("LockIME's own synthesized key is never consumed")
     func synthesizedKeyPassesThrough() {
         // If this failed, LockIME would treat its own echoed key as a new press
         // and the session would toggle forever.
-        let shortcut = VoiceShortcut(keyCode: 105)
-        #expect(!consumes(shortcut: shortcut, keyCode: 105, modifiers: [], marked: true))
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(105, marked: true)]) == [.pass])
     }
 
     @Test("ordinary typing and other shortcuts are untouched")
     func otherKeysPassThrough() {
-        let shortcut = VoiceShortcut(keyCode: 105)
-        #expect(!consumes(shortcut: shortcut, keyCode: 0, modifiers: [], marked: false))
-        #expect(!consumes(shortcut: shortcut, keyCode: 49, modifiers: [.command], marked: false))
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(0), .up(0), .down(49, [.command])]) == [.pass, .pass, .pass])
     }
 
-    @Test("a modified voice key only matches with its modifiers held")
-    func modifiersAreRequired() {
-        let shortcut = VoiceShortcut(keyCode: 9, modifiers: [.control, .option])
-        #expect(consumes(shortcut: shortcut, keyCode: 9, modifiers: [.control, .option], marked: false))
-        // Extra modifiers still match (a superset), so holding Shift alongside
-        // does not leak the key to the input method.
-        #expect(consumes(
-            shortcut: shortcut,
-            keyCode: 9,
-            modifiers: [.control, .option, .shift],
-            marked: false
-        ))
-        // Missing modifiers must NOT match, or plain "V" would be swallowed.
-        #expect(!consumes(shortcut: shortcut, keyCode: 9, modifiers: [.control], marked: false))
-        #expect(!consumes(shortcut: shortcut, keyCode: 9, modifiers: [], marked: false))
+    @Test("a modified voice key needs exactly its own modifiers")
+    func modifiersMustMatchExactly() {
+        let controlOptionV = VoiceShortcut(keyCode: 9, modifiers: [.control, .option])
+        #expect(run(controlOptionV, [.down(9, [.control, .option])]) == [pressed])
+        // Plain "V" — the bug where every typed v was swallowed.
+        #expect(run(controlOptionV, [.down(9)]) == [.pass])
+        #expect(run(controlOptionV, [.down(9, [.control])]) == [.pass])
+        // ⌃⌥⇧V is a different shortcut; it belongs to whoever registered it.
+        #expect(run(controlOptionV, [.down(9, [.control, .option, .shift])]) == [.pass])
+    }
+
+    @Test("auto-repeat is swallowed but reports no extra press")
+    func autoRepeatIsSwallowed() {
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(105), .down(105, repeat: true), .up(105)]) == [
+            pressed, .swallow, released,
+        ])
+    }
+
+    @Test("a lost key-up never leaves the next press dead")
+    func freshPressAfterLostKeyUp() {
+        // The tap can miss a key-up (disabled by timeout, Secure Input). The next
+        // real key-down is not an auto-repeat, so it must still start a press.
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(105), .down(105)]) == [pressed, pressed])
+    }
+
+    @Test("releasing a modifier before the key still closes the press")
+    func keyUpMatchesOnKeyCodeAlone() {
+        let controlOptionV = VoiceShortcut(keyCode: 9, modifiers: [.control, .option])
+        #expect(run(controlOptionV, [.down(9, [.control, .option]), .up(9, [.option])]) == [
+            pressed, released,
+        ])
+    }
+
+    @Test("a key-up whose key-down was not taken is left alone")
+    func unownedKeyUpPassesThrough() {
+        // Otherwise the input method would get a key-down with no key-up.
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.up(105)]) == [.pass])
+    }
+
+    @Test("while the recorder is reading keys nothing is taken")
+    func recorderGetsTheKey() {
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(run(f13, [.down(105), .up(105)], yield: true) == [.pass, .pass])
+    }
+
+    @Test("reset forgets a press in flight")
+    func resetForgetsPress() {
+        var matcher = VoiceKeyMatcher(shortcut: VoiceShortcut(keyCode: 105))
+        _ = matcher.decide(
+            kind: .keyDown, keyCode: 105, modifiers: [],
+            isAutorepeat: false, isMarked: false, yield: { false }
+        )
+        #expect(matcher.isDown)
+        matcher.reset()
+        #expect(!matcher.isDown)
     }
 
     @Test("a bare modifier voice key matches either side")
     func bareModifierMatchesBothSides() {
-        // The user records whichever side they use; macOS reports left/right as
-        // different key codes (58/61), both of which stand for Option.
+        // macOS reports left/right as different key codes (58/61), both of which
+        // stand for Option.
         let rightOption = VoiceShortcut(keyCode: 61, modifiers: [.option])
         #expect(rightOption.isModifierKey)
-        #expect(consumes(shortcut: rightOption, keyCode: 61, modifiers: [.option], marked: false))
-        #expect(consumes(shortcut: rightOption, keyCode: 58, modifiers: [.option], marked: false))
-        #expect(!consumes(shortcut: rightOption, keyCode: 59, modifiers: [.control], marked: false))
+        #expect(run(rightOption, [.flags(58, [.option]), .flags(58, [])]) == [pressed, released])
+        #expect(run(rightOption, [.flags(59, [.control])]) == [.pass])
     }
 }

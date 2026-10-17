@@ -15,8 +15,107 @@ public enum VoiceKeyMonitorError: Error, Equatable, Sendable {
 
 @MainActor
 public protocol VoiceKeyMonitoring: AnyObject {
-    func start(keyCode: UInt16, _ handler: @escaping @MainActor (VoiceKeyEvent) -> Void) throws
+    func start(shortcut: VoiceShortcut, _ handler: @escaping @MainActor (VoiceKeyEvent) -> Void) throws
     func stop()
+}
+
+/// The tap's per-event decision, kept free of CoreGraphics so it can be tested
+/// directly (the tap itself needs a live window server and the Accessibility
+/// grant).
+///
+/// Rules:
+/// * LockIME's own synthesized key is never touched, or it would loop.
+/// * A key-down is owned only when the key code **and the exact modifier set**
+///   match — `⌃⌥V` must not swallow plain `V`, nor `⌃⌥⇧V` (a different shortcut).
+/// * Auto-repeat of an owned key is swallowed; a *fresh* key-down always starts a
+///   new press, so a key-up lost while the tap was disabled can't leave the key
+///   dead for the next press.
+/// * A key-up is owned only if its key-down was. It is matched on the key code
+///   alone: releasing a modifier before the key must still close the press.
+/// * While LockIME's own recorder is reading the key (`yield`), nothing is owned.
+public struct VoiceKeyMatcher: Sendable {
+    public enum EventKind: Sendable {
+        case keyDown
+        case keyUp
+        case flagsChanged
+    }
+
+    public struct Decision: Equatable, Sendable {
+        public var consume: Bool
+        public var event: VoiceKeyEvent?
+
+        public static let pass = Decision(consume: false, event: nil)
+        public static let swallow = Decision(consume: true, event: nil)
+    }
+
+    public let shortcut: VoiceShortcut
+    public private(set) var isDown = false
+
+    public init(shortcut: VoiceShortcut) {
+        self.shortcut = shortcut
+    }
+
+    /// Forget any press in flight — used when the tap was re-enabled after macOS
+    /// disabled it, since the matching key-up may have been missed.
+    public mutating func reset() {
+        isDown = false
+    }
+
+    public mutating func decide(
+        kind: EventKind,
+        keyCode: UInt16,
+        modifiers: VoiceShortcut.Modifiers,
+        isAutorepeat: Bool,
+        isMarked: Bool,
+        yield: () -> Bool
+    ) -> Decision {
+        // Our own synthesized key: let it through untouched, or LockIME would
+        // treat its own output as a new press and loop.
+        guard !isMarked else { return .pass }
+
+        if shortcut.isModifierKey {
+            // A bare modifier key arrives as flagsChanged; match on the modifier
+            // this shortcut stands for, not on the raw key code, so both the left
+            // and right variants macOS reports are recognized.
+            guard kind == .flagsChanged else { return .pass }
+            let changed = VoiceShortcut(keyCode: keyCode).modifierKey
+            guard !changed.isEmpty, changed == shortcut.modifierKey else { return .pass }
+            let isPressed = modifiers.contains(shortcut.modifierKey)
+            if isPressed, !isDown {
+                if yield() { return .pass }
+                isDown = true
+                return Decision(consume: true, event: .pressed)
+            }
+            if !isPressed, isDown {
+                isDown = false
+                return Decision(consume: true, event: .released)
+            }
+            return .pass
+        }
+
+        guard keyCode == shortcut.keyCode else { return .pass }
+        switch kind {
+        case .keyDown:
+            guard modifiers == shortcut.modifiers else { return .pass }
+            if isAutorepeat {
+                // Swallow the repeats of a press we own; a repeat of a press we
+                // let through (recorder) stays with whoever got the key-down.
+                return isDown ? .swallow : .pass
+            }
+            // The recorder is reading this very key: yield it so the press can be
+            // recorded instead of swallowed. Checked only after the key matched,
+            // so ordinary typing never pays for the lookup.
+            if yield() { return .pass }
+            isDown = true
+            return Decision(consume: true, event: .pressed)
+        case .keyUp:
+            guard isDown else { return .pass }
+            isDown = false
+            return Decision(consume: true, event: .released)
+        case .flagsChanged:
+            return .pass
+        }
+    }
 }
 
 /// Owns the voice key so the input method never sees it.
@@ -43,28 +142,25 @@ public protocol VoiceKeyMonitoring: AnyObject {
 /// * synthesized events carry `ShortcutEventMarker`, and the tap returns marked
 ///   events untouched — otherwise LockIME would react to its own output forever;
 /// * only the exact configured combination is consumed, so ordinary typing (and
-///   every other shortcut) is unaffected.
+///   every other shortcut) is unaffected — see `VoiceKeyMatcher`.
 ///
 /// A consuming tap needs the Accessibility grant. Without it the tap cannot be
 /// created and the caller surfaces that as a failure rather than silently doing
 /// nothing.
 @MainActor
 public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
-    private var eventTap: CFMachPort?
-    private var runLoopSource: CFRunLoopSource?
+    private var context: VoiceKeyTapContext?
     private var handler: (@MainActor (VoiceKeyEvent) -> Void)?
-    private var shortcut: VoiceShortcut?
-    /// Tracks the down/up phase so a press is reported once, however macOS
-    /// repeats the event while the key is held.
-    private var isDown = false
-    /// Asks whether LockIME's own UI currently wants the raw key — i.e. the user
-    /// is recording a shortcut in Settings. Evaluated per event rather than
-    /// tracked with an external flag: a flag set from SwiftUI's `onAppear` fires
-    /// when the *view* is built, not when recording starts, so it would disable
-    /// the tap for as long as the pane was on screen (and, if the pane stayed
-    /// alive, permanently). Deciding here keeps the tap active whenever the user
-    /// is not actually recording.
-    public var shouldYieldKey: (@MainActor () -> Bool)?
+    /// The shortcut the running tap owns, or nil when stopped — lets the caller
+    /// skip tearing down and recreating an identical tap.
+    public private(set) var activeShortcut: VoiceShortcut?
+    /// Whether LockIME's own voice-key editor is capturing a key right now. The
+    /// tap then lets the key through so the editor can read it. Pushed from the
+    /// main thread (the tap thread must not touch AppKit) and kept across
+    /// restarts of the tap.
+    public var yieldsKey = false {
+        didSet { context?.yieldsKey = yieldsKey }
+    }
 
     public init() {}
 
@@ -72,124 +168,141 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
         MainActor.assumeIsolated { stop() }
     }
 
+    /// Install the tap on its own thread. The tap sits in front of *every* key
+    /// event on the system, so it must never wait behind LockIME's main thread
+    /// (synchronous Accessibility queries, SwiftData saves, SwiftUI updates):
+    /// that would delay typing in every app, and a long enough stall gets the tap
+    /// disabled by macOS — the voice key then leaks to the input method.
     public func start(
-        keyCode: UInt16,
+        shortcut: VoiceShortcut,
         _ handler: @escaping @MainActor (VoiceKeyEvent) -> Void
     ) throws {
         stop()
-        shortcut = VoiceShortcut(keyCode: keyCode)
-        self.handler = handler
-        isDown = false
-
+        let context = VoiceKeyTapContext(
+            shortcut: shortcut,
+            yieldsKey: yieldsKey,
+            deliver: { [weak self] event in
+                Task { @MainActor in self?.handler?(event) }
+            }
+        )
         let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
             | CGEventMask(1 << CGEventType.keyUp.rawValue)
             | CGEventMask(1 << CGEventType.flagsChanged.rawValue)
         let callback: CGEventTapCallBack = { _, type, event, refcon in
             guard let refcon else { return Unmanaged.passUnretained(event) }
-            let monitor = Unmanaged<CGConsumingVoiceKeyMonitor>
-                .fromOpaque(refcon)
-                .takeUnretainedValue()
-            if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-                MainActor.assumeIsolated { monitor.enableTap() }
-                return Unmanaged.passUnretained(event)
-            }
+            let context = Unmanaged<VoiceKeyTapContext>.fromOpaque(refcon).takeUnretainedValue()
             // `nil` means "consume": the event is not delivered to anyone else,
             // including the input method that would otherwise claim the key.
-            let consume = MainActor.assumeIsolated { monitor.handle(type: type, event: event) }
-            return consume ? nil : Unmanaged.passUnretained(event)
+            return context.handle(type: type, event: event) ? nil : Unmanaged.passUnretained(event)
         }
-        let tap = CGEvent.tapCreate(
+        // Created here, not on the tap thread, so a missing Accessibility grant
+        // surfaces synchronously as a thrown error.
+        guard let tap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
             eventsOfInterest: mask,
             callback: callback,
-            userInfo: Unmanaged.passUnretained(self).toOpaque()
-        )
-        guard let tap else {
-            self.handler = nil
-            self.shortcut = nil
+            userInfo: Unmanaged.passUnretained(context).toOpaque()
+        ) else {
             throw VoiceKeyMonitorError.eventTapCreateFailed
         }
-        let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
-        CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-        eventTap = tap
-        runLoopSource = source
-        CGEvent.tapEnable(tap: tap, enable: true)
+        context.run(tap: tap)
+        self.context = context
+        self.handler = handler
+        activeShortcut = shortcut
     }
 
     public func stop() {
-        if let runLoopSource {
-            CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
-        }
-        if let eventTap {
-            CFMachPortInvalidate(eventTap)
-        }
-        runLoopSource = nil
-        eventTap = nil
+        context?.invalidate()
+        context = nil
         handler = nil
-        shortcut = nil
-        isDown = false
+        activeShortcut = nil
+    }
+}
+
+/// Everything the tap callback touches. It lives on the tap thread: `matcher`
+/// and `tap` are only used there (the thread's closure keeps the context alive
+/// until the run loop exits), and the one value the main thread writes,
+/// `yieldsKey`, is lock-protected.
+final class VoiceKeyTapContext: @unchecked Sendable {
+    private var matcher: VoiceKeyMatcher
+    private var tap: CFMachPort?
+    private var runLoop: CFRunLoop?
+    private let state = NSLock()
+    private var yieldsKeyStorage: Bool
+    private let deliver: @Sendable (VoiceKeyEvent) -> Void
+
+    init(
+        shortcut: VoiceShortcut,
+        yieldsKey: Bool,
+        deliver: @escaping @Sendable (VoiceKeyEvent) -> Void
+    ) {
+        matcher = VoiceKeyMatcher(shortcut: shortcut)
+        yieldsKeyStorage = yieldsKey
+        self.deliver = deliver
     }
 
-    /// Returns whether the event must be consumed.
-    private func handle(type: CGEventType, event: CGEvent) -> Bool {
-        guard let shortcut else { return false }
-        // Our own synthesized key: let it through untouched, or LockIME would
-        // treat its own output as a new press and loop.
-        guard !ShortcutEventMarker.isMarked(event) else { return false }
-        // The user is recording this very key in Settings: yield it so the
-        // recorder can read it, instead of swallowing the press.
-        if shouldYieldKey?() == true { return false }
+    var yieldsKey: Bool {
+        get { state.withLock { yieldsKeyStorage } }
+        set { state.withLock { yieldsKeyStorage = newValue } }
+    }
 
-        let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
-        let modifiers = VoiceShortcut.Modifiers(event.flags)
-
-        if shortcut.isModifierKey {
-            // A bare modifier key arrives as flagsChanged; match on the modifier
-            // this shortcut stands for, not on the raw key code, so both the left
-            // and right variants macOS reports are recognized.
-            guard type == .flagsChanged else { return false }
-            let changed = VoiceShortcut(keyCode: keyCode).modifierKey
-            guard !changed.isEmpty, changed == shortcut.modifierKey else { return false }
-            let isPressed = modifiers.contains(shortcut.modifierKey)
-            if isPressed, !isDown {
-                isDown = true
-                emit(.pressed)
-            } else if !isPressed, isDown {
-                isDown = false
-                emit(.released)
-            }
-            return true
+    /// Start the tap thread and return once its run loop is serving the tap.
+    func run(tap: CFMachPort) {
+        self.tap = tap
+        let ready = DispatchSemaphore(value: 0)
+        let thread = Thread { [self] in
+            guard let tap = self.tap else { ready.signal(); return }
+            let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+            let loop = CFRunLoopGetCurrent()
+            state.withLock { runLoop = loop }
+            CFRunLoopAddSource(loop, source, .commonModes)
+            CGEvent.tapEnable(tap: tap, enable: true)
+            ready.signal()
+            // Returns once `invalidate` stops the loop; the thread then exits.
+            CFRunLoopRun()
+            CFRunLoopRemoveSource(loop, source, .commonModes)
         }
+        thread.name = "LockIME voice-key tap"
+        thread.qualityOfService = .userInteractive
+        thread.start()
+        ready.wait()
+    }
 
-        guard keyCode == shortcut.keyCode, modifiers.isSuperset(of: shortcut.modifiers) else {
-            return false
-        }
+    func invalidate() {
+        if let tap { CFMachPortInvalidate(tap) }
+        if let loop = state.withLock({ runLoop }) { CFRunLoopStop(loop) }
+    }
+
+    /// Tap thread. Returns whether the event must be consumed.
+    func handle(type: CGEventType, event: CGEvent) -> Bool {
+        let kind: VoiceKeyMatcher.EventKind
         switch type {
-        case .keyDown:
-            guard !isDown else { return true }  // swallow auto-repeat
-            isDown = true
-            emit(.pressed)
-        case .keyUp:
-            guard isDown else { return true }
-            isDown = false
-            emit(.released)
+        case .keyDown: kind = .keyDown
+        case .keyUp: kind = .keyUp
+        case .flagsChanged: kind = .flagsChanged
+        case .tapDisabledByTimeout, .tapDisabledByUserInput:
+            // macOS disabled the tap. Turn it back on, and drop any press in
+            // flight: its key-up may have gone by while the tap was off, and a
+            // stale "down" would swallow the next real press.
+            matcher.reset()
+            if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
+            return false
         default:
             return false
         }
-        return true
-    }
-
-    private func emit(_ event: VoiceKeyEvent) {
-        Task { @MainActor in
-            handler?(event)
+        let decision = matcher.decide(
+            kind: kind,
+            keyCode: UInt16(event.getIntegerValueField(.keyboardEventKeycode)),
+            modifiers: VoiceShortcut.Modifiers(event.flags),
+            isAutorepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
+            isMarked: ShortcutEventMarker.isMarked(event),
+            yield: { yieldsKey }
+        )
+        if let voiceEvent = decision.event {
+            deliver(voiceEvent)
         }
-    }
-
-    private func enableTap() {
-        if let eventTap {
-            CGEvent.tapEnable(tap: eventTap, enable: true)
-        }
+        return decision.consume
     }
 }

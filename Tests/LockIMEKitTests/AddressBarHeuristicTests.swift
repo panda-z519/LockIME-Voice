@@ -73,4 +73,21 @@ struct AddressBarHeuristicTests {
             ancestorRoles: ["AXGroup", "AXWindow"]
         ))
     }
+
+    @Test("the cheap pre-check agrees with the full classifier on every non-candidate")
+    func candidateGateIsSound() {
+        // Skipping the ancestor walk is only safe if a non-candidate can never be
+        // an address bar, whatever its ancestors are.
+        let chrome = ["AXGroup", "AXToolbar", "AXWindow"]
+        #expect(!AddressBarHeuristic.isCandidate(identifier: "x", domIdentifier: "y", domClassList: ["z"]))
+        #expect(!AddressBarHeuristic.isAddressBar(
+            identifier: "x", domIdentifier: "y", domClassList: ["z"], ancestorRoles: chrome
+        ))
+        #expect(AddressBarHeuristic.isCandidate(
+            identifier: nil, domIdentifier: AddressBarHeuristic.geckoDOMIdentifier, domClassList: []
+        ))
+        #expect(AddressBarHeuristic.isCandidate(
+            identifier: nil, domIdentifier: nil, domClassList: [AddressBarHeuristic.chromiumDOMClass]
+        ))
+    }
 }

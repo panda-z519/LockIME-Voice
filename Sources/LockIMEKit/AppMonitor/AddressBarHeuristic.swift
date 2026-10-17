@@ -21,6 +21,20 @@ public enum AddressBarHeuristic {
     /// Firefox/Gecko's urlbar exposes this `AXDOMIdentifier`.
     public static let geckoDOMIdentifier = "urlbar-input"
 
+    /// Whether the element's own identifiers name an address bar — the cheap
+    /// half of `isAddressBar`. When this is false the answer is already "no", so
+    /// the caller can skip reading the ancestor chain (one cross-process
+    /// Accessibility call per level, on every focus change in the browser).
+    public static func isCandidate(
+        identifier: String?,
+        domIdentifier: String?,
+        domClassList: [String]
+    ) -> Bool {
+        identifier == safariIdentifier
+            || domIdentifier == geckoDOMIdentifier
+            || domClassList.contains(chromiumDOMClass)
+    }
+
     /// Whether the focused element is a browser address bar.
     ///
     /// - `identifier`: the element's `AXIdentifier` (Safari).

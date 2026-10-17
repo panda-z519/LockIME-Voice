@@ -150,21 +150,6 @@ struct VoiceInputConfigurationTests {
         #expect(VoiceInputConfiguration.default.restoreDelay == .seconds(2))
     }
 
-    @Test("disabled configuration has no required notices")
-    func disabledConfigurationHasNoRequiredNotices() {
-        let config = VoiceInputConfiguration(isEnabled: false)
-        #expect(config.requiredNotices().isEmpty)
-    }
-
-    @Test("an enabled configuration asks for the matching-settings and separate-shortcut notices")
-    func enabledConfigurationRequiresBothNotices() {
-        let config = VoiceInputConfiguration(isEnabled: true)
-        #expect(config.requiredNotices() == [
-            .settingsMustMatchInputMethod,
-            .separateTriggerShortcut
-        ])
-    }
-
     @Test("all voice behaviors are codable by stable raw value")
     func behaviorsAreCodable() throws {
         let encoded = try JSONEncoder().encode(VoiceInputBehavior.pressOnceAnyKeyEnds)

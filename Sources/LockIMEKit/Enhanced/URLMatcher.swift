@@ -161,10 +161,23 @@ public enum URLMatcher {
     /// match off the main actor with a wall-clock deadline.
     static func matchesRegex(_ urlString: String, pattern: String) -> Bool {
         guard !pattern.isEmpty, !urlString.isEmpty, urlString.utf16.count <= maxRegexURLLength,
-              let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+              let regex = compiledRegex(pattern)
         else { return false }
         let range = NSRange(urlString.startIndex..., in: urlString)
         return regex.firstMatch(in: urlString, range: range) != nil
+    }
+
+    /// Compiled patterns, reused across evaluations: the URL poll re-matches
+    /// every rule every 1.5 s, and compiling is far costlier than matching.
+    /// `NSCache` is thread-safe and `NSRegularExpression` immutable.
+    nonisolated(unsafe) private static let regexCache = NSCache<NSString, NSRegularExpression>()
+
+    static func compiledRegex(_ pattern: String) -> NSRegularExpression? {
+        if let cached = regexCache.object(forKey: pattern as NSString) { return cached }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+        else { return nil }
+        regexCache.setObject(regex, forKey: pattern as NSString)
+        return regex
     }
 
     /// Whether `pattern` is a valid regular expression — for the editor to warn

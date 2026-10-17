@@ -18,13 +18,4 @@ extension VoiceShortcut {
         if shortcut.modifiers.contains(.shift) { converted.insert(.shift) }
         self.init(keyCode: UInt16(shortcut.carbonKeyCode), modifiers: converted)
     }
-
-    /// The recorded form, for the one-shot migration that carries an existing
-    /// voice key over to LockIME's own trigger shortcut.
-    var recordedShortcut: KeyboardShortcuts.Shortcut {
-        KeyboardShortcuts.Shortcut(
-            carbonKeyCode: Int(keyCode),
-            carbonModifiers: modifiers.carbonFlags
-        )
-    }
 }

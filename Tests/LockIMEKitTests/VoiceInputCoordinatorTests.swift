@@ -39,11 +39,11 @@ struct VoiceInputCoordinatorTests {
         #expect(sender.events == [.tap(shortcut), .tap(shortcut)])
     }
 
-    @Test("a session that does not switch sources never touches the input source")
+    @Test("without switching the key is mirrored and no session is kept")
     func nonSwitchingSessionLeavesTheInputSourceAlone() throws {
-        // The conflict-free setup: the trigger shortcut only synthesizes the
-        // input method's own voice key. No override, no switching, nothing to
-        // restore — so the user's input source is untouched end to end.
+        // The conflict-free setup: each press only re-sends the input method's
+        // own voice key. No override, no switching, nothing to restore — and no
+        // session state that could drift from what the input method is doing.
         let engine = RecordingVoiceOverrideEngine()
         let sender = RecordingShortcutEventSender()
         let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
@@ -55,16 +55,21 @@ struct VoiceInputCoordinatorTests {
             restoreSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         )
-        #expect(coordinator.state == .voiceActive)
-        #expect(sender.events == [.tap(shortcut)])
+        #expect(coordinator.state == .idle)
+        #expect(sender.events == [.keyDown(shortcut)])
+        coordinator.handleWorkflowShortcutReleased()
+        #expect(sender.events == [.keyDown(shortcut), .keyUp(shortcut)])
 
         try coordinator.handleWorkflowShortcutPressed(
             config: config,
             restoreSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         )
+        coordinator.handleWorkflowShortcutReleased()
         #expect(coordinator.state == .idle)
-        #expect(sender.events == [.tap(shortcut), .tap(shortcut)])
+        #expect(sender.events == [
+            .keyDown(shortcut), .keyUp(shortcut), .keyDown(shortcut), .keyUp(shortcut),
+        ])
 
         // The whole point: not one override was taken, and nothing was switched.
         #expect(engine.beginCount == 0)
@@ -86,8 +91,8 @@ struct VoiceInputCoordinatorTests {
             installedSources: []
         )
 
-        #expect(coordinator.state == .voiceActive)
-        #expect(sender.events == [.tap(shortcut)])
+        #expect(coordinator.state == .idle)
+        #expect(sender.events == [.keyDown(shortcut)])
     }
 
     @Test("automatic switching without a voice source is refused, not silently degraded")
@@ -142,7 +147,7 @@ struct VoiceInputCoordinatorTests {
         let sender = RecordingShortcutEventSender()
         let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
         let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
-        let config = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
+        let config = makeSwitchingConfig(shortcut: shortcut)
 
         try coordinator.handleWorkflowShortcutPressed(
             config: config,
@@ -290,7 +295,7 @@ struct VoiceInputCoordinatorTests {
         let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
         var states: [VoiceInputSessionState] = []
         coordinator.onStateChange = { states.append($0) }
-        let config = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
+        let config = makeSwitchingConfig(shortcut: shortcut)
 
         try coordinator.handleWorkflowShortcutPressed(
             config: config,
@@ -303,9 +308,9 @@ struct VoiceInputCoordinatorTests {
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         )
 
-        // Nothing interrupts a non-switching session, so it goes straight from
-        // active to ending to idle — no restore phase to report.
-        #expect(states == [.preparingVoice, .voiceActive, .endingVoice, .idle])
+        #expect(states == [
+            .preparingVoice, .voiceActive, .endingVoice, .restoringDefaultInput, .idle,
+        ])
         #expect(!coordinator.isSessionInProgress)
     }
 
@@ -394,8 +399,29 @@ struct VoiceInputCoordinatorTests {
             restoreSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         )
-        #expect(coordinator.state == .voiceActive)
-        #expect(sender.events == [.tap(shortcut)])
+        #expect(coordinator.state == .idle)
+        #expect(sender.events == [.keyDown(shortcut)])
+    }
+
+    @Test("a lost release never leaves the mirrored key stuck down")
+    func lostReleaseIsLiftedBeforeTheNextPress() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let shortcut = VoiceShortcut(keyCode: 61, modifiers: [.option])
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+        let config = makeConfig(shortcut: shortcut, behavior: .pressOncePressAgainEnds)
+        let installed: [InputSource] = [.stub(daily.rawValue)]
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config, restoreSourceID: daily, installedSources: installed
+        )
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config, restoreSourceID: daily, installedSources: installed
+        )
+        #expect(sender.events == [.keyDown(shortcut), .keyUp(shortcut), .keyDown(shortcut)])
+
+        coordinator.stopActiveSession()
+        #expect(sender.events.last == .keyUp(shortcut))
     }
 
     @Test("a failed end tap still hands the input source back")
@@ -529,8 +555,10 @@ struct VoiceInputCoordinatorTests {
         #expect(engine.switches == [voice, daily])
     }
 
-    @Test("a non-switching session still expires on the safety timeout")
-    func nonSwitchingSessionExpiresOnTimeout() throws {
+    @Test("without switching no safety timeout is armed, so nothing fires later")
+    func nonSwitchingPressArmsNoTimeout() throws {
+        // A blind toggle 60 s later would switch the microphone back on whenever
+        // the input method had already stopped by itself.
         let engine = RecordingVoiceOverrideEngine()
         let sender = RecordingShortcutEventSender()
         let scheduler = RecordingVoiceTimeoutScheduler()
@@ -547,14 +575,99 @@ struct VoiceInputCoordinatorTests {
             restoreSourceID: daily,
             installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
         )
-        #expect(scheduler.delays == [60])
+        #expect(scheduler.delays.isEmpty)
+        #expect(sender.events == [.keyDown(shortcut)])
+    }
 
-        // The timeout must also end the recording: there is no source to hand
-        // back, so it sends the same end tap a second press would.
+    @Test("the switching timeout restores the source without sending a key")
+    func switchingTimeoutSendsNoKey() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let scheduler = RecordingVoiceTimeoutScheduler()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(
+            overrideEngine: engine,
+            sender: sender,
+            timeoutScheduler: scheduler
+        )
+        let config = makeSwitchingConfig(shortcut: shortcut)
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        )
         try scheduler.fire(at: 0)
         #expect(coordinator.state == .idle)
-        #expect(engine.switches.isEmpty)
+        #expect(sender.events == [.tap(shortcut)])
+        #expect(engine.switches == [voice, daily])
+    }
+
+    @Test("ending a switching session waits the restore delay before switching back")
+    func endingWaitsRestoreDelay() throws {
+        // The input method needs a moment to commit the recognized text; taking
+        // the source away at once can drop it or deliver the end key elsewhere.
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let scheduler = RecordingVoiceTimeoutScheduler()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(
+            overrideEngine: engine,
+            sender: sender,
+            timeoutScheduler: scheduler
+        )
+        var config = makeSwitchingConfig(shortcut: shortcut)
+        config.restoreDelay = .seconds(2)
+        let installed: [InputSource] = [.stub(daily.rawValue), .stub(voice.rawValue)]
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config, restoreSourceID: daily, installedSources: installed
+        )
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config, restoreSourceID: daily, installedSources: installed
+        )
         #expect(sender.events == [.tap(shortcut), .tap(shortcut)])
+        #expect(coordinator.state == .restoringDefaultInput)
+        #expect(engine.switches == [voice])
+        #expect(engine.endCount == 0)
+        #expect(scheduler.delays == [60, 2])
+
+        // The stale safety timeout (index 0) must not act on the ending session.
+        try scheduler.fire(at: 0)
+        #expect(engine.switches == [voice])
+
+        try scheduler.fire(at: 0)
+        #expect(coordinator.state == .idle)
+        #expect(engine.switches == [voice, daily])
+        #expect(engine.endCount == 1)
+    }
+
+    @Test("a press during the restore delay starts a fresh session")
+    func pressDuringRestoreDelayRestarts() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let scheduler = RecordingVoiceTimeoutScheduler()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(
+            overrideEngine: engine,
+            sender: sender,
+            timeoutScheduler: scheduler
+        )
+        var config = makeSwitchingConfig(shortcut: shortcut)
+        config.restoreDelay = .seconds(2)
+        let installed: [InputSource] = [.stub(daily.rawValue), .stub(voice.rawValue)]
+
+        for _ in 0..<3 {
+            try coordinator.handleWorkflowShortcutPressed(
+                config: config, restoreSourceID: daily, installedSources: installed
+            )
+        }
+        #expect(coordinator.state == .voiceActive)
+        #expect(sender.events.count == 3)
+
+        // The delayed restore from the previous session is now stale.
+        try scheduler.fire(at: 1)
+        #expect(coordinator.state == .voiceActive)
     }
 
     @Test("shutting down abandons the session without restoring the source")
@@ -596,7 +709,8 @@ struct VoiceInputCoordinatorTests {
             voiceSourceID: voice,
             voiceShortcut: shortcut,
             behavior: .pressOncePressAgainEnds,
-            switchesVoiceSourceAutomatically: true
+            switchesVoiceSourceAutomatically: true,
+            restoreDelay: .seconds(0)
         )
     }
 }

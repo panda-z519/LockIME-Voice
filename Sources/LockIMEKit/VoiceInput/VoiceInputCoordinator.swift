@@ -61,6 +61,14 @@ public final class VoiceInputCoordinator {
     private var didScheduleVoiceShortcut = false
     private var sessionShortcut: VoiceShortcut?
     private var sessionBehavior: VoiceInputBehavior?
+    /// How long a switching session keeps the voice input source after the end
+    /// tap, so the input method can commit the recognized text before the source
+    /// changes under it. Snapshotted at start, like the shortcut.
+    private var sessionRestoreDelay: TimeInterval = 0
+    /// Shortcut-only mode mirrors the physical key: the echo goes down when the
+    /// user presses and up when they release. This is the key still held down,
+    /// so a release (or a teardown) can lift exactly what was pressed.
+    private var echoedKeyDown: VoiceShortcut?
     /// The voice key the session echoes back to the input method. In the
     /// single-shortcut model this is the key LockIME consumed, so it is known
     /// for the whole session and does not depend on a separately recorded value.
@@ -93,11 +101,14 @@ public final class VoiceInputCoordinator {
         self.sourceActivationDelay = sourceActivationDelay
     }
 
-    /// A trigger press, from LockIME's own global shortcut (`voiceInput`). It is
-    /// a *separate* combination from the input method's own voice shortcut, so
-    /// each key is handled exactly once: LockIME acts on this one and the input
-    /// method acts on the synthesized one. Sharing a single combination is what
-    /// made macOS report a shortcut conflict.
+    /// A press of the voice key, which LockIME consumed so the input method never
+    /// saw it. Without automatic switching the key is mirrored to the input
+    /// method — down now, up on release (`handleWorkflowShortcutReleased`) — and
+    /// LockIME keeps no session: the input method alone knows whether it is
+    /// recording (it may stop on silence by itself), any state kept here could
+    /// only drift from it, and mirroring works the same whether the input method
+    /// toggles on a tap or records while the key is held. With automatic
+    /// switching the press starts or ends a session that owns the input source.
     public func handleWorkflowShortcutPressed(
         config: VoiceInputConfiguration,
         restoreSourceID: InputSourceID?,
@@ -107,6 +118,8 @@ public final class VoiceInputCoordinator {
         // the switch so a stale live session can't be ended either: the user
         // turned the feature off, so LockIME stops synthesizing keys. The session
         // is torn down locally (no further key is sent) and the state reset.
+        // A key-up lost in transit must not leave the echo stuck down.
+        releaseEchoedKey()
         guard config.isEnabled else {
             cleanupOverride()
             state = .idle
@@ -133,37 +146,27 @@ public final class VoiceInputCoordinator {
         }
     }
 
-    /// The safety timeout. In a switching session it hands the input source back;
-    /// in a shortcut-only session there is nothing to hand back, but the input
-    /// method may still be recording, so the timeout must also *end* the session
-    /// the same way a second press would — otherwise LockIME reports idle while
-    /// the microphone is still live, and the next press would start a fresh
-    /// session instead of ending the running one.
-    public func handleRestoreTimeout(config: VoiceInputConfiguration) throws {
-        guard state == .voiceActive else { return }
-        if ownsInputSource {
-            try restoreDefault(reason: .safetyTimeout)
-            return
-        }
-        guard let sessionShortcut else {
-            failAndRestore(.shortcutSendFailed, reason: .safetyTimeout)
-            throw VoiceInputCoordinatorError.shortcutSendFailed
-        }
-        do {
-            try sender.sendTap(sessionShortcut)
-        } catch {
-            failAndRestore(.shortcutSendFailed, reason: .safetyTimeout)
-            throw VoiceInputCoordinatorError.shortcutSendFailed
-        }
-        cleanupOverride()
-        state = .idle
+    /// The voice key came back up: lift the mirrored key in shortcut-only mode.
+    /// A switching session ends on the next press instead, so it ignores this.
+    public func handleWorkflowShortcutReleased() {
+        releaseEchoedKey()
     }
-    /// Begin a session. Two shapes:
+
+    /// The safety timeout of a switching session: hand the input source back so
+    /// the user is never stranded in the voice input method. It deliberately
+    /// sends no key — a blind toggle would *start* recording again whenever the
+    /// input method had already stopped by itself.
+    public func handleRestoreTimeout(config: VoiceInputConfiguration) throws {
+        guard state == .voiceActive, ownsInputSource else { return }
+        try restoreDefault(reason: .safetyTimeout)
+    }
+    /// Handle a press from a clean slate. Two shapes:
     ///  * **automatic switching** — take over the input source, wait for the
     ///    switch to land, then send the input method's voice shortcut;
     ///  * **shortcut only** (automatic switching off, or the voice input method
-    ///    being the global default) — send the voice shortcut straight away, and
-    ///    never touch the input source, so nothing has to be restored.
+    ///    being the global default) — echo the voice shortcut straight away and
+    ///    keep no session: the input source is never touched, so there is nothing
+    ///    to restore, time out, or keep in step with the input method.
     private func start(
         config: VoiceInputConfiguration,
         restoreSourceID: InputSourceID?,
@@ -197,18 +200,19 @@ public final class VoiceInputCoordinator {
         didSendVoiceShortcut = false
         didScheduleVoiceShortcut = true
         ownsInputSource = false
-        sessionShortcut = voiceShortcut
-        sessionBehavior = config.behavior
         guard switchesSource, let voiceSourceID = config.voiceSourceID else {
-            self.restoreSourceID = nil
-            state = .preparingVoice
-            activateVoiceShortcut(
-                config: config,
-                voiceShortcut: voiceShortcut,
-                generation: currentGeneration
-            )
+            do {
+                try sender.sendKeyDown(voiceShortcut)
+                echoedKeyDown = voiceShortcut
+                state = .idle
+            } catch {
+                state = .failed(.shortcutSendFailed)
+            }
             return
         }
+        sessionShortcut = voiceShortcut
+        sessionBehavior = config.behavior
+        sessionRestoreDelay = config.restoreDelay.interval
         state = .preparingVoice
         didScheduleVoiceShortcut = false
         token = overrideEngine.beginTemporaryInputSourceOverride { [weak self] sourceID in
@@ -292,12 +296,9 @@ public final class VoiceInputCoordinator {
             Self.log.notice(
                 "Sending voice shortcut: keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue)"
             )
-            // Only press-once / press-again is reachable: the other two
-            // behaviors need a key-up or any-key listener (the removed
-            // shared-key monitor) and are no longer offered.
             try sender.sendTap(voiceShortcut)
-            armRestoreTimeout(config: config, generation: generation)
             state = .voiceActive
+            armRestoreTimeout(config: config, generation: generation)
         } catch {
             failAndRestore(.shortcutSendFailed, reason: .shortcutSendFailed)
         }
@@ -321,7 +322,22 @@ public final class VoiceInputCoordinator {
                 throw VoiceInputCoordinatorError.shortcutSendFailed
             }
         }
-        try restoreDefault(reason: .workflowShortcut)
+        // Give the input method time to commit the recognized text before the
+        // source changes under it. The override stays in place meanwhile, so the
+        // lock engine doesn't snap the source back early either.
+        guard ownsInputSource, sessionRestoreDelay > 0 else {
+            try restoreDefault(reason: .workflowShortcut)
+            return
+        }
+        state = .restoringDefaultInput
+        let currentGeneration = generation
+        timeoutScheduler.schedule(after: sessionRestoreDelay) { [weak self] in
+            guard let self,
+                  self.generation == currentGeneration,
+                  self.state == .restoringDefaultInput
+            else { return }
+            try? self.restoreDefault(reason: .workflowShortcut)
+        }
     }
 
     /// Hand the input source back and end the session. In the shortcut-only path
@@ -374,6 +390,7 @@ public final class VoiceInputCoordinator {
         didScheduleVoiceShortcut = false
         sessionShortcut = nil
         sessionBehavior = nil
+        sessionRestoreDelay = 0
         if hadSession {
             onSessionCleanup?()
         }
@@ -388,8 +405,19 @@ public final class VoiceInputCoordinator {
     /// Abandon any in-flight session without restoring the input source. Used on
     /// app shutdown, where the override hand-back would race the process exit.
     public func stopActiveSession() {
+        releaseEchoedKey()
         cleanupOverride()
         state = .idle
+    }
+
+    private func releaseEchoedKey() {
+        guard let echoed = echoedKeyDown else { return }
+        echoedKeyDown = nil
+        do {
+            try sender.sendKeyUp(echoed)
+        } catch {
+            state = .failed(.shortcutSendFailed)
+        }
     }
 
     private func failAndRestore(

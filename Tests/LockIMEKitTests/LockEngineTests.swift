@@ -75,6 +75,25 @@ struct LockEngineTests {
         #expect(provider.current == pinyin) // URL rule wins over the app rule
     }
 
+    @Test("while LockIME is off the browser URL is never read")
+    func disabledNeverReadsURL() {
+        // Reading it is a full Accessibility tree walk in the browser; with the
+        // lock off the result would only be thrown away.
+        let provider = MockInputSourceProvider(current: us, sources: [.stub(us.rawValue), .stub(abc.rawValue)])
+        let monitor = MockFrontmostMonitor(bundleID: "com.apple.Safari")
+        let urls = MockBrowserURLProvider(url: "https://github.com/x")
+        let engine = LockEngine(provider: provider, appMonitor: monitor, urlProvider: urls)
+        engine.start()
+        engine.apply(LockConfiguration(
+            isEnabled: false,
+            defaultSourceID: us,
+            enhancedModeEnabled: true,
+            urlRules: [URLRule(hostPattern: "github.com", lockedSourceID: abc)]
+        ))
+        monitor.activate("com.google.Chrome")
+        #expect(urls.readCount == 0)
+    }
+
     @Test("re-resolving after the URL changes switches to the new rule")
     func urlChangeReResolves() {
         let pinyin: InputSourceID = "com.apple.inputmethod.SCIM.ITABC"
@@ -168,6 +187,18 @@ struct LockEngineLauncherTests {
         )
         engine.start()
         return (engine, provider, floating)
+    }
+
+    @Test("launcher overlays are only observed while LockIME is on")
+    func launcherObservedOnlyWhileEnabled() {
+        let (engine, provider, floating) = makeEngine(current: us, frontmost: "com.foo.App")
+        let rules = [AppRule(bundleID: spotlight, mode: .locked, lockedSourceID: abc)]
+        engine.apply(LockConfiguration(isEnabled: false, defaultSourceID: us, appRules: rules))
+        floating.setLauncher(spotlight)       // detached: nothing reaches the engine
+        engine.apply(LockConfiguration(isEnabled: true, defaultSourceID: us, appRules: rules))
+        #expect(provider.current == us)
+        floating.setLauncher(spotlight)       // re-attached on enable
+        #expect(provider.current == abc)
     }
 
     @Test("a launcher overlay retargets to its own rule, and dismissing it reverts")

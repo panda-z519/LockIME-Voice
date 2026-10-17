@@ -19,11 +19,9 @@ extension KeyboardShortcuts.Name {
     /// frontmost app has no rule.
     nonisolated(unsafe) static let removeFrontmostAppRule = Self("removeFrontmostAppRule")
 
-    /// Global: start or end the voice input workflow. This is LockIME's *own*
-    /// trigger key — deliberately a **different** combination from the selected
-    /// input method's voice shortcut (see `VoiceInputConfiguration.voiceShortcut`).
-    /// One key, handled once by LockIME, which then synthesizes the other; sharing
-    /// a single combination is what made macOS and the input methods report a
-    /// shortcut conflict.
+    /// Where v0.1.4–0.1.5 stored the voice key. The key now lives in
+    /// `VoiceInputConfiguration.voiceShortcut` (the recorder here cannot capture
+    /// a lone modifier); this name is kept only so launch can migrate and clear
+    /// an old recording (`AppState.migrateRecordedVoiceKey`).
     nonisolated(unsafe) static let voiceInput = Self("voiceInput")
 }

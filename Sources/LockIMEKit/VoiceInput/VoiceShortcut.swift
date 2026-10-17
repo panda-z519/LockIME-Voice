@@ -62,6 +62,53 @@ public struct VoiceShortcut: Codable, Sendable, Equatable, Hashable {
         !modifierKey.isEmpty
     }
 
+    /// The device-dependent flag bits a real keyboard sets alongside the
+    /// device-independent ones: which *side* each held modifier is on. Input
+    /// methods that bind "right ⌥" tell it apart from left ⌥ only by these bits,
+    /// so an echo without them is not recognized as the voice key at all.
+    /// Modifiers held together with the key are reported as their left-hand
+    /// keys, as a keyboard would for the common case.
+    func deviceFlagBits(keyDown: Bool) -> UInt64 {
+        var bits: UInt64 = 0
+        var others = modifiers
+        if isModifierKey {
+            others.remove(modifierKey)
+            if keyDown { bits |= Self.deviceBit(forModifierKeyCode: keyCode) }
+        }
+        if others.contains(.control) { bits |= 0x0000_0001 }
+        if others.contains(.shift) { bits |= 0x0000_0002 }
+        if others.contains(.command) { bits |= 0x0000_0008 }
+        if others.contains(.option) { bits |= 0x0000_0020 }
+        return bits
+    }
+
+    private static func deviceBit(forModifierKeyCode keyCode: UInt16) -> UInt64 {
+        switch keyCode {
+        case 59: 0x0000_0001  // left ⌃
+        case 62: 0x0000_2000  // right ⌃
+        case 56: 0x0000_0002  // left ⇧
+        case 60: 0x0000_0004  // right ⇧
+        case 55: 0x0000_0008  // left ⌘
+        case 54: 0x0000_0010  // right ⌘
+        case 58: 0x0000_0020  // left ⌥
+        case 61: 0x0000_0040  // right ⌥
+        default: 0
+        }
+    }
+
+    /// Keys the hardware reports with the secondary-Fn flag set: F1–F20, the
+    /// arrows, and the Home/End/Page/Forward-Delete/Help block.
+    var isFunctionRowKey: Bool {
+        Self.functionRowKeyCodes.contains(keyCode)
+    }
+
+    private static let functionRowKeyCodes: Set<UInt16> = [
+        122, 120, 99, 118, 96, 97, 98, 100, 101, 109, 103, 111,  // F1–F12
+        105, 107, 113, 106, 64, 79, 80, 90,                      // F13–F20
+        123, 124, 125, 126,                                      // arrows
+        115, 119, 116, 121, 117, 114,                            // Home End PgUp PgDn ⌦ Help
+    ]
+
     public static func canonicalModifierKeyCode(
         eventKeyCode: UInt16,
         deviceFlagsRawValue: UInt64

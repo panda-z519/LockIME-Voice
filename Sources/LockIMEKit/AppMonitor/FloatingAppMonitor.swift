@@ -25,6 +25,8 @@ public final class FloatingAppMonitor: FloatingAppMonitoring {
     private var workspaceTokens: [any NSObjectProtocol] = []
     /// The launcher bundle ID last reported, for change de-duplication.
     private var current: String?
+    /// An `evaluate()` is already queued for this run-loop turn.
+    private var evaluationPending = false
 
     private let systemWide: AXUIElement
 
@@ -58,6 +60,8 @@ public final class FloatingAppMonitor: FloatingAppMonitoring {
         }
 
         attachAll()
+        // A launcher may already hold focus when observation (re)starts.
+        scheduleEvaluate()
     }
 
     public func refresh() {
@@ -154,6 +158,23 @@ public final class FloatingAppMonitor: FloatingAppMonitoring {
 
     // MARK: - Evaluation
 
+    /// Called from the AX callback. A launcher fires these in bursts — every
+    /// result row it tears down while the user types posts an element-destroyed
+    /// notification — and each `evaluate()` is a synchronous cross-process
+    /// Accessibility query on the main thread. Coalesce a burst into one read on
+    /// the next run-loop turn; the answer only depends on where focus settled.
+    fileprivate func scheduleEvaluate() {
+        guard !evaluationPending else { return }
+        evaluationPending = true
+        RunLoop.main.perform { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.evaluationPending = false
+                self.evaluate()
+            }
+        }
+    }
+
     /// Called from the AX callback on every watched notification. Reads the
     /// real keyboard-focused app and reports the launcher overlay (or `nil`).
     fileprivate func evaluate() {
@@ -195,6 +216,6 @@ private func floatingAXCallback(
     // isolation boundary trips strict-concurrency region analysis.
     let monitor = Unmanaged<FloatingAppMonitor>.fromOpaque(refcon).takeUnretainedValue()
     MainActor.assumeIsolated {
-        monitor.evaluate()
+        monitor.scheduleEvaluate()
     }
 }

@@ -1,3 +1,4 @@
+import CoreGraphics
 import Testing
 
 @testable import LockIMEKit
@@ -44,6 +45,41 @@ struct ShortcutEventSenderTests {
         #expect(try sender.makeEvent(rightOption, keyDown: false).type == .flagsChanged)
         #expect(CGShortcutEventSender.tapDelayMicroseconds(for: rightOption) >= 80_000)
         #expect(CGShortcutEventSender.tapDelayMicroseconds(for: regularKey) == 20_000)
+    }
+}
+
+@MainActor
+@Suite("Echoed key fidelity")
+struct EchoedKeyFidelityTests {
+    @Test("a right-hand modifier echo carries the right-side device bit")
+    func rightOptionCarriesItsSide() throws {
+        // Input methods bind "right ⌥" by these bits; without them the echo is
+        // just "⌥" and the voice key never fires.
+        let rightOption = VoiceShortcut(keyCode: 61, modifiers: [.option])
+        let down = try CGShortcutEventSender().makeEvent(rightOption, keyDown: true)
+        let up = try CGShortcutEventSender().makeEvent(rightOption, keyDown: false)
+        #expect(down.flags.rawValue & 0x40 != 0)
+        #expect(down.flags.contains(.maskAlternate))
+        #expect(up.flags.rawValue & 0x40 == 0)
+        #expect(!up.flags.contains(.maskAlternate))
+    }
+
+    @Test("each side maps to its own device bit")
+    func deviceBitsPerSide() {
+        #expect(VoiceShortcut(keyCode: 58, modifiers: [.option]).deviceFlagBits(keyDown: true) == 0x20)
+        #expect(VoiceShortcut(keyCode: 54, modifiers: [.command]).deviceFlagBits(keyDown: true) == 0x10)
+        #expect(VoiceShortcut(keyCode: 62, modifiers: [.control]).deviceFlagBits(keyDown: true) == 0x2000)
+        #expect(VoiceShortcut(keyCode: 60, modifiers: [.shift]).deviceFlagBits(keyDown: true) == 0x04)
+        // A combination reports its modifiers as left-hand keys, like a keyboard.
+        #expect(VoiceShortcut(keyCode: 9, modifiers: [.control, .option]).deviceFlagBits(keyDown: true) == 0x21)
+    }
+
+    @Test("an F-key echo is tagged secondary-Fn like the hardware event")
+    func functionKeyCarriesFnFlag() throws {
+        let f13 = VoiceShortcut(keyCode: 105)
+        #expect(try CGShortcutEventSender().makeEvent(f13, keyDown: true).flags.contains(.maskSecondaryFn))
+        let letter = VoiceShortcut(keyCode: 9, modifiers: [.control])
+        #expect(try !CGShortcutEventSender().makeEvent(letter, keyDown: true).flags.contains(.maskSecondaryFn))
     }
 }
 
