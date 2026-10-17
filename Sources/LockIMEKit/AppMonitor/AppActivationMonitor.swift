@@ -22,16 +22,20 @@ public final class AppActivationMonitor: FrontmostAppMonitoring {
 
     public func start(onChange: @escaping @MainActor (String?) -> Void) {
         guard task == nil else { return }
-        let debounce = self.debounce
+        let debouncer = Debouncer(delay: debounce)
         task = Task { @MainActor in
             let activations = NSWorkspace.shared.notificationCenter.notifications(
                 named: NSWorkspace.didActivateApplicationNotification
             )
             for await _ in activations {
-                try? await Task.sleep(for: debounce)
-                if Task.isCancelled { break }
-                onChange(NSWorkspace.shared.frontmostApplication?.ruleIdentity)
+                // A Cmd-Tab burst reports once, for the app it settles on —
+                // each report costs a full re-evaluation (and, for a browser,
+                // Accessibility queries), so the skipped ones are pure waste.
+                debouncer.schedule {
+                    onChange(NSWorkspace.shared.frontmostApplication?.ruleIdentity)
+                }
             }
+            debouncer.cancel()
         }
     }
 
@@ -42,5 +46,31 @@ public final class AppActivationMonitor: FrontmostAppMonitoring {
 
     deinit {
         task?.cancel()
+    }
+}
+
+/// Runs only the last of a burst of calls, `delay` after it arrived.
+@MainActor
+final class Debouncer {
+    private let delay: Duration
+    private var pending: Task<Void, Never>?
+
+    init(delay: Duration) {
+        self.delay = delay
+    }
+
+    func schedule(_ work: @escaping @MainActor () -> Void) {
+        pending?.cancel()
+        let delay = self.delay
+        pending = Task { @MainActor in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            work()
+        }
+    }
+
+    func cancel() {
+        pending?.cancel()
+        pending = nil
     }
 }

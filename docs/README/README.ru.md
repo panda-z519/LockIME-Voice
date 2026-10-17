@@ -6,14 +6,14 @@
 
 [English](../../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português](README.pt.md) · **Русский**
 
-[![CI](https://img.shields.io/github/actions/workflow/status/zhangsiqiang519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/panda-z519/LockIME-Voice/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/panda-z519/LockIME-Voice/ci.yml?branch=main&label=CI)](https://github.com/panda-z519/LockIME-Voice/actions/workflows/ci.yml)
 [![Лицензия: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-3A5BD9)](../../LICENSE)
 [![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-F05138?logo=swift&logoColor=white)](https://swift.org)
 
 </div>
 
-> **Форк исходного кода LockIME Voice.** Эта производная версия GPL-3.0 добавляет настраиваемый процесс голосового ввода. `v0.1.5` предлагает предварительные установщики с ad-hoc подписью, но без Developer ID, нотаризации, Sparkle и Homebrew.
+> **Форк исходного кода LockIME Voice.** Эта производная версия GPL-3.0 добавляет настраиваемый процесс голосового ввода. `v0.1.6` предлагает предварительные установщики с ad-hoc подписью, но без Developer ID, нотаризации, Sparkle и Homebrew.
 
 Приложение для строки меню macOS, которое **блокирует источник ввода клавиатуры**. Как только вы (или другое приложение) переключаете метод ввода, LockIME немедленно возвращает заблокированный — глобально, для каждого активного приложения или (в дополнительном расширенном режиме) для каждого URL в браузере.
 
@@ -48,16 +48,16 @@
 
 Скачайте подходящий установщик:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.5/LockIME-Voice-0.1.5-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.5/LockIME-Voice-0.1.5-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.6/LockIME-Voice-0.1.6-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.6/LockIME-Voice-0.1.6-x86_64.dmg)
 
 Проверяйте загрузку перед открытием. В каждом релизе публикуется `SHA256SUMS.txt`,
 поэтому контрольная сумма всегда соответствует артефакту, собранному для этого
 тега (DMG не воспроизводится побайтово, поэтому здесь она не зафиксирована):
 
 ```sh
-gh release download v0.1.3 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.5-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.6 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.6-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

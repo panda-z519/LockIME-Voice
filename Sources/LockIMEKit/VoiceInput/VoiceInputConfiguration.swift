@@ -6,38 +6,12 @@ public enum VoiceInputBehavior: String, Codable, Sendable, CaseIterable, Identif
     case pressOnceAnyKeyEnds
 
     public var id: String { rawValue }
-
-    public static func available(capabilities: VoiceInputCapabilities) -> [VoiceInputBehavior] {
-        var behaviors: [VoiceInputBehavior] = [.pressOncePressAgainEnds]
-        if capabilities.supportsHoldToSpeak {
-            behaviors.append(.holdToSpeak)
-        }
-        if capabilities.supportsAnyKeyTermination {
-            behaviors.append(.pressOnceAnyKeyEnds)
-        }
-        return behaviors
-    }
 }
 
 public enum VoiceInputWorkflowMode: Equatable, Sendable {
     case disabled
     case direct
     case bridged
-}
-
-public struct VoiceInputCapabilities: Codable, Sendable, Equatable {
-    public var supportsHoldToSpeak: Bool
-    public var supportsAnyKeyTermination: Bool
-
-    public init(supportsHoldToSpeak: Bool = false, supportsAnyKeyTermination: Bool = false) {
-        self.supportsHoldToSpeak = supportsHoldToSpeak
-        self.supportsAnyKeyTermination = supportsAnyKeyTermination
-    }
-
-    public static let conservativeDefault = VoiceInputCapabilities()
-    public static let anyKeyTerminationValidated = VoiceInputCapabilities(
-        supportsAnyKeyTermination: true
-    )
 }
 
 public enum VoiceRestoreTimeout: Codable, Sendable, Equatable, Hashable {
@@ -77,22 +51,12 @@ public enum VoiceInputValidationError: Equatable, Sendable {
     case voiceSourceUnavailable(InputSourceID)
 }
 
-public enum VoiceInputConfigurationNotice: Equatable, Sendable {
-    case settingsMustMatchInputMethod
-    /// The LockIME trigger shortcut and the input method's own voice shortcut
-    /// must be two different combinations — sharing one processes it twice and
-    /// makes macOS or the input method report a shortcut conflict.
-    case separateTriggerShortcut
-}
-
 public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
     public var isEnabled: Bool
     public var voiceSourceID: InputSourceID?
-    /// The voice key, kept for reading configurations written by v0.1.3 and
-    /// earlier. Since 0.1.4 the key is a single recorded shortcut owned by the
-    /// app (see `KeyboardShortcuts.Name.voiceInput`), because the key the user
-    /// presses is also the key the input method uses — storing it in two places
-    /// is what let the displayed value drift from the effective one.
+    /// The voice key: the input method's own voice shortcut, which LockIME takes
+    /// over and echoes back. The single place it is stored, so the key shown in
+    /// Settings is always the key the tap owns.
     public var voiceShortcut: VoiceShortcut?
     public var behavior: VoiceInputBehavior
     /// Whether a trigger switches the Mac to `voiceSourceID` for the session and
@@ -135,10 +99,9 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         return .bridged
     }
 
-    /// Whether the workflow holds the system permission it needs. Only event
-    /// *posting* matters now: LockIME no longer listens for the input method's
-    /// voice key (that listener caused the double handling behind the
-    /// conflict prompt), it only synthesizes the shortcut.
+    /// Whether LockIME may post the echoed key (`CGPreflightPostEventAccess`).
+    /// Taking the key over additionally needs Accessibility for the consuming
+    /// tap; the Settings pane reports that one separately.
     public static func hasRequiredSystemPermissions(eventPostingGranted: Bool) -> Bool {
         eventPostingGranted
     }
@@ -183,10 +146,6 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         return voiceSourceID == defaultSourceID
     }
 
-    public func requiredNotices() -> [VoiceInputConfigurationNotice] {
-        isEnabled ? [.settingsMustMatchInputMethod, .separateTriggerShortcut] : []
-    }
-
     private enum CodingKeys: String, CodingKey {
         case isEnabled
         case workflowShortcut
@@ -226,8 +185,6 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         } else {
             switchesVoiceSourceAutomatically = voiceSourceID != nil
         }
-        restoreDelay = try container.decodeIfPresent(VoiceRestoreDelay.self, forKey: .restoreDelay)
-            ?? .seconds(2)
         restoreDelay = try container.decodeIfPresent(VoiceRestoreDelay.self, forKey: .restoreDelay)
             ?? .seconds(2)
     }

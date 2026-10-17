@@ -32,7 +32,16 @@ extension NSImage {
 /// Resolves a display name and icon for a bundle identifier, for the rules UI.
 @MainActor
 enum AppDisplay {
+    /// Installed apps' names and icons, by bundle ID. Each lookup goes through
+    /// LaunchServices and reads the bundle's Info.plist (or renders its icon), and
+    /// both are asked for on every forced switch (the activation log) and every
+    /// render of the rule lists. Running-only processes are not cached: their
+    /// live name is what should show.
+    private static var nameCache: [String: String] = [:]
+    private static var iconCache: [String: NSImage] = [:]
+
     static func name(for bundleID: String) -> String {
+        if let cached = nameCache[bundleID] { return cached }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
             // Not an installed `.app` — a bare-executable process (e.g.
             // Minecraft's `java`) still shows its live name while running; a
@@ -43,17 +52,22 @@ enum AppDisplay {
                 ?? bundleID
         }
         let bundle = Bundle(url: url)
-        return (bundle?.localizedInfoDictionary?["CFBundleDisplayName"] as? String)
+        let name = (bundle?.localizedInfoDictionary?["CFBundleDisplayName"] as? String)
             ?? (bundle?.infoDictionary?["CFBundleDisplayName"] as? String)
             ?? (bundle?.infoDictionary?["CFBundleName"] as? String)
             ?? url.deletingPathExtension().lastPathComponent
+        nameCache[bundleID] = name
+        return name
     }
 
     static func icon(for bundleID: String) -> NSImage? {
+        if let cached = iconCache[bundleID] { return cached }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
             return runningApplication(for: bundleID)?.icon
         }
-        return NSWorkspace.shared.icon(forFile: url.path)
+        let icon = NSWorkspace.shared.icon(forFile: url.path)
+        iconCache[bundleID] = icon
+        return icon
     }
 
     private static func runningApplication(for bundleID: String) -> NSRunningApplication? {

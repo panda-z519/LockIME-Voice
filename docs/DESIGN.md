@@ -220,28 +220,33 @@ the grant watcher.
   never re-yanks the underlying app); the kit's `LockController.switchOnce`
   performs the switch without installing a standing target.
 - **Shortcuts:** native recorder rows in two sections — **Global** (toggle lock,
-  lock to previous/next input source, and the voice workflow's own trigger) and
-  **Current app** (cycle, or remove, the frontmost app's rule). The voice
-  trigger must differ from the shortcut the voice input method uses internally
-  (see **Voice Input** below); the footer says so. Recorder titles must be
-  `LocalizedStringKey(...)`, not a bare `String` literal, or the label renders
-  in the system language (see the i18n guards in CLAUDE.md).
-- **Voice Input:** the workflow pane, built around **two** shortcuts, not one.
-  `KeyboardShortcuts.Recorder` ("LockIME voice shortcut", `.voiceInput`) is the
-  key the user actually presses and the only one LockIME handles. The
-  combination configured *inside* the selected input method, which LockIME only
-  hand-rolled `VoiceShortcutEditor` ("Input method voice shortcut") holds the
-  combination the key was processed twice — once by the input method, once by
-  LockIME's synthetic copy — and macOS/the input method reported a shortcut
-  conflict; the pane therefore warns when the two match. **Switch input source
-  automatically** (default **off**) gates everything source-related: off means
-  the synthesized shortcut alone does the job and the input source is never
-  touched; on reveals the voice-source picker, the restore-source row and the
-  restore timeout, and makes `VoiceInputCoordinator` take a `LockController`
-  temporary override for the session. Modifier/key display comes from
-  `VoiceShortcut.displayText`, which also renders the Fn/🌐 key. The workflow
-  needs **event posting** only — no Input Monitoring grant, because nothing is
-  listening for the user's keys.
+  lock to previous/next input source) and **Current app** (cycle, or remove, the
+  frontmost app's rule). The voice key is not here: it is set in **Voice Input**.
+  Recorder titles must be `LocalizedStringKey(...)`, not a bare `String`
+  literal, or the label renders in the system language (see the i18n guards in
+  CLAUDE.md).
+- **Voice Input:** the workflow pane, built around **one** key — the shortcut
+  the input method itself uses for voice input. It is recorded with the
+  hand-rolled `VoiceShortcutEditor` (not `KeyboardShortcuts.Recorder`, which
+  cannot capture a lone modifier such as right ⌥) and stored in
+  `VoiceInputConfiguration.voiceShortcut`; v0.1.4–0.1.5 kept it in
+  `KeyboardShortcuts` `.voiceInput`, migrated once at launch. A consuming
+  `CGEventTap` (`CGConsumingVoiceKeyMonitor`, decisions in `VoiceKeyMatcher`)
+  takes that exact key so the input method never sees the physical press, and
+  LockIME echoes it back marked so its own tap ignores it — one press, handled
+  once, no conflict prompt. The echo mirrors a real keyboard, including the
+  left/right device bits and the secondary-Fn flag. While the editor records,
+  the tap yields the key. **Switch input source automatically** (default
+  **off**) gates everything source-related: off means the key is mirrored
+  (down on press, up on release) and LockIME keeps no session, so it works for
+  tap-to-toggle and hold-to-talk input methods alike and never drifts from the
+  input method's own recording state; on reveals the voice-source picker, the
+  restore-source row and the restore timeout, and makes `VoiceInputCoordinator`
+  take a `LockController` temporary override per session (press to start,
+  press again to end, source restored after `restoreDelay`; the safety timeout
+  only restores the source and never sends a key). Modifier/key display comes
+  from `VoiceShortcut.displayText`, which also renders the Fn/🌐 key. The tap
+  needs the **Accessibility** grant, which also covers posting the echo.
 - **Permissions:** the single home for the optional Accessibility grant
   (`AXIsProcessTrusted`), which unlocks two features — per-URL rules and
   launcher-overlay detection (Spotlight/Raycast/…). One `GrantAccessibilityButton`

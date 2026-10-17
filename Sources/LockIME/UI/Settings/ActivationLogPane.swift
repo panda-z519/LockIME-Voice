@@ -6,13 +6,19 @@ struct ActivationLogPane: View {
     @Environment(AppState.self) private var state
     @Query private var entries: [ActivationLogEntry]
 
+    /// The table shows the most recent entries only: a day of a tug-of-war can
+    /// log thousands, and the query re-runs on every recorded switch while the
+    /// pane is open.
+    static let displayLimit = 500
+
     init() {
         let cutoff = Date.now.addingTimeInterval(-LogStore.retention)
-        _entries = Query(
-            filter: #Predicate<ActivationLogEntry> { $0.timestamp > cutoff },
-            sort: \ActivationLogEntry.timestamp,
-            order: .reverse
+        var descriptor = FetchDescriptor<ActivationLogEntry>(
+            predicate: #Predicate { $0.timestamp > cutoff },
+            sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
         )
+        descriptor.fetchLimit = Self.displayLimit
+        _entries = Query(descriptor)
     }
 
     var body: some View {

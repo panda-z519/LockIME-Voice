@@ -37,8 +37,9 @@ That triggers the `Release` workflow:
 3. **publish** — runs only for tags (a manual `workflow_dispatch` run stops after
    building and leaves the DMGs as workflow artifacts, never a public Release).
    It combines the per-arch checksums into `SHA256SUMS.txt` and creates the
-   Release, re-uploading with `--clobber` so re-running the same tag is
-   idempotent.
+   Release. Re-running the same tag updates the existing Release instead —
+   assets re-uploaded with `--clobber`, title and notes rewritten — so a re-run
+   is idempotent and never leaves stale notes.
 
 ## Release notes are part of the release
 

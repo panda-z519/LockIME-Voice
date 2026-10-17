@@ -24,8 +24,7 @@ struct MenuBarView: View {
         // toggle-lock shortcut. Non-interactive: a *disabled* Button still draws
         // the accelerator natively but can't fire it, so it never clashes with
         // the real global handler — it's a pure hint. The source name is omitted:
-        // the list below already moves the default source first and marks it
-        // with a pin.
+        // the list below already moves the default source first and checks it.
         Button {} label: {
             Label {
                 Text(verbatim: status)
@@ -39,46 +38,53 @@ struct MenuBarView: View {
         Divider()
 
         // The system input sources, flattened directly into the menu with the
-        // configured default first. Each is a Button carrying a leading pin in
-        // the menu-item *image* column — visible on the locked source (LockIME
-        // on AND this is the global
-        // target), kept as an empty slot of the same size otherwise. That
-        // reserves the gutter at a constant width, so the menu doesn't
-        // grow/shrink as the lock toggles. (A `Toggle`'s native checkmark lives
-        // in NSMenu's *state* column, which collapses to zero width when nothing
-        // is checked — that is what made the menu jump, and it still does on
-        // macOS 27: 144pt unlocked vs 158pt locked.) Clicking an unchecked
-        // source targets it (sets the global source + turns LockIME on, one
-        // commit, preserving the configured lock/switch default behavior);
-        // clicking the pinned source clears the global target (app and switch
-        // rules stay live). No separate on/off toggle, no submenu. Source names are
-        // verbatim system strings, not catalog keys. The global toggle-lock
-        // shortcut (Settings ▸ Shortcuts) flips LockIME on/off.
+        // configured default first. Each row says where it stands:
+        //
+        // * **locked** (LockIME on AND this is the global target) — a native
+        //   checkmark plus a filled pin. The checkmark lives in NSMenu's *state*
+        //   column, which AppKit draws itself on every macOS version; the
+        //   menu-item *image* column is not reliable (macOS 27 hides menu
+        //   images — see `MenuIcon`), and a pin alone there left the selected
+        //   source looking unselected. The state column collapses when nothing
+        //   is checked, so the menu narrows slightly while LockIME is off; the
+        //   image column below keeps its constant width either way.
+        // * **default, lock off** — an outline pin and no checkmark: chosen, but
+        //   not being enforced right now.
+        // * anything else — an empty slot of the pin's size.
+        //
+        // Clicking an unlocked source targets it (sets the global source + turns
+        // LockIME on, one commit, preserving the configured lock/switch default
+        // behavior); clicking the locked source clears the global target (app
+        // and switch rules stay live). Source names are verbatim system strings,
+        // not catalog keys. The global toggle-lock shortcut (Settings ▸
+        // Shortcuts) flips LockIME on/off.
         let menuSources = InputSourceOrdering.defaultFirst(
             state.availableSources,
             defaultSourceID: state.config.defaultSourceID
         )
         ForEach(menuSources) { source in
-            let isLockedTo = state.isAppEnabled && state.config.defaultSourceID == source.id
-            Button {
-                if isLockedTo {
-                    // Clear just the global lock target — the app and any one-shot
-                    // switch rules stay alive. (Use Settings to turn LockIME off
-                    // entirely.)
-                    state.setDefaultSource(nil)
-                } else {
-                    state.lockToSource(source.id)
+            let isDefault = state.config.defaultSourceID == source.id
+            let isLockedTo = state.isAppEnabled && isDefault
+            Toggle(isOn: Binding(
+                get: { isLockedTo },
+                set: { _ in
+                    if isLockedTo {
+                        // Clear just the global lock target — the app and any
+                        // one-shot switch rules stay alive. (Use Settings to turn
+                        // LockIME off entirely.)
+                        state.setDefaultSource(nil)
+                    } else {
+                        state.lockToSource(source.id)
+                    }
                 }
-            } label: {
+            )) {
                 Label {
                     Text(verbatim: source.localizedName)
                 } icon: {
-                    // NSMenu drops SwiftUI's `.opacity`, so a hidden-via-opacity
-                    // pin would show on every row. Swap the image itself
-                    // instead: the real pin when locked, a same-size empty
-                    // slot otherwise — keeping the gutter reserved at a constant
-                    // width either way.
-                    Image(nsImage: isLockedTo ? MenuIcon.pin : MenuIcon.blank)
+                    // NSMenu drops SwiftUI's `.opacity`, so swap the image itself
+                    // rather than hiding one, keeping the gutter reserved at a
+                    // constant width.
+                    Image(nsImage: isLockedTo ? MenuIcon.pin : (isDefault ? MenuIcon.pinOutline : MenuIcon.blank))
                 }
             }
         }
@@ -174,6 +180,7 @@ private enum MenuIcon {
     static let lockClosed = symbol("lock.fill")
     static let lockOpen = symbol("lock.open.fill")
     static let pin = symbol("pin.fill")
+    static let pinOutline = symbol("pin")
     static let gear = symbol("gearshape")
     static let update = symbol("arrow.down.circle")
     static let updateReady = symbol("arrow.down.circle.fill")

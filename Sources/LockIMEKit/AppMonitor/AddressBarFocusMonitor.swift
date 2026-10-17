@@ -168,10 +168,16 @@ public final class AddressBarFocusMonitor: AddressBarFocusMonitoring {
         // transition) must not be mistaken for the address bar.
         var pid: pid_t = 0
         guard AXUIElementGetPid(element, &pid) == .success, pid == observedPID else { return false }
+        let identifier = string(element, "AXIdentifier")
+        let domIdentifier = string(element, "AXDOMIdentifier")
+        let domClassList = stringArray(element, "AXDOMClassList")
+        guard AddressBarHeuristic.isCandidate(
+            identifier: identifier, domIdentifier: domIdentifier, domClassList: domClassList
+        ) else { return false }
         return AddressBarHeuristic.isAddressBar(
-            identifier: string(element, "AXIdentifier"),
-            domIdentifier: string(element, "AXDOMIdentifier"),
-            domClassList: stringArray(element, "AXDOMClassList"),
+            identifier: identifier,
+            domIdentifier: domIdentifier,
+            domClassList: domClassList,
             ancestorRoles: ancestorRoles(of: element)
         )
     }

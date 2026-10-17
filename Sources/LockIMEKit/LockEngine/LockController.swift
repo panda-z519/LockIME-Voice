@@ -54,6 +54,22 @@ public final class LockController {
     /// field's focus lifetime).
     public static let secureInputPollInterval: TimeInterval = 0.5
 
+    /// Polls kept at `secureInputPollInterval` before backing off — 10 s, which
+    /// covers typing a password. Secure input is process-global, so an app that
+    /// holds it for long (Terminal's Secure Keyboard Entry, an app that leaks
+    /// it) would otherwise wake LockIME twice a second indefinitely.
+    public static let secureInputFastPolls = 20
+    /// Ceiling of the backed-off secure-input poll.
+    public static let maxSecureInputPollInterval: TimeInterval = 4
+
+    /// The delay before secure-input poll number `tick` (0-based): fast for the
+    /// first `secureInputFastPolls`, then doubling up to the ceiling.
+    static func secureInputPollDelay(tick: Int) -> TimeInterval {
+        guard tick >= secureInputFastPolls else { return secureInputPollInterval }
+        let doublings = min(tick - secureInputFastPolls + 1, 4)
+        return min(secureInputPollInterval * pow(2, Double(doublings)), maxSecureInputPollInterval)
+    }
+
     /// Rolling window over which `.revertedSwitch` corrective forces count as
     /// one continuous fight. Sized to catch a programmatic opponent (which
     /// reverts our force within a second or two at most) while staying above
@@ -89,7 +105,8 @@ public final class LockController {
     /// actor after `delay` (mirrors `LockEngine.urlPollTask`'s Task+sleep style).
     public static let defaultScheduler: @MainActor (TimeInterval, @escaping @MainActor () -> Void) -> Void = { delay, work in
         Task { @MainActor in
-            try? await Task.sleep(for: .seconds(delay))
+            // A little tolerance lets macOS coalesce these wakeups with others.
+            try? await Task.sleep(for: .seconds(delay), tolerance: .seconds(delay * 0.1))
             work()
         }
     }
@@ -122,6 +139,8 @@ public final class LockController {
     private var pendingRecheck = false
     /// Coalesces overlapping secure-input watches into a single in-flight poll.
     private var secureWatchPending = false
+    /// Secure-input polls since secure input was last seen off.
+    private var secureWatchTicks = 0
     /// Uptime stamps of recent `.revertedSwitch` corrective forces, pruned to
     /// `conflictWindow`. A full window means the lock is fighting another IME
     /// manager, not correcting isolated drift.
@@ -340,6 +359,7 @@ public final class LockController {
             scheduleSecureInputWatch()
             return
         }
+        secureWatchTicks = 0
         // Conflict backoff: a recent tug-of-war conceded the source to the other
         // manager for a bounded pause — stand down until it expires (the expiry
         // wakeup then re-runs this decision).
@@ -480,7 +500,7 @@ public final class LockController {
     private func scheduleSecureInputWatch() {
         guard !secureWatchPending else { return }
         secureWatchPending = true
-        scheduler(Self.secureInputPollInterval) { [weak self] in
+        scheduler(Self.secureInputPollDelay(tick: secureWatchTicks)) { [weak self] in
             self?.performSecureInputWatch()
         }
     }
@@ -493,6 +513,7 @@ public final class LockController {
     /// notification.
     private func performSecureInputWatch() {
         secureWatchPending = false
+        secureWatchTicks += 1
         enforceIfNeeded(reason: .revertedSwitch)
     }
 

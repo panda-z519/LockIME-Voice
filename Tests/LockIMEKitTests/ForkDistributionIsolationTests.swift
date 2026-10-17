@@ -75,18 +75,25 @@ struct ForkDistributionIsolationTests {
         #expect(readme.contains("Settings ▸ Voice Input"))
     }
 
-    @Test("v0.1.5 release documentation includes changes screenshot and installers")
+    @Test("release documentation matches the version in project.yml")
     func releaseDocumentationIsComplete() throws {
         let project = try Self.read("project.yml")
         let readme = try Self.read("README.md")
         let screenshot = Self.path("docs/images/settings-voice-input-zh-CN.png")
 
-        #expect(project.contains(#"MARKETING_VERSION: "0.1.5""#))
+        // Read the version instead of pinning it, so a release only bumps
+        // project.yml — and this test then demands the docs follow.
+        let match = try #require(project.firstMatch(of: /MARKETING_VERSION: "([0-9.]+)"/))
+        let version = String(match.1)
         #expect(readme.contains("## Changes in LockIME Voice"))
         #expect(readme.contains("docs/images/settings-voice-input-zh-CN.png"))
-        #expect(readme.contains("LockIME-Voice-0.1.5-arm64.dmg"))
-        #expect(readme.contains("LockIME-Voice-0.1.5-x86_64.dmg"))
+        #expect(readme.contains("LockIME-Voice-\(version)-arm64.dmg"))
+        #expect(readme.contains("LockIME-Voice-\(version)-x86_64.dmg"))
         #expect(FileManager.default.fileExists(atPath: screenshot))
+        #expect(
+            FileManager.default.fileExists(atPath: Self.path("docs/release-notes/\(version).md")),
+            "the release workflow refuses to publish without docs/release-notes/\(version).md"
+        )
 
         let translations = try FileManager.default.contentsOfDirectory(
             atPath: Self.path("docs/README")
@@ -96,6 +103,7 @@ struct ForkDistributionIsolationTests {
             let translated = try Self.read("docs/README/\(file)")
             #expect(translated.contains("## Changes in LockIME Voice"), "\(file) missing changes section")
             #expect(translated.contains("../images/settings-voice-input-zh-CN.png"), "\(file) missing screenshot")
+            #expect(translated.contains("LockIME-Voice-\(version)-arm64.dmg"), "\(file) links an old installer")
         }
     }
 

@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 /// Integration facade tying together the input-source provider, the lock state
@@ -15,6 +16,21 @@ public final class LockEngine {
     private let addressBarMonitor: any AddressBarFocusMonitoring
     private let urlProvider: (any BrowserURLProviding)?
     private var urlPollTask: Task<Void, Never>?
+    /// Whether the launcher-overlay observers are attached. They run only while
+    /// LockIME is on: a launcher fires Accessibility notifications on every
+    /// keystroke typed into it, which is wasted work when nothing acts on them.
+    private var launcherMonitorRunning = false
+    /// The displays are asleep or the user switched away from this session:
+    /// nobody is browsing, so the URL poll stands down.
+    private var userAway = false
+    private var workspaceTokens: [any NSObjectProtocol] = []
+    /// Display names by source ID. Resolving one enumerates every input source
+    /// via TIS, and the name is needed on every source/app change; the cache is
+    /// dropped whenever the enabled sources change.
+    private var sourceNameCache: [InputSourceID: String] = [:]
+    /// Input-method installers and mode changes post the enabled-sources
+    /// notification in bursts; each one re-enumerates every source.
+    private let enabledSourcesDebouncer = Debouncer(delay: .milliseconds(200))
 
     /// Fired after every successful forced switch.
     public var onActivation: (@MainActor (ActivationEvent) -> Void)?
@@ -105,7 +121,8 @@ public final class LockEngine {
         observer.start { [weak self] in self?.handleSourceChange() }
         enabledSourcesObserver.start { [weak self] in self?.handleEnabledSourcesChange() }
         appMonitor.start { [weak self] id in self?.handleFrontmostChange(id) }
-        floatingAppMonitor.start { [weak self] id in self?.handleLauncherChange(id) }
+        updateLauncherMonitoring()
+        observeUserPresence()
         addressBarMonitor.start { [weak self] focused in self?.handleAddressBarFocusChange(focused) }
         updateAddressBarMonitoring()
         notifyCurrent()
@@ -116,9 +133,51 @@ public final class LockEngine {
         enabledSourcesObserver.stop()
         appMonitor.stop()
         floatingAppMonitor.stop()
+        launcherMonitorRunning = false
         addressBarMonitor.stop()
         urlPollTask?.cancel()
         urlPollTask = nil
+        enabledSourcesDebouncer.cancel()
+        for token in workspaceTokens {
+            NSWorkspace.shared.notificationCenter.removeObserver(token)
+        }
+        workspaceTokens.removeAll()
+    }
+
+    /// Attach the launcher-overlay observers while LockIME is on, detach them
+    /// while it is off (dropping any launcher attribution with them).
+    private func updateLauncherMonitoring() {
+        if config.isEnabled {
+            guard !launcherMonitorRunning else { return }
+            launcherMonitorRunning = true
+            floatingAppMonitor.start { [weak self] id in self?.handleLauncherChange(id) }
+        } else {
+            guard launcherMonitorRunning else { return }
+            launcherMonitorRunning = false
+            floatingAppMonitor.stop()
+            launcherBundleID = nil
+        }
+    }
+
+    /// Pause the URL poll while the displays sleep or the session is switched
+    /// away, and resume it on return.
+    private func observeUserPresence() {
+        guard workspaceTokens.isEmpty else { return }
+        let center = NSWorkspace.shared.notificationCenter
+        let away = [NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification]
+        let back = [NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification]
+        for (names, isAway) in [(away, true), (back, false)] {
+            for name in names {
+                let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated {
+                        guard let self, self.userAway != isAway else { return }
+                        self.userAway = isAway
+                        self.updateURLPolling()
+                    }
+                }
+                workspaceTokens.append(token)
+            }
+        }
     }
 
     /// Re-attempt launcher-overlay observer attachment. macOS doesn't notify us
@@ -139,6 +198,7 @@ public final class LockEngine {
     /// since whichever fires is the one that emits the activation event.
     public func apply(_ config: LockConfiguration, reason: ActivationReason = .configChanged) {
         self.config = config
+        updateLauncherMonitoring()
         // Thread the secure-input policy to the controller BEFORE any enforce
         // this apply may trigger (reevaluate / setEnabled below both can force),
         // so the very first enforcement already honors the current policy.
@@ -207,7 +267,10 @@ public final class LockEngine {
 
     public func currentSourceName() -> String {
         guard let id = provider.currentSourceID() else { return "—" }
-        return provider.source(for: id)?.localizedName ?? id.rawValue
+        if let cached = sourceNameCache[id] { return cached }
+        guard let name = provider.source(for: id)?.localizedName else { return id.rawValue }
+        sourceNameCache[id] = name
+        return name
     }
 
     // MARK: - Internal event handling
@@ -219,7 +282,11 @@ public final class LockEngine {
     }
 
     private func handleEnabledSourcesChange() {
-        onSelectableSourcesChange?(provider.selectableSources())
+        sourceNameCache.removeAll()
+        enabledSourcesDebouncer.schedule { [weak self] in
+            guard let self else { return }
+            self.onSelectableSourcesChange?(self.provider.selectableSources())
+        }
     }
 
     private func handleFrontmostChange(_ bundleID: String?) {
@@ -372,7 +439,10 @@ public final class LockEngine {
     /// the returned `pattern` is the matched rule's own pattern (a stable per-rule
     /// key for the one-shot dedup and the "why" shown in the activation log).
     private func enhancedURLMatch() -> (id: InputSourceID, pattern: String, action: RuleAction)? {
-        guard config.enhancedModeEnabled, let urlProvider, !config.urlRules.isEmpty else { return nil }
+        // Gated on the master switch like the poll: while LockIME is off the URL
+        // would be read (a full Accessibility tree walk) only to be discarded.
+        guard config.isEnabled, config.enhancedModeEnabled, let urlProvider, !config.urlRules.isEmpty
+        else { return nil }
         let urlString = urlProvider.currentURL(forBundleID: effectiveBundleID) ?? ""
         guard let rule = URLMatcher.matchedRule(urlString: urlString, rules: config.urlRules)
         else { return nil }
@@ -389,11 +459,12 @@ public final class LockEngine {
         // The master switch gates observation too: while LockIME is off it
         // must stop reading browser URLs, not just refrain from acting on them.
         guard config.isEnabled, config.enhancedModeEnabled, urlProvider != nil, !config.urlRules.isEmpty,
-              BrowserBundleIDs.isBrowser(effectiveBundleID)
+              !userAway, BrowserBundleIDs.isBrowser(effectiveBundleID)
         else { return }
         urlPollTask = Task { @MainActor [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .milliseconds(1500))
+                // Tolerance lets macOS batch this wakeup with others.
+                try? await Task.sleep(for: .milliseconds(1500), tolerance: .milliseconds(500))
                 if Task.isCancelled { break }
                 guard let self else { break }
                 // reevaluate() upgrades the reason to .urlMatched when a URL

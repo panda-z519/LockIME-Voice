@@ -12,14 +12,10 @@ name: Release
 on:
   push:
     tags: ["v*"]
-  # Allow a dry run from the Actions tab: builds and verifies everything, then
-  # uploads the installers as workflow artifacts instead of creating a Release.
+  # A manual run from the Actions tab is always a dry run: it builds and
+  # verifies everything and uploads the installers as workflow artifacts. Only a
+  # tag push publishes (the publish steps are gated on `refs/tags/`).
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Build and verify only (no GitHub Release)"
-        type: boolean
-        default: true
 
 concurrency:
   group: release-${{ github.ref }}
@@ -254,15 +250,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${GITHUB_REF_NAME#v}"
-          # --clobber makes a re-run of the same tag idempotent instead of failing
-          # on the already-uploaded assets.
-          gh release create "$GITHUB_REF_NAME" \
-            --title "LockIME Voice $version" \
-            --notes-file release-body.md \
-            --verify-tag \
-            dist/*.dmg dist/SHA256SUMS.txt \
-            || gh release upload "$GITHUB_REF_NAME" \
-                 dist/*.dmg dist/SHA256SUMS.txt --clobber
+          # A re-run of the same tag updates the existing Release — assets *and*
+          # notes — instead of failing. Decided up front rather than with
+          # `create || upload`, which also swallowed real `create` failures.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" \
+              dist/*.dmg dist/SHA256SUMS.txt --clobber
+            gh release edit "$GITHUB_REF_NAME" \
+              --title "LockIME Voice $version" \
+              --notes-file release-body.md
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "LockIME Voice $version" \
+              --notes-file release-body.md \
+              --verify-tag \
+              dist/*.dmg dist/SHA256SUMS.txt
+          fi
 
       - name: Summary
         run: |

@@ -19,6 +19,12 @@ public final class LogStore {
     }
 
     public let container: ModelContainer
+    /// Saves are coalesced: a forced switch can come in quick bursts (app hops,
+    /// a tug-of-war), and each save is a synchronous SQLite write on the main
+    /// thread. Unsaved inserts are still visible to every fetch on the main
+    /// context (the log pane, the `list-log` API); `flush()` persists them.
+    private let saveDebouncer = Debouncer(delay: .seconds(2))
+    private var hasUnsavedEntries = false
 
     public init(inMemory: Bool = false, directoryOverride: URL? = nil) {
         let configuration: ModelConfiguration
@@ -47,16 +53,29 @@ public final class LogStore {
     /// which the non-UI kit avoids).
     public func record(_ event: ActivationEvent, triggeringAppName: String? = nil) {
         container.mainContext.insert(ActivationLogEntry(event, triggeringAppName: triggeringAppName))
+        hasUnsavedEntries = true
+        saveDebouncer.schedule { [weak self] in self?.flush() }
+    }
+
+    /// Persist any recorded entries now. Called on shutdown, and by the
+    /// coalescing timer.
+    public func flush() {
+        saveDebouncer.cancel()
+        guard hasUnsavedEntries else { return }
+        hasUnsavedEntries = false
         do {
             try container.mainContext.save()
         } catch {
-            Self.log.error("Failed to save activation log entry: \(error.localizedDescription, privacy: .public)")
+            Self.log.error("Failed to save activation log entries: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     /// Delete entries older than `retention` relative to `now`.
     public func purgeExpired(now: Date = .now, retention: TimeInterval = LogStore.retention) {
         let cutoff = now.addingTimeInterval(-retention)
+        // The batch delete runs against the store, so entries still pending in
+        // the context would escape it: persist them first.
+        flush()
         do {
             try container.mainContext.delete(
                 model: ActivationLogEntry.self,

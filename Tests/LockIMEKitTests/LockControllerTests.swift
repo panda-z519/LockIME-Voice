@@ -412,6 +412,38 @@ struct LockControllerTests {
         #expect(provider.selectCalls == [us])
     }
 
+    @Test("a long-held secure input backs the poll off instead of waking twice a second")
+    func secureInputWatchBacksOff() {
+        let secure = FakeSecureInput()
+        let scheduler = FakeScheduler()
+        let (controller, provider, _) = make(
+            current: us, enabled: true, revertsInSecureInput: false, secureInput: secure, scheduler: scheduler
+        )
+        controller.setTarget(us)
+        secure.isEnabled = true
+        provider.current = abc
+        controller.selectedSourceDidChange()
+
+        for _ in 0..<40 { #expect(scheduler.fire()) }
+        let delays = scheduler.scheduledDelays.filter { $0 <= LockController.maxSecureInputPollInterval }
+        #expect(delays.prefix(LockController.secureInputFastPolls).allSatisfy {
+            $0 == LockController.secureInputPollInterval
+        })
+        #expect(delays.last == LockController.maxSecureInputPollInterval)
+        #expect(provider.selectCalls.isEmpty)
+
+        // Secure input ends: the next tick re-asserts, and a later secure field
+        // starts again at the fast rate.
+        secure.isEnabled = false
+        #expect(scheduler.fire())
+        #expect(provider.selectCalls == [us])
+        while scheduler.fire() {}
+        secure.isEnabled = true
+        provider.current = abc
+        controller.selectedSourceDidChange()
+        #expect(scheduler.scheduledDelays.last == LockController.secureInputPollInterval)
+    }
+
     @Test("changing the target supersedes the suppression window")
     func targetChangeBypassesWindow() {
         let (controller, provider, uptime) = make(current: us, enabled: true)

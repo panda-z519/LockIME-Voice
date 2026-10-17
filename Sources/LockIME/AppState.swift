@@ -29,11 +29,19 @@ final class AppState {
     /// the shortcut-conflict prompts).
     private(set) var eventPostingGranted: Bool = false
 
-    /// Whether the voice key has been recorded. The pane and the monitor both ask
-    /// this one question, so the displayed state cannot drift from the value the
-    /// tap actually owns.
+    /// Whether the voice key has been recorded. The pane and the monitor both read
+    /// `voiceInputConfig.voiceShortcut`, so the displayed key cannot drift from
+    /// the key the tap actually owns.
     var voiceKeyConfigured: Bool {
-        KeyboardShortcuts.getShortcut(for: .voiceInput) != nil
+        voiceInputConfig.voiceShortcut != nil
+    }
+
+    /// Set by the voice-key editor while it is capturing a key, so the consuming
+    /// tap lets that key reach the editor instead of swallowing it. Pushed to the
+    /// monitor rather than polled: the tap runs off the main thread and must not
+    /// read AppKit state.
+    @ObservationIgnored var isRecordingVoiceKey = false {
+        didSet { voiceKeyMonitor?.yieldsKey = isRecordingVoiceKey }
     }
 
     var voiceInputPermissionsGranted: Bool {
@@ -120,74 +128,6 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// old KeyboardShortcuts trigger, which could not stop the key reaching the
     /// input method and so produced the shortcut-conflict prompt.
     @ObservationIgnored private var voiceKeyMonitor: CGConsumingVoiceKeyMonitor?
-    /// Whether LockIME's own Settings window currently holds keyboard focus. The
-    /// consuming tap yields the voice key in that case, so the in-app recorder can
-    /// read it instead of having the press swallowed.
-    ///
-    /// Deliberately derived from the *window* being key rather than set by a
-    /// SwiftUI `onAppear` on the recorder: `onAppear` fires when the view is
-    /// built, so it would disable the tap for as long as the pane existed — and
-    /// the voice key would fall through to the input method, which is exactly the
-    /// conflict this design removes.
-    /// Whether one of our own ordinary windows (Settings) is currently key, which
-    /// is when the in-app recorder may be reading the voice key.
-    ///
-    /// Maintained from AppKit's notifications rather than polled from inside the
-    /// event-tap callback: polling `NSApp.windows` proved racy — a window that had
-    /// just closed could still be reported as key, so the tap kept yielding
-    /// afterwards and the voice key silently stopped working.
-    var isSettingsWindowFocused: Bool { settingsWindowFocused }
-
-    @ObservationIgnored private var settingsWindowFocused = false
-    @ObservationIgnored private var windowObservers: [any NSObjectProtocol] = []
-
-    private func startObservingWindowFocus() {
-        guard windowObservers.isEmpty else { return }
-        let center = NotificationCenter.default
-        let names: [Notification.Name] = [
-            NSWindow.didBecomeKeyNotification,
-            NSWindow.didResignKeyNotification,
-            NSWindow.willCloseNotification,
-        ]
-        for name in names {
-            let token = center.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
-                // `Notification` is not Sendable, so take the only fact we need
-                // (is this one of our own ordinary windows?) before hopping to
-                // the main actor.
-                let isStatusItemWindow = (note.object as? NSWindow)
-                    .map { $0.className.contains("NSStatusBarWindow") } ?? true
-                MainActor.assumeIsolated {
-                    guard let self, !isStatusItemWindow else { return }
-                    switch name {
-                    case NSWindow.didBecomeKeyNotification:
-                        self.settingsWindowFocused = true
-                    case NSWindow.didResignKeyNotification, NSWindow.willCloseNotification:
-                        // Only clear when nothing else of ours is key, so closing
-                        // an auxiliary window while Settings stays open is safe.
-                        self.settingsWindowFocused = self.anyOwnWindowIsKey()
-                    default:
-                        break
-                    }
-                }
-            }
-            windowObservers.append(token)
-        }
-    }
-
-    private func stopObservingWindowFocus() {
-        for token in windowObservers { NotificationCenter.default.removeObserver(token) }
-        windowObservers.removeAll()
-        settingsWindowFocused = false
-    }
-
-    /// Re-derives the flag from the live window list. Used on the events that can
-    /// clear it, and safe to call at any time.
-    private func anyOwnWindowIsKey() -> Bool {
-        NSApp.windows.contains { window in
-            !window.className.contains("NSStatusBarWindow")
-                && (window.isKeyWindow || window.isMainWindow)
-        }
-    }
     @ObservationIgnored private var purgeTask: Task<Void, Never>?
     @ObservationIgnored private var shortcutObserver: (any NSObjectProtocol)?
 
@@ -359,12 +299,9 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         voiceInputCoordinator.voiceShortcutProvider = { [weak self] in
             self?.voiceKeyShortcut
         }
-        voiceInputCoordinator.voiceShortcutProvider = { [weak self] in
-            self?.voiceKeyShortcut
-        }
         self.voiceInputCoordinator = voiceInputCoordinator
+        migrateRecordedVoiceKey()
         voiceKeyMonitor = CGConsumingVoiceKeyMonitor()
-        startObservingWindowFocus()
         accessibilityGranted = AXIsProcessTrusted()
         eventPostingGranted = CGPreflightPostEventAccess()
         // Arm the consuming tap now that it exists. Without this the voice key
@@ -387,16 +324,21 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             let appName = event.triggeringBundleID.map(AppDisplay.name(for:))
             self.logStore.record(event, triggeringAppName: appName)
         }
+        // Assign only on a real change: `@Observable` notifies on every write,
+        // and these fire on each app switch — an open Settings window would
+        // otherwise re-render for nothing.
         engine.onCurrentSourceChange = { [weak self] name in
-            self?.currentSourceName = name
+            guard let self, self.currentSourceName != name else { return }
+            self.currentSourceName = name
         }
         engine.onFrontmostChange = { [weak self] bundleID in
-            self?.frontmostBundleID = bundleID
+            guard let self, self.frontmostBundleID != bundleID else { return }
+            self.frontmostBundleID = bundleID
         }
         // Keep the tray switcher and Settings pickers in sync when the user
         // adds or removes an input source in System Settings while we run.
         engine.onSelectableSourcesChange = { [weak self] sources in
-            guard let self else { return }
+            guard let self, self.availableSources != sources else { return }
             self.availableSources = sources
             self.voiceInputRuntimeError = nil
             self.refreshVoiceKeyMonitor()
@@ -481,14 +423,15 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         // coordinator's cleanup callback re-runs the pending state refresh, so
         // doing it in this order leaves the observable flags consistent instead
         // of letting the callback re-set them from the dying session.
-        stopObservingWindowFocus()
         voiceKeyMonitor?.stop()
         voiceKeyMonitor = nil
         voiceInputCoordinator?.stopActiveSession()
         voiceInputCoordinator = nil
         voiceInputSessionInProgress = false
         voiceInputRuntimeError = nil
+        purgeTask?.cancel()
         purgeTask = nil
+        logStore.flush()
         accessibilityWatcher.stop()
         if let shortcutObserver {
             NotificationCenter.default.removeObserver(shortcutObserver)
@@ -818,6 +761,8 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             handleAccessibilityGranted()
         } else {
             engine?.accessibilityDidChange()
+            // The tap dies with the grant; re-arming surfaces that in the pane.
+            refreshVoiceKeyMonitor(force: true)
         }
     }
 
@@ -851,8 +796,9 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     }
 
     /// Open System Settings to the page that governs synthetic key events. The
-    /// permission itself is *posting* (`CGPreflightPostEventAccess`), but macOS
-    /// grants it from the Input Monitoring list — there is no separate pane.
+    /// permission itself is *posting* (`CGPreflightPostEventAccess`), and macOS
+    /// lists it under Accessibility — Input Monitoring only covers *reading*
+    /// keys, so granting it there would leave this permission missing.
     func requestEventPostingAccess(
         localeIdentifier: String?,
         suggestedAppURLs: [URL],
@@ -860,10 +806,11 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     ) {
         permissionFlow.setLocaleIdentifier(localeIdentifier)
         permissionFlow.authorize(
-            pane: .inputMonitoring,
+            pane: .accessibility,
             suggestedAppURLs: suggestedAppURLs,
             sourceFrameInScreen: sourceFrame
         )
+        accessibilityWatcher.start { [weak self] in self?.completeAccessibilityGrant() }
     }
 
     /// Run when the grant is detected: close the floating helper (the system
@@ -883,6 +830,9 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         permissionFlow.closePanel(returnToPreviousApp: true)
         accessibilityWatcher.stop()
         engine?.accessibilityDidChange()
+        // The consuming tap could not be created without the grant; create it
+        // now so the voice key works without a relaunch.
+        refreshVoiceKeyMonitor(force: true)
     }
 
     #if DEBUG
@@ -924,15 +874,25 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         print("AXFLOW: \(panelClosed && toggleEnabled ? "ALL PASS" : "FAILED")")
     }
     #endif
-    /// LockIME's own voice trigger fired. One click, one handler: the session is
-    /// toggled and the input method's own key is only ever *synthesized* — never
-    /// also delivered to us — which is what removes the conflict prompt.
+
     /// The single voice key, recorded by the user. It is both the key LockIME
     /// consumes and the key it echoes to the input method, so there is nothing to
     /// keep in sync and no chance of the two drifting apart.
     private var voiceKeyShortcut: VoiceShortcut? {
-        guard let recorded = KeyboardShortcuts.getShortcut(for: .voiceInput) else { return nil }
-        return VoiceShortcut(recorded: recorded)
+        voiceInputConfig.voiceShortcut
+    }
+
+    /// v0.1.4–0.1.5 kept the voice key in `KeyboardShortcuts` (`.voiceInput`),
+    /// whose recorder cannot capture a lone modifier such as right ⌥ — a common
+    /// voice key. It now lives in the voice configuration; carry an existing
+    /// recording over once and clear the old slot so there is a single store.
+    private func migrateRecordedVoiceKey() {
+        guard let recorded = KeyboardShortcuts.getShortcut(for: .voiceInput) else { return }
+        // The recorded key is the one those builds actually owned, so it wins
+        // over any value a v0.1.3 configuration left behind.
+        voiceInputConfig.voiceShortcut = VoiceShortcut(recorded: recorded)
+        persistVoiceInputConfig()
+        KeyboardShortcuts.setShortcut(nil, for: .voiceInput)
     }
 
     /// Install (or tear down) the consuming tap that owns the voice key.
@@ -940,25 +900,30 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// The tap swallows the key so the input method never sees the physical
     /// press — that is what removes the conflict prompt — and LockIME then sends
     /// the same key back, marked so the tap ignores its own output.
-    func refreshVoiceKeyMonitor() {
+    ///
+    /// Called after every config commit and source-list change, so it leaves a
+    /// running tap alone when it already owns the right key: recreating it costs
+    /// a WindowServer round-trip and drops a press in flight. `force` rebuilds it
+    /// anyway — after a permission change the old tap may be dead.
+    func refreshVoiceKeyMonitor(force: Bool = false) {
         guard let voiceKeyMonitor else { return }
         guard voiceInputConfig.isEnabled, let shortcut = voiceKeyShortcut else {
             voiceKeyMonitor.stop()
             return
         }
+        if !force, voiceKeyMonitor.activeShortcut == shortcut { return }
         do {
-            voiceKeyMonitor.shouldYieldKey = { [weak self] in
-                self?.isSettingsWindowFocused ?? false
-            }
-            try voiceKeyMonitor.start(keyCode: shortcut.keyCode) { [weak self] event in
+            try voiceKeyMonitor.start(shortcut: shortcut) { [weak self] event in
                 switch event {
                 case .pressed:
                     self?.handleVoiceInputWorkflowToggled()
                 case .released:
-                    // The single-key behavior ends on a second press, so a release
-                    // carries no action of its own.
-                    break
+                    // Shortcut-only mode mirrors the key: lift the echo now.
+                    self?.voiceInputCoordinator?.handleWorkflowShortcutReleased()
                 }
+            }
+            if voiceInputRuntimeError == .eventTapUnavailable {
+                voiceInputRuntimeError = nil
             }
         } catch {
             // No Accessibility grant means no tap, so the key cannot be owned and
@@ -972,6 +937,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     private func handleVoiceInputWorkflowToggled() {
         guard let voiceInputCoordinator else { return }
         Self.log.notice("Voice workflow trigger pressed")
+        voiceInputRuntimeError = nil
         do {
             try voiceInputCoordinator.handleWorkflowShortcutPressed(
                 config: voiceInputConfig,

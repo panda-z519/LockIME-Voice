@@ -449,7 +449,7 @@ struct ImportPlanTests {
 
     @Test("outcome reports imported and inactive counts")
     func outcomeReceipt() {
-        var plan = ImportPlan(current: .default, backup: backup(
+        let plan = ImportPlan(current: .default, backup: backup(
             appRules: [
                 AppRule(bundleID: "com.ok", mode: .locked, lockedSourceID: "US"),
                 AppRule(bundleID: "com.missing", mode: .locked, lockedSourceID: "Missing"),
