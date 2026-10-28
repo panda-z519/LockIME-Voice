@@ -128,6 +128,10 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// old KeyboardShortcuts trigger, which could not stop the key reaching the
     /// input method and so produced the shortcut-conflict prompt.
     @ObservationIgnored private var voiceKeyMonitor: CGConsumingVoiceKeyMonitor?
+    /// Re-checks the tap when the app becomes active, so an out-of-band grant
+    /// (the user switching back from System Settings, or re-authorizing after an
+    /// ad-hoc-signed update reset it) heals without a relaunch.
+    @ObservationIgnored private var appActivationObserver: (any NSObjectProtocol)?
     @ObservationIgnored private var purgeTask: Task<Void, Never>?
     @ObservationIgnored private var shortcutObserver: (any NSObjectProtocol)?
 
@@ -308,6 +312,7 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         // would be recorded but never owned, and pressing it would fall through
         // to the input method — the original conflict.
         refreshVoiceKeyMonitor()
+        startObservingAppActivation()
         engine.onActivation = { [weak self] event in
             guard let self else { return }
             // `.conflictPaused` is the one diagnostic (non-switch) event: log it
@@ -417,6 +422,29 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         }
     }
 
+    /// Re-arm the consuming tap on activation.
+    ///
+    /// macOS never notifies us when Accessibility is granted, and every
+    /// ad-hoc-signed update resets it, so a grant made outside this app's own
+    /// permission flow would otherwise leave the voice key dead until the next
+    /// relaunch. Only a tap that failed to install is retried, so a healthy tap
+    /// is never rebuilt on a mere app switch.
+    private func startObservingAppActivation() {
+        guard appActivationObserver == nil else { return }
+        appActivationObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.refreshAccessibilityStatus()
+                self.refreshVoiceInputPermissionStatus()
+                if self.voiceInputRuntimeError == .eventTapUnavailable {
+                    self.refreshVoiceKeyMonitor(force: true)
+                }
+            }
+        }
+    }
+
     /// Tear down observers and the purge loop for a clean shutdown.
     func stop() {
         // Abandon a live voice session *before* clearing the cached flags: the
@@ -436,6 +464,10 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         if let shortcutObserver {
             NotificationCenter.default.removeObserver(shortcutObserver)
             self.shortcutObserver = nil
+        }
+        if let appActivationObserver {
+            NotificationCenter.default.removeObserver(appActivationObserver)
+            self.appActivationObserver = nil
         }
     }
 

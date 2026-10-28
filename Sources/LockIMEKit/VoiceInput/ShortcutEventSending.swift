@@ -1,8 +1,15 @@
+import ApplicationServices
 import CoreGraphics
 import Foundation
 
 public enum ShortcutEventSenderError: Error, Equatable {
     case eventCreationFailed
+    /// macOS will not let this process post synthetic key events (the
+    /// Accessibility / "post event" grant is missing), so `CGEvent.post` would
+    /// silently drop the key. Reported instead of pretending the session
+    /// started: a silent drop is indistinguishable from "the input method never
+    /// woke up", which is exactly the bug users report.
+    case postingUnavailable
 }
 
 @MainActor
@@ -22,6 +29,7 @@ public final class CGShortcutEventSender: ShortcutEventSending {
     /// delivering down and up back to back — a zero-length press some input
     /// methods ignore.
     public func sendTap(_ shortcut: VoiceShortcut) throws {
+        try Self.ensureCanPostEvents()
         // Build both events up front so a failure surfaces here, synchronously,
         // instead of as a stuck key-down.
         let down = try makeEvent(shortcut, keyDown: true)
@@ -36,13 +44,24 @@ public final class CGShortcutEventSender: ShortcutEventSending {
     }
 
     public func sendKeyDown(_ shortcut: VoiceShortcut) throws {
+        try Self.ensureCanPostEvents()
         let event = try makeEvent(shortcut, keyDown: true)
         event.post(tap: .cghidEventTap)
     }
 
     public func sendKeyUp(_ shortcut: VoiceShortcut) throws {
+        try Self.ensureCanPostEvents()
         let event = try makeEvent(shortcut, keyDown: false)
         event.post(tap: .cghidEventTap)
+    }
+
+    /// `CGEvent.post` has no return value: without the grant it silently does
+    /// nothing, so the caller would report a running session that never reached
+    /// the input method. Checked up front so the failure is reportable.
+    private static func ensureCanPostEvents() throws {
+        guard CGPreflightPostEventAccess() else {
+            throw ShortcutEventSenderError.postingUnavailable
+        }
     }
 
     static func tapDelayMicroseconds(for shortcut: VoiceShortcut) -> useconds_t {

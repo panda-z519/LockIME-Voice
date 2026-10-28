@@ -74,11 +74,21 @@ struct VoiceInputSettingsPane: View {
                     AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
                 }
 
-                if state.voiceInputRuntimeError != nil {
-                    VoiceInputStatusNote(
-                        "The last voice input workflow failed. Check that the configured input source is still available and that the shortcut matches your input method.",
-                        systemImage: "exclamationmark.triangle"
-                    )
+                // Name the actual failure. "The workflow failed" is useless when
+                // the fix is a permission: macOS dropping our synthetic key looks
+                // exactly like "the input method never woke up".
+                if let failure = state.voiceInputRuntimeError {
+                    switch failure {
+                    case .eventTapUnavailable:
+                        AccessibilityRequiredNote("Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict")
+                    case .eventPostingUnavailable:
+                        AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
+                    default:
+                        VoiceInputStatusNote(
+                            "The last voice input workflow failed. Check that the configured input sources are still available.",
+                            systemImage: "exclamationmark.triangle"
+                        )
+                    }
                 }
             } header: {
                 Text("Voice Trigger")

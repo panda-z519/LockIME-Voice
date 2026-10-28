@@ -334,6 +334,32 @@ struct VoiceInputCoordinatorTests {
         #expect(engine.endCount == 1)
     }
 
+    @Test("macOS refusing to post our key is reported as a permission problem")
+    func postingUnavailableIsReportedAsPermission() throws {
+        // Not interchangeable with a generic send failure: only this one is fixed
+        // by granting Accessibility, so a user told "the workflow failed" cannot
+        // act on it. `CGEvent.post` returns no error, which is why the sender
+        // preflights the grant instead.
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+        let config = makeSwitchingConfig(shortcut: shortcut)
+        sender.shouldFail = true
+        sender.failure = .postingUnavailable
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        )
+
+        #expect(coordinator.state == .failed(.eventPostingUnavailable))
+        // The source is still handed back: the session never reached the input
+        // method, so leaving the user on the voice source would strand them.
+        #expect(engine.switches == [voice, daily])
+    }
+
     @Test("a missing voice shortcut fails before any override is taken")
     func missingVoiceShortcutDoesNotBeginOverride() {
         let engine = RecordingVoiceOverrideEngine()

@@ -23,6 +23,10 @@ public enum VoiceInputCoordinatorError: Error, Equatable, Sendable {
     case switchToVoiceFailed(InputSourceID)
     case restoreDefaultFailed(InputSourceID)
     case shortcutSendFailed
+    /// macOS would not accept our synthetic key, so the input method was never
+    /// woken. Kept apart from `shortcutSendFailed` because only this one is
+    /// fixed by granting (or re-granting) Accessibility.
+    case eventPostingUnavailable
     /// The consuming voice-key tap could not be installed (missing Accessibility
     /// grant), so the key cannot be owned and the workflow cannot run.
     case eventTapUnavailable

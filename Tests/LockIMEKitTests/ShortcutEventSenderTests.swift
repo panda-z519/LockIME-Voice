@@ -93,19 +93,22 @@ final class RecordingShortcutEventSender: ShortcutEventSending {
 
     private(set) var events: [Event] = []
     var shouldFail = false
+    /// Which failure to raise while `shouldFail` is set, so a test can pin how a
+    /// permission problem is reported versus any other send failure.
+    var failure: ShortcutEventSenderError = .eventCreationFailed
 
     func sendTap(_ shortcut: VoiceShortcut) throws {
-        if shouldFail { throw ShortcutEventSenderError.eventCreationFailed }
+        if shouldFail { throw failure }
         events.append(.tap(shortcut))
     }
 
     func sendKeyDown(_ shortcut: VoiceShortcut) throws {
-        if shouldFail { throw ShortcutEventSenderError.eventCreationFailed }
+        if shouldFail { throw failure }
         events.append(.keyDown(shortcut))
     }
 
     func sendKeyUp(_ shortcut: VoiceShortcut) throws {
-        if shouldFail { throw ShortcutEventSenderError.eventCreationFailed }
+        if shouldFail { throw failure }
         events.append(.keyUp(shortcut))
     }
 }

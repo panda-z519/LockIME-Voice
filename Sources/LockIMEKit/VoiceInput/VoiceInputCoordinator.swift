@@ -206,7 +206,7 @@ public final class VoiceInputCoordinator {
                 echoedKeyDown = voiceShortcut
                 state = .idle
             } catch {
-                state = .failed(.shortcutSendFailed)
+                state = .failed(Self.failure(for: error))
             }
             return
         }
@@ -300,7 +300,7 @@ public final class VoiceInputCoordinator {
             state = .voiceActive
             armRestoreTimeout(config: config, generation: generation)
         } catch {
-            failAndRestore(.shortcutSendFailed, reason: .shortcutSendFailed)
+            failAndRestore(Self.failure(for: error), reason: .shortcutSendFailed)
         }
     }
 
@@ -318,8 +318,9 @@ public final class VoiceInputCoordinator {
                 // input method: hand the source back anyway (the opponent in a
                 // `holdToSpeak`-style config can't be ended, but the user's
                 // typing source still has to be restored).
-                failAndRestore(.shortcutSendFailed, reason: .shortcutSendFailed)
-                throw VoiceInputCoordinatorError.shortcutSendFailed
+                let failure = Self.failure(for: error)
+                failAndRestore(failure, reason: .shortcutSendFailed)
+                throw failure
             }
         }
         // Give the input method time to commit the recognized text before the
@@ -416,8 +417,20 @@ public final class VoiceInputCoordinator {
         do {
             try sender.sendKeyUp(echoed)
         } catch {
-            state = .failed(.shortcutSendFailed)
+            state = .failed(Self.failure(for: error))
         }
+    }
+
+    /// Distinguish "macOS refused to post our key" from a generic send failure:
+    /// only the former is fixed by granting (or re-granting) Accessibility, and a
+    /// user told "the workflow failed" cannot act on it.
+    private static func failure(for error: Error) -> VoiceInputCoordinatorError {
+        if let senderError = error as? ShortcutEventSenderError,
+           senderError == .postingUnavailable {
+            Self.log.error("Voice shortcut not sent: macOS refused to post events")
+            return .eventPostingUnavailable
+        }
+        return .shortcutSendFailed
     }
 
     private func failAndRestore(

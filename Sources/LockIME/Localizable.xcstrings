@@ -15185,6 +15185,110 @@
           }
         }
       }
+    },
+    "Voice shortcut": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音快捷键"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音快速鍵"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声ショートカット"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourci vocal"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprach-Tastenkürzel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajo de voz"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atalho de voz"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Голосовое сочетание клавиш"
+          }
+        }
+      }
+    },
+    "Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入需要辅助功能权限来接管语音快捷键，这样 macOS 才不会继续报告快捷键冲突"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入需要輔助功能權限來接管語音快速鍵，這樣 macOS 才不會繼續回報快速鍵衝突"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力が音声ショートカットを引き継ぐにはアクセシビリティ権限が必要です。これがないと macOS がショートカットの競合を報告し続けます"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La saisie vocale a besoin de l'autorisation Accessibilité pour prendre le raccourci vocal en charge ; sans elle, macOS continue de signaler un conflit de raccourci"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Spracheingabe benötigt die Bedienungshilfen-Berechtigung, um das Sprach-Tastenkürzel zu übernehmen; ohne sie meldet macOS weiterhin einen Tastenkürzel-Konflikt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La entrada de voz necesita permiso de Accesibilidad para tomar el atajo de voz; sin él, macOS sigue avisando de un conflicto de atajos"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A entrada por voz precisa da permissão de Acessibilidade para assumir o atalho de voz; sem ela, o macOS continua a avisar de um conflito de atalhos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для голосового ввода нужен доступ в разделе «Универсальный доступ», чтобы перехватывать голосовое сочетание клавиш; без него macOS продолжит сообщать о конфликте сочетаний"
+          }
+        }
+      }
     }
   }
 }
