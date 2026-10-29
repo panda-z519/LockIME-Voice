@@ -173,6 +173,23 @@ struct VoiceTypingInterruptTests {
         #expect(!decision.consume)
     }
 
+    @Test("a bare-modifier voice key still sees typing")
+    func bareModifierShortcutSeesTyping() {
+        // The regression that mattered in practice: right ⌘ is a *modifier* key,
+        // so its branch in the matcher only handled flagsChanged and returned
+        // early for key-downs — ordinary typing was never reported and the
+        // session ran until the safety timeout instead of ending on the first
+        // keystroke.
+        var matcher = VoiceKeyMatcher(shortcut: VoiceShortcut(keyCode: 54, modifiers: [.command]))
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 0, modifiers: [.command],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == .otherKeyDown)
+        #expect(!decision.consume)
+    }
+
     @Test("the voice key itself is never reported as typing")
     func voiceKeyIsNotTyping() {
         var matcher = VoiceKeyMatcher(shortcut: voiceKey)

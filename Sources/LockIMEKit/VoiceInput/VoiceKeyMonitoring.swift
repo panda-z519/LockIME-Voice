@@ -85,6 +85,22 @@ public struct VoiceKeyMatcher: Sendable {
         // treat its own output as a new press and loop.
         guard !isMarked else { return .pass }
 
+        // Any key that is *not* the voice key going down while a session owns the
+        // input source is the user typing: report it (never consume it) so the
+        // session hands the source back instead of waiting out the safety
+        // timeout. Checked before the shape-specific branches below, because a
+        // bare-modifier voice key (right ⌘, right ⌥) never reaches the ordinary
+        // key path — putting this inside it made typing invisible for exactly
+        // those, the most common voice keys of all.
+        if interruptsOnTyping, kind == .keyDown {
+            let isVoiceKeyDown = !shortcut.isModifierKey
+                && keyCode == shortcut.keyCode
+                && modifiers == shortcut.modifiers
+            if !isVoiceKeyDown {
+                return Decision(consume: false, event: .otherKeyDown)
+            }
+        }
+
         if shortcut.isModifierKey {
             // A bare modifier key arrives as flagsChanged; match on the modifier
             // this shortcut stands for, not on the raw key code, so both the left
@@ -105,21 +121,10 @@ public struct VoiceKeyMatcher: Sendable {
             return .pass
         }
 
-        // Not the voice key: while a session owns the input source this is the
-        // user typing, which must end the session and give the source back. The
-        // key itself is passed through untouched — it still has to type.
-        guard keyCode == shortcut.keyCode else {
-            if interruptsOnTyping, kind == .keyDown {
-                return Decision(consume: false, event: .otherKeyDown)
-            }
-            return .pass
-        }
+        guard keyCode == shortcut.keyCode else { return .pass }
         switch kind {
         case .keyDown:
-            guard modifiers == shortcut.modifiers else {
-                // The same letter without the voice modifiers: ordinary typing.
-                return interruptsOnTyping ? Decision(consume: false, event: .otherKeyDown) : .pass
-            }
+            guard modifiers == shortcut.modifiers else { return .pass }
             if isAutorepeat {
                 // Swallow the repeats of a press we own; a repeat of a press we
                 // let through (recorder) stays with whoever got the key-down.
