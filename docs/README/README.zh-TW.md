@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.6` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
+> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.7` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
 
 一款 macOS 選單列應用程式，用於**鎖定你的鍵盤輸入法**。每當你（或其他應用程式）切換輸入法時，LockIME 會立即切回被鎖定的那個——可以是全域的、依最前方應用程式區分的，或者（在可選的增強模式下）依瀏覽器 URL 區分的。
 
@@ -44,7 +44,7 @@
 
 - **語音輸入法可設定**——不寫死任何輸入法，可選擇豆包、微信或其他已安裝輸入法。
 - **一個快速鍵，由 LockIME 接管**——錄入你在輸入法裡使用的同一個語音快速鍵。LockIME 會吃掉這個按鍵，讓輸入法收不到實際按下（這正是 macOS 不再提示快速鍵衝突的原因），再把同一個鍵送回去以開始與結束錄音。支援左右修飾鍵與多鍵組合。
-- **三種語音行為**——再次按下結束、按住說話、任意鍵結束，與輸入法自身設定保持一致。
+- **再按一次或直接打字即可結束**——再次按下語音快速鍵會結束錄音；開始打字同樣會結束，並把輸入法切回你的文字輸入法，不會讓你卡在語音輸入法裡。
 - **暫時接管輸入法**——語音期間暫停普通鎖定規則，避免剛切到語音輸入法就被切回預設輸入法。
 - **恢復全域預設輸入法**——恢復目標直接取自 **App Rules** 的全域預設規則，不再重複設定「日常輸入法」。
 - **連續使用更可靠**——加入輸入法確認、過期工作取消、安全逾時、合成事件過濾與工作階段快速鍵快照。
@@ -56,14 +56,14 @@
 
 下載與你的 Mac 相符的安裝包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.6/LockIME-Voice-0.1.6-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.6/LockIME-Voice-0.1.6-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.7/LockIME-Voice-0.1.7-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.7/LockIME-Voice-0.1.7-x86_64.dmg)
 
 開啟前請先校驗下載檔案。每個 Release 都會發布 `SHA256SUMS.txt`，因此校驗和始終與該 tag 建置出的產物一致（DMG 不是可重現建置，所以本檔案裡不寫死雜湊）：
 
 ```sh
-gh release download v0.1.6 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.6-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.7 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.7-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
