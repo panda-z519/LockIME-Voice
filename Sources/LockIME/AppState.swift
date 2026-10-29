@@ -872,14 +872,15 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
     }
 
-    /// Same for the two keyboard services: the `CGPreflight*` checks only read the
-    /// state, so each one has to be *requested* at least once or the app never
-    /// appears in the pane the user is supposed to switch on. Which of the two an
-    /// active event tap needs has varied across macOS releases, so ask for both and
-    /// let either grant unlock the workflow.
+    /// Same for the "post events" service: `CGPreflightPostEventAccess` only reads
+    /// the state, so the request has to be made explicitly at least once.
+    ///
+    /// Deliberately *not* `CGRequestListenEventAccess()`: LockIME does not listen
+    /// for keys (it consumes one), and asking for Input Monitoring only added an
+    /// entry to a pane that cannot unlock anything — verified against the logs,
+    /// where a granted Accessibility alone is what lets the tap install.
     private func promptForEventPostingTrust() {
         CGRequestPostEventAccess()
-        CGRequestListenEventAccess()
     }
 
     /// Run when the grant is detected: close the floating helper (the system
