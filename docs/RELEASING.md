@@ -76,7 +76,13 @@ artifacts it uploads.
 - `.github/workflows/release.yml` publishes tagged releases (above).
 - `make build` creates `LockIME Voice Dev.app`, ad-hoc signed for local use.
 - `make build CONFIG=Release` creates `LockIME Voice.app`, also ad-hoc signed.
-- `make dmg CONFIG=Release` packages that app without notarizing the image.
+- `make dmg CONFIG=Release` packages that app without notarizing the image. The
+  image also carries `Install notes — 安装说明.txt`, a bilingual (zh-Hans/English)
+  note beside the drag target that names the "Open Anyway" step in Privacy &
+  Security and the single Accessibility grant — an unnotarized build is refused on
+  first launch, and that refusal reads like a corrupt download. It is a plain text
+  file, not a Finder-laid-out background, so the image is built identically here
+  and on CI.
 - Normal Debug and Release builds do not start Sparkle or contain a production
   `SUFeedURL` / `SUPublicEDKey`, so **there is no in-app automatic update yet**.
 - `make update-test-*` remains a local-only loopback laboratory. It uses a
