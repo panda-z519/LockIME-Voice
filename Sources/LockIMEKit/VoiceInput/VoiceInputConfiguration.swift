@@ -99,13 +99,6 @@ public struct VoiceInputConfiguration: Codable, Sendable, Equatable {
         return .bridged
     }
 
-    /// Whether LockIME may post the echoed key (`CGPreflightPostEventAccess`).
-    /// Taking the key over additionally needs Accessibility for the consuming
-    /// tap; the Settings pane reports that one separately.
-    public static func hasRequiredSystemPermissions(eventPostingGranted: Bool) -> Bool {
-        eventPostingGranted
-    }
-
     public func validationErrors(
         defaultSourceID: InputSourceID?,
         installedSources: [InputSource]

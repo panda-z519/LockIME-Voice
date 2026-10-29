@@ -110,14 +110,6 @@ struct VoiceInputConfigurationTests {
         ).workflowMode(defaultSourceID: daily) == .direct)
     }
 
-    @Test("sending the voice shortcut needs only the event posting permission")
-    func eventPostingIsTheOnlyRequiredPermission() {
-        // Listening for the input method's key is gone, so Input Monitoring is
-        // irrelevant — the workflow only posts one synthetic key.
-        #expect(VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: true))
-        #expect(!VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: false))
-    }
-
     @Test("default timeout is a sixty-second safety fallback")
     func defaultTimeoutIsSixtySeconds() {
         #expect(VoiceInputConfiguration.default.restoreTimeout == .seconds(60))

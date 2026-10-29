@@ -23,12 +23,6 @@ final class AppState {
     private(set) var availableSources: [InputSource] = []
     private(set) var loginItemState: LoginItemState = .unknown
     private(set) var accessibilityGranted: Bool = false
-    /// Whether macOS lets us post synthetic key events — the only permission the
-    /// voice workflow needs now that LockIME no longer listens for the input
-    /// method's own voice key (that listener caused the double handling behind
-    /// the shortcut-conflict prompts).
-    private(set) var eventPostingGranted: Bool = false
-
     /// Whether the voice key has been recorded. The pane and the monitor both read
     /// `voiceInputConfig.voiceShortcut`, so the displayed key cannot drift from
     /// the key the tap actually owns.
@@ -44,9 +38,6 @@ final class AppState {
         didSet { voiceKeyMonitor?.yieldsKey = isRecordingVoiceKey }
     }
 
-    var voiceInputPermissionsGranted: Bool {
-VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventPostingGranted)
-    }
     private(set) var voiceInputSessionInProgress = false
     private(set) var voiceInputRuntimeError: VoiceInputCoordinatorError?
 
@@ -312,7 +303,6 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         migrateRecordedVoiceKey()
         voiceKeyMonitor = CGConsumingVoiceKeyMonitor()
         accessibilityGranted = AXIsProcessTrusted()
-        eventPostingGranted = CGPreflightPostEventAccess()
         // Arm the consuming tap now that it exists. Without this the voice key
         // would be recorded but never owned, and pressing it would fall through
         // to the input method — the original conflict.
@@ -442,7 +432,6 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             MainActor.assumeIsolated {
                 guard let self else { return }
                 self.refreshAccessibilityStatus()
-                self.refreshVoiceInputPermissionStatus()
                 if self.voiceInputRuntimeError == .eventTapUnavailable {
                     self.refreshVoiceKeyMonitor(force: true)
                 }
@@ -792,7 +781,6 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         let trusted = AXIsProcessTrusted()
         let wasGranted = accessibilityGranted
         accessibilityGranted = trusted
-        refreshVoiceInputPermissionStatus()
         guard trusted != wasGranted else { return }
         if trusted {
             handleAccessibilityGranted()
@@ -822,43 +810,10 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         accessibilityWatcher.start { [weak self] in self?.completeAccessibilityGrant() }
     }
 
-    /// Reconcile the event-posting permission (the only one the voice workflow
-    /// needs) with the live preflight state, so granting it in System Settings
-    /// while the app runs flips the Settings note without a relaunch.
-    func refreshVoiceInputPermissionStatus() {
-        let canPost = CGPreflightPostEventAccess()
-        guard canPost != eventPostingGranted else { return }
-        eventPostingGranted = canPost
-    }
-
     /// Stop watching for the Accessibility grant (e.g. when the pane disappears)
     /// so an abandoned request doesn't keep polling in the background.
     func stopAccessibilityWatch() {
         accessibilityWatcher.stop()
-    }
-
-    /// Open System Settings to the page that governs synthetic key events. The
-    /// permission itself is *posting* (`CGPreflightPostEventAccess`), and macOS
-    /// lists it under Accessibility — Input Monitoring only covers *reading*
-    /// keys, so granting it there would leave this permission missing.
-    func requestEventPostingAccess(
-        localeIdentifier: String?,
-        suggestedAppURLs: [URL],
-        sourceFrame: CGRect
-    ) {
-        // Posting events is granted through the Accessibility pane, and it is the
-        // same grant the consuming tap needs — there is no separate "event
-        // posting" list. Request both services so whichever one macOS checks for
-        // this build, the app is listed and the toggle can actually be switched on.
-        promptForAccessibilityTrust()
-        promptForEventPostingTrust()
-        permissionFlow.setLocaleIdentifier(localeIdentifier)
-        permissionFlow.authorize(
-            pane: .accessibility,
-            suggestedAppURLs: suggestedAppURLs,
-            sourceFrameInScreen: sourceFrame
-        )
-        accessibilityWatcher.start { [weak self] in self?.completeAccessibilityGrant() }
     }
 
     /// Put LockIME in the Accessibility list by asking the system, which also shows
@@ -872,22 +827,10 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
     }
 
-    /// Same for the "post events" service: `CGPreflightPostEventAccess` only reads
-    /// the state, so the request has to be made explicitly at least once.
-    ///
-    /// Deliberately *not* `CGRequestListenEventAccess()`: LockIME does not listen
-    /// for keys (it consumes one), and asking for Input Monitoring only added an
-    /// entry to a pane that cannot unlock anything — verified against the logs,
-    /// where a granted Accessibility alone is what lets the tap install.
-    private func promptForEventPostingTrust() {
-        CGRequestPostEventAccess()
-    }
-
     /// Run when the grant is detected: close the floating helper (the system
     /// never does) and flip the flag so the toggle becomes usable at once.
     private func completeAccessibilityGrant() {
         accessibilityGranted = true
-        refreshVoiceInputPermissionStatus()
         handleAccessibilityGranted()
     }
 

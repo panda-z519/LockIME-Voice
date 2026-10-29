@@ -28,42 +28,15 @@ struct PermissionsSettingsPane: View {
             } footer: {
                 SectionFooter("The core lock needs no permissions.")
             }
-
-            // Event posting is the only keyboard permission the voice workflow
-            // still needs: LockIME synthesizes the input method's own voice key
-            // rather than listening for it, so no Input Monitoring grant (and no
-            // key listener) is involved any more.
-            Section {
-                if state.eventPostingGranted {
-                    Label("Keyboard event posting granted", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.secondary)
-                } else {
-                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        Text("Grant to let LockIME send the voice input shortcut:")
-                        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                            FeatureBullet("Sending the voice input shortcut")
-                        }
-                    }
-                    GrantEventPostingButton()
-                }
-            } header: {
-                Text("Event Posting")
-            } footer: {
-                SectionFooter("macOS may ask for permission when LockIME sends the voice input shortcut. LockIME only sends that one key; it never listens for your typing.")
-            }
         }
         .formStyle(.grouped)
         .navigationTitle(state.loc("Permissions"))
         // The watcher's abandon-stop lives on SettingsRootView (window close), so
         // switching tabs mid-grant doesn't kill detection; panes only reconcile
         // the shared status, which also recovers a grant the watcher missed.
-        .onAppear {
-            state.refreshAccessibilityStatus()
-            state.refreshVoiceInputPermissionStatus()
-        }
+        .onAppear { state.refreshAccessibilityStatus() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             state.refreshAccessibilityStatus()
-            state.refreshVoiceInputPermissionStatus()
         }
     }
 }

@@ -30,32 +30,6 @@ struct GrantAccessibilityButton: View {
     }
 }
 
-/// Opens System Settings to the permission that lets LockIME post synthetic key
-/// events — what the voice workflow needs to send the input method's own voice
-/// shortcut. Kept as one shared button because two panes (Permissions, Voice
-/// Input) route here rather than each prompting separately.
-struct GrantEventPostingButton: View {
-    @Environment(AppState.self) private var state
-    @Environment(\.locale) private var locale
-
-    var body: some View {
-        Button {
-            state.requestEventPostingAccess(
-                localeIdentifier: locale.identifier,
-                suggestedAppURLs: [Bundle.main.bundleURL],
-                sourceFrame: Self.clickSourceFrame()
-            )
-        } label: {
-            Label("Grant Event Posting Access", systemImage: "arrow.right.circle.fill")
-        }
-    }
-
-    private static func clickSourceFrame() -> CGRect {
-        let mouse = NSEvent.mouseLocation
-        return CGRect(x: mouse.x - 16, y: mouse.y - 16, width: 32, height: 32)
-    }
-}
-
 /// A passive "Requires Accessibility" note for feature panes (App Rules, URL
 /// Rules). It carries no grant button of its own — that lives only in General —
 /// it just explains the dependency in its own words and routes there, so the

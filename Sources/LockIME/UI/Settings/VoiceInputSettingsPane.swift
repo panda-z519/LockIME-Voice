@@ -70,8 +70,6 @@ struct VoiceInputSettingsPane: View {
                 // falls through to the input method, which is the conflict again.
                 if !state.accessibilityGranted {
                     AccessibilityRequiredNote("Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict")
-                } else if !canSendShortcut {
-                    AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
                 }
 
                 // Name the actual failure. "The workflow failed" is useless when
@@ -82,7 +80,7 @@ struct VoiceInputSettingsPane: View {
                     case .eventTapUnavailable:
                         AccessibilityRequiredNote("Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict")
                     case .eventPostingUnavailable:
-                        AccessibilityRequiredNote("Voice input requires permission to send keyboard events")
+                        AccessibilityRequiredNote("Voice input needs Accessibility to take over the voice shortcut so macOS stops reporting a shortcut conflict")
                     default:
                         VoiceInputStatusNote(
                             "The last voice input workflow failed. Check that the configured input sources are still available.",
@@ -181,10 +179,6 @@ struct VoiceInputSettingsPane: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             state.refreshAccessibilityStatus()
         }
-    }
-
-    private var canSendShortcut: Bool {
-VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: state.eventPostingGranted)
     }
 
     /// Source-related validation problems, in user-facing form and stable order.
