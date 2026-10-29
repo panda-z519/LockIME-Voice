@@ -131,6 +131,15 @@ struct VoiceInputSettingsPane: View {
                             "The voice input source is already the global default, so no switch is needed and its shortcut is sent directly.",
                             systemImage: "info.circle"
                         )
+                    } else {
+                        // The session hands the source back on the first keystroke,
+                        // so a voice input method that never starts recording (no
+                        // microphone, denied mic permission) can't strand the user
+                        // on the voice source until the safety timeout.
+                        VoiceInputStatusNote(
+                            "Typing while voice input is active ends the session and returns you to your text input source.",
+                            systemImage: "keyboard"
+                        )
                     }
                 } else {
                     VoiceInputStatusNote(

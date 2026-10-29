@@ -360,6 +360,47 @@ struct VoiceInputCoordinatorTests {
         #expect(engine.switches == [voice, daily])
     }
 
+    @Test("typing during a session hands the input source back without sending a key")
+    func typingInterruptRestoresWithoutKey() throws {
+        // The escape hatch when the input method never started recording (no
+        // microphone, or its mic permission denied): the user types, and has to be
+        // back on their text input instead of waiting for the safety timeout.
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let shortcut = VoiceShortcut(keyCode: 49, modifiers: [.control])
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+        let config = makeSwitchingConfig(shortcut: shortcut)
+
+        try coordinator.handleWorkflowShortcutPressed(
+            config: config,
+            restoreSourceID: daily,
+            installedSources: [.stub(daily.rawValue), .stub(voice.rawValue)]
+        )
+        #expect(coordinator.state == .voiceActive)
+
+        try coordinator.handleTypingInterrupt()
+
+        #expect(coordinator.state == .idle)
+        // No end tap: a blind toggle would RESTART a recording the input method
+        // may have already stopped, and there is nothing to stop when it never
+        // started at all.
+        #expect(sender.events == [.tap(shortcut)])
+        #expect(engine.switches == [voice, daily])
+    }
+
+    @Test("a typing interrupt without a live session does nothing")
+    func typingInterruptIsInertWhenIdle() throws {
+        let engine = RecordingVoiceOverrideEngine()
+        let sender = RecordingShortcutEventSender()
+        let coordinator = VoiceInputCoordinator(overrideEngine: engine, sender: sender)
+
+        try coordinator.handleTypingInterrupt()
+
+        #expect(coordinator.state == .idle)
+        #expect(sender.events.isEmpty)
+        #expect(engine.switches.isEmpty)
+    }
+
     @Test("a missing voice shortcut fails before any override is taken")
     func missingVoiceShortcutDoesNotBeginOverride() {
         let engine = RecordingVoiceOverrideEngine()

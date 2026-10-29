@@ -15289,6 +15289,58 @@
           }
         }
       }
+    },
+    "Typing while voice input is active ends the session and returns you to your text input source.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入进行中开始打字会结束本次语音，并切回你的文字输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入進行中開始打字會結束本次語音，並切回你的文字輸入法"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力中に文字を打つと音声入力を終了し、通常の入力ソースに戻ります"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taper du texte pendant la saisie vocale termine la session et vous rend votre source de saisie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippen während der Spracheingabe beendet die Sitzung und schaltet auf Ihre Texteingabe zurück"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribir durante la entrada de voz termina la sesión y te devuelve a tu fuente de texto"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digitar durante a entrada por voz encerra a sessão e devolve a sua fonte de texto"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Если начать печатать во время голосового ввода, сеанс завершится и вернётся ваша раскладка для текста"
+          }
+        }
+      }
     }
   }
 }

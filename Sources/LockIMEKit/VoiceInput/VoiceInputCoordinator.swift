@@ -33,6 +33,7 @@ public final class VoiceInputCoordinator {
     private enum RestoreReason: String {
         case workflowShortcut
         case safetyTimeout
+        case typingInterrupted
         case sourceSelectionFailed
         case shortcutSendFailed
     }
@@ -150,6 +151,17 @@ public final class VoiceInputCoordinator {
     /// A switching session ends on the next press instead, so it ignores this.
     public func handleWorkflowShortcutReleased() {
         releaseEchoedKey()
+    }
+
+    /// The user started typing while a session owned the input source: hand the
+    /// source back immediately so the keystrokes land in the text input they
+    /// expect. Sends no key — a blind toggle would *restart* recording whenever
+    /// the input method had already stopped by itself, and when it never started
+    /// at all (no microphone, denied mic permission) there is nothing to stop.
+    public func handleTypingInterrupt() throws {
+        guard state == .voiceActive, ownsInputSource else { return }
+        Self.log.notice("Voice session ended: the user started typing")
+        try restoreDefault(reason: .typingInterrupted)
     }
 
     /// The safety timeout of a switching session: hand the input source back so

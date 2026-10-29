@@ -21,7 +21,8 @@ struct VoiceKeyMonitoringTests {
     private func run(
         _ shortcut: VoiceShortcut,
         _ steps: [Step],
-        yield: Bool = false
+        yield: Bool = false,
+        interruptsOnTyping: Bool = false
     ) -> [VoiceKeyMatcher.Decision] {
         var matcher = VoiceKeyMatcher(shortcut: shortcut)
         return steps.map { step in
@@ -29,12 +30,14 @@ struct VoiceKeyMonitoringTests {
             case let .down(key, modifiers, isRepeat, marked):
                 matcher.decide(
                     kind: .keyDown, keyCode: key, modifiers: modifiers,
-                    isAutorepeat: isRepeat, isMarked: marked, yield: { yield }
+                    isAutorepeat: isRepeat, isMarked: marked, yield: { yield },
+                    interruptsOnTyping: interruptsOnTyping
                 )
             case let .up(key, modifiers):
                 matcher.decide(
                     kind: .keyUp, keyCode: key, modifiers: modifiers,
-                    isAutorepeat: false, isMarked: false, yield: { yield }
+                    isAutorepeat: false, isMarked: false, yield: { yield },
+                    interruptsOnTyping: interruptsOnTyping
                 )
             case let .flags(key, modifiers):
                 matcher.decide(
@@ -137,4 +140,85 @@ struct VoiceKeyMonitoringTests {
         #expect(run(rightOption, [.flags(58, [.option]), .flags(58, [])]) == [pressed, released])
         #expect(run(rightOption, [.flags(59, [.control])]) == [.pass])
     }
+
+/// A session that owns the input source must not strand the user in the voice
+/// input method: typing has to hand the source back. The tap is the only thing
+/// that sees those keystrokes, so it reports them — without ever consuming them.
+@Suite("Typing interrupts a voice session")
+struct VoiceTypingInterruptTests {
+    private let voiceKey = VoiceShortcut(keyCode: 49, modifiers: [.option])
+
+    @Test("typing during a session is reported but still types")
+    func typingIsReportedAndPasses() {
+        var matcher = VoiceKeyMatcher(shortcut: voiceKey)
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 0, modifiers: [],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == .otherKeyDown)
+        // Consuming it would eat the character the user typed to get back.
+        #expect(!decision.consume)
+    }
+
+    @Test("the same letter without the voice modifiers counts as typing")
+    func plainLetterIsTyping() {
+        var matcher = VoiceKeyMatcher(shortcut: VoiceShortcut(keyCode: 9, modifiers: [.control, .option]))
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 9, modifiers: [],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == .otherKeyDown)
+        #expect(!decision.consume)
+    }
+
+    @Test("the voice key itself is never reported as typing")
+    func voiceKeyIsNotTyping() {
+        var matcher = VoiceKeyMatcher(shortcut: voiceKey)
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 49, modifiers: [.option],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == .pressed)
+        #expect(decision.consume)
+    }
+
+    @Test("our own echoed key is never reported as typing")
+    func echoIsNotTyping() {
+        var matcher = VoiceKeyMatcher(shortcut: voiceKey)
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 0, modifiers: [],
+            isAutorepeat: false, isMarked: true,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == nil)
+        #expect(!decision.consume)
+    }
+
+    @Test("modifier presses are not typing")
+    func modifierChangesAreNotTyping() {
+        var matcher = VoiceKeyMatcher(shortcut: voiceKey)
+        let decision = matcher.decide(
+            kind: .flagsChanged, keyCode: 56, modifiers: [.shift],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }, interruptsOnTyping: true
+        )
+        #expect(decision.event == nil)
+    }
+
+    @Test("with no session active nothing is reported")
+    func noSessionReportsNothing() {
+        var matcher = VoiceKeyMatcher(shortcut: voiceKey)
+        let decision = matcher.decide(
+            kind: .keyDown, keyCode: 0, modifiers: [],
+            isAutorepeat: false, isMarked: false,
+            yield: { false }
+        )
+        #expect(decision.event == nil)
+        #expect(!decision.consume)
+    }
+}
+
 }

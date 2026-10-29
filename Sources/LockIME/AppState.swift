@@ -290,6 +290,11 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         )
         voiceInputCoordinator.onStateChange = { [weak self] sessionState in
             guard let self else { return }
+            // While a session owns the input source, the tap reports typing so the
+            // session can hand the source back instead of waiting for the safety
+            // timeout — the escape hatch when the input method never starts
+            // recording (no microphone, denied mic permission).
+            self.voiceKeyMonitor?.interruptsOnTyping = sessionState == .voiceActive
             self.voiceInputSessionInProgress = sessionState.isInProgress
             switch sessionState {
             case .preparingVoice:
@@ -803,6 +808,11 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
     /// (the system never does) and flip `accessibilityGranted`, so the toggle
     /// becomes usable without the user having to switch tabs.
     func requestAccessibilityAccess(localeIdentifier: String?, suggestedAppURLs: [URL], sourceFrame: CGRect) {
+        // Ask macOS to *list* LockIME and show its own prompt. `AXIsProcessTrusted()`
+        // only reports a state — calling it never puts the app in the pane, so a
+        // user sent to System Settings found no entry to switch on and could not
+        // grant anything (the exact "无法授予" dead end).
+        promptForAccessibilityTrust()
         permissionFlow.setLocaleIdentifier(localeIdentifier)
         permissionFlow.authorize(
             pane: .accessibility,
@@ -836,6 +846,12 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
         suggestedAppURLs: [URL],
         sourceFrame: CGRect
     ) {
+        // Posting events is granted through the Accessibility pane, and it is the
+        // same grant the consuming tap needs — there is no separate "event
+        // posting" list. Request both services so whichever one macOS checks for
+        // this build, the app is listed and the toggle can actually be switched on.
+        promptForAccessibilityTrust()
+        promptForEventPostingTrust()
         permissionFlow.setLocaleIdentifier(localeIdentifier)
         permissionFlow.authorize(
             pane: .accessibility,
@@ -843,6 +859,23 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             sourceFrameInScreen: sourceFrame
         )
         accessibilityWatcher.start { [weak self] in self?.completeAccessibilityGrant() }
+    }
+
+    /// Put LockIME in the Accessibility list by asking the system, which also shows
+    /// the "would like to control this computer" prompt. Without this the app is
+    /// invisible in that pane and the user has nothing to switch on.
+    @discardableResult
+    private func promptForAccessibilityTrust() -> Bool {
+        // `kAXTrustedCheckOptionPrompt` is a non-Sendable global `CFStringRef`,
+        // which Swift 6 rejects off the main actor; its documented value is this
+        // string key (HIServices/AXUIElement.h).
+        AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+    }
+
+    /// Same for the "post events" service: `CGPreflightPostEventAccess` only reads
+    /// the state, so the request has to be made explicitly at least once.
+    private func promptForEventPostingTrust() {
+        CGRequestPostEventAccess()
     }
 
     /// Run when the grant is detected: close the floating helper (the system
@@ -952,6 +985,9 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
                 case .released:
                     // Shortcut-only mode mirrors the key: lift the echo now.
                     self?.voiceInputCoordinator?.handleWorkflowShortcutReleased()
+                case .otherKeyDown:
+                    // Typing during a session: give the input source back at once.
+                    self?.handleTypingWhileVoiceActive()
                 }
             }
             if voiceInputRuntimeError == .eventTapUnavailable {
@@ -962,6 +998,17 @@ VoiceInputConfiguration.hasRequiredSystemPermissions(eventPostingGranted: eventP
             // the workflow cannot run. Surfaced rather than failing silently.
             voiceInputRuntimeError = .eventTapUnavailable
             Self.log.error("Voice key monitor failed to start: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    /// The user typed while a session was holding the input source.
+    private func handleTypingWhileVoiceActive() {
+        guard let voiceInputCoordinator, voiceInputCoordinator.isSessionInProgress else { return }
+        do {
+            try voiceInputCoordinator.handleTypingInterrupt()
+        } catch {
+            voiceInputRuntimeError = error as? VoiceInputCoordinatorError
+            Self.log.error("Voice input typing interrupt failed: \(String(describing: error), privacy: .public)")
         }
     }
 

@@ -7,6 +7,11 @@ public enum VoiceKeyEvent: Equatable, Sendable {
     case pressed
     /// The voice key came back up.
     case released
+    /// The user pressed some other key while a voice session owned the input
+    /// source. The event is *not* consumed — the key still types — but it tells
+    /// the session to hand the input source back, so the user is typing again
+    /// instead of waiting for the safety timeout.
+    case otherKeyDown
 }
 
 public enum VoiceKeyMonitorError: Error, Equatable, Sendable {
@@ -17,6 +22,12 @@ public enum VoiceKeyMonitorError: Error, Equatable, Sendable {
 public protocol VoiceKeyMonitoring: AnyObject {
     func start(shortcut: VoiceShortcut, _ handler: @escaping @MainActor (VoiceKeyEvent) -> Void) throws
     func stop()
+    /// Whether a key press that is *not* the voice key should be reported as
+    /// `otherKeyDown`. Set while a voice session owns the input source: the tap
+    /// then reports typing so the session can hand the source back, instead of
+    /// stranding the user in the voice input method until the safety timeout.
+    /// The key itself is never consumed.
+    var interruptsOnTyping: Bool { get set }
 }
 
 /// The tap's per-event decision, kept free of CoreGraphics so it can be tested
@@ -67,7 +78,8 @@ public struct VoiceKeyMatcher: Sendable {
         modifiers: VoiceShortcut.Modifiers,
         isAutorepeat: Bool,
         isMarked: Bool,
-        yield: () -> Bool
+        yield: () -> Bool,
+        interruptsOnTyping: Bool = false
     ) -> Decision {
         // Our own synthesized key: let it through untouched, or LockIME would
         // treat its own output as a new press and loop.
@@ -93,10 +105,21 @@ public struct VoiceKeyMatcher: Sendable {
             return .pass
         }
 
-        guard keyCode == shortcut.keyCode else { return .pass }
+        // Not the voice key: while a session owns the input source this is the
+        // user typing, which must end the session and give the source back. The
+        // key itself is passed through untouched — it still has to type.
+        guard keyCode == shortcut.keyCode else {
+            if interruptsOnTyping, kind == .keyDown {
+                return Decision(consume: false, event: .otherKeyDown)
+            }
+            return .pass
+        }
         switch kind {
         case .keyDown:
-            guard modifiers == shortcut.modifiers else { return .pass }
+            guard modifiers == shortcut.modifiers else {
+                // The same letter without the voice modifiers: ordinary typing.
+                return interruptsOnTyping ? Decision(consume: false, event: .otherKeyDown) : .pass
+            }
             if isAutorepeat {
                 // Swallow the repeats of a press we own; a repeat of a press we
                 // let through (recorder) stays with whoever got the key-down.
@@ -162,6 +185,11 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
         didSet { context?.yieldsKey = yieldsKey }
     }
 
+    /// Mirrors `VoiceKeyMonitoring.interruptsOnTyping` onto the tap thread.
+    public var interruptsOnTyping = false {
+        didSet { context?.interruptsOnTyping = interruptsOnTyping }
+    }
+
     public init() {}
 
     deinit {
@@ -181,6 +209,7 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
         let context = VoiceKeyTapContext(
             shortcut: shortcut,
             yieldsKey: yieldsKey,
+            interruptsOnTyping: interruptsOnTyping,
             deliver: { [weak self] event in
                 Task { @MainActor in self?.handler?(event) }
             }
@@ -231,21 +260,29 @@ final class VoiceKeyTapContext: @unchecked Sendable {
     private var runLoop: CFRunLoop?
     private let state = NSLock()
     private var yieldsKeyStorage: Bool
+    private var interruptsOnTypingStorage = false
     private let deliver: @Sendable (VoiceKeyEvent) -> Void
 
     init(
         shortcut: VoiceShortcut,
         yieldsKey: Bool,
+        interruptsOnTyping: Bool,
         deliver: @escaping @Sendable (VoiceKeyEvent) -> Void
     ) {
         matcher = VoiceKeyMatcher(shortcut: shortcut)
         yieldsKeyStorage = yieldsKey
+        interruptsOnTypingStorage = interruptsOnTyping
         self.deliver = deliver
     }
 
     var yieldsKey: Bool {
         get { state.withLock { yieldsKeyStorage } }
         set { state.withLock { yieldsKeyStorage = newValue } }
+    }
+
+    var interruptsOnTyping: Bool {
+        get { state.withLock { interruptsOnTypingStorage } }
+        set { state.withLock { interruptsOnTypingStorage = newValue } }
     }
 
     /// Start the tap thread and return once its run loop is serving the tap.
@@ -298,7 +335,8 @@ final class VoiceKeyTapContext: @unchecked Sendable {
             modifiers: VoiceShortcut.Modifiers(event.flags),
             isAutorepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
             isMarked: ShortcutEventMarker.isMarked(event),
-            yield: { yieldsKey }
+            yield: { yieldsKey },
+            interruptsOnTyping: interruptsOnTyping
         )
         if let voiceEvent = decision.event {
             deliver(voiceEvent)
