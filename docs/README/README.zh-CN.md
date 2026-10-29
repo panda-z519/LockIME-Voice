@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.8` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
+> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.9` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
 
 一款 macOS 菜单栏应用，用于**锁定你的键盘输入源**。每当你（或其他应用）切换输入法时，LockIME 会立即切回被锁定的那个——可以是全局的、按前台应用区分的，或者（在可选的增强模式下）按浏览器 URL 区分的。
 
@@ -56,14 +56,14 @@
 
 下载与你的 Mac 匹配的安装包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.8/LockIME-Voice-0.1.8-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.8/LockIME-Voice-0.1.8-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
 
 打开前请先校验下载文件。每个 Release 都会发布 `SHA256SUMS.txt`，因此校验和始终与该 tag 构建出的产物一致（DMG 不是可复现构建，所以本文件里不写死哈希）：
 
 ```sh
-gh release download v0.1.8 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.8-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

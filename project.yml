@@ -27,8 +27,8 @@ settings:
     CLANG_WARN_DOCUMENTATION_COMMENTS: NO
     # Public preview packages are ad-hoc signed and unnotarized. The version is
     # still explicit so installed builds and GitHub assets can be identified.
-    MARKETING_VERSION: "0.1.8"
-    CURRENT_PROJECT_VERSION: "9"
+    MARKETING_VERSION: "0.1.9"
+    CURRENT_PROJECT_VERSION: "10"
     ONLY_ACTIVE_ARCH: YES
     # Single-arch by design — we ship one app per architecture, never a
     # universal binary (download size). Local default is arm64; CI overrides

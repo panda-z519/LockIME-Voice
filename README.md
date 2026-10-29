@@ -14,7 +14,7 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. `v0.1.8` provides ad-hoc-signed preview installers, but
+> voice-input workflow. `v0.1.9` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
 > are not available.
 
@@ -75,16 +75,16 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 Download the installer matching your Mac:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.8/LockIME-Voice-0.1.8-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.8/LockIME-Voice-0.1.8-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
 
 Verify your download before opening it. Each Release publishes a
 `SHA256SUMS.txt`, so the checksum always matches the artifact built for that tag
 (the DMG is not byte-reproducible, so no checksum belongs in this file):
 
 ```sh
-gh release download v0.1.8 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.8-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
