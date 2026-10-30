@@ -12,9 +12,6 @@ struct VoiceInputSettingsPane: View {
     @Environment(AppState.self) private var state
 
     var body: some View {
-        let workflowMode = state.voiceInputConfig.workflowMode(
-            defaultSourceID: state.config.defaultSourceID
-        )
         let settingsLocked = state.voiceInputSessionInProgress
         Form {
             Section {
@@ -120,25 +117,22 @@ struct VoiceInputSettingsPane: View {
                     }
                     .disabled(settingsLocked)
 
-                    LabeledContent("Restore input source") {
-                        Text(verbatim: restoreSourceName)
-                    }
+                    // One key serves both kinds of input method: a tap toggles
+                    // (press again to stop), a hold records until release. See
+                    // `VoiceInputCoordinator.handleWorkflowShortcutReleased`.
+                    VoiceInputStatusNote(
+                        "Tap the shortcut to start and tap it again to stop, or hold it while you speak and release to stop.",
+                        systemImage: "hand.tap"
+                    )
 
-                    if workflowMode == .direct {
-                        VoiceInputStatusNote(
-                            "The voice input source is already the global default, so no switch is needed and its shortcut is sent directly.",
-                            systemImage: "info.circle"
-                        )
-                    } else {
-                        // The session hands the source back on the first keystroke,
-                        // so a voice input method that never starts recording (no
-                        // microphone, denied mic permission) can't strand the user
-                        // on the voice source until the safety timeout.
-                        VoiceInputStatusNote(
-                            "Typing while voice input is active ends the session and returns you to your text input source.",
-                            systemImage: "keyboard"
-                        )
-                    }
+                    // Any other key ends the session (and is consumed, so it
+                    // cannot overwrite the recognized text). It is also the escape
+                    // hatch when the input method never starts recording (no
+                    // microphone, denied mic permission).
+                    VoiceInputStatusNote(
+                        "Pressing any other key while voice input is active ends it, like pressing the shortcut again: the recognized text is kept and that key is not typed.",
+                        systemImage: "keyboard"
+                    )
                 } else {
                     VoiceInputStatusNote(
                         "Off: the shortcut alone starts voice input in whichever input method is active, and your input source is never changed.",
@@ -165,9 +159,9 @@ struct VoiceInputSettingsPane: View {
                 Text("Input Sources")
             } footer: {
                 if state.voiceInputConfig.switchesVoiceSourceAutomatically {
-                    SectionFooter("After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before turning this on.")
+                    SectionFooter("After voice input ends, LockIME switches back to the input source you were using when you pressed the shortcut.")
                 } else {
-                    SectionFooter("Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and restores your global default afterwards.")
+                    SectionFooter("Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and switches back to your input source afterwards.")
                 }
             }
         }
@@ -182,6 +176,9 @@ struct VoiceInputSettingsPane: View {
     }
 
     /// Source-related validation problems, in user-facing form and stable order.
+    /// Only the voice source is a setting: the source handed back is whichever
+    /// one is current at the press (the global default is merely a fallback),
+    /// so a missing or unavailable default is no configuration problem.
     private var sourceProblems: [VoiceInputSourceProblem] {
         let errors = state.voiceInputConfig.validationErrors(
             defaultSourceID: state.config.defaultSourceID,
@@ -191,22 +188,10 @@ struct VoiceInputSettingsPane: View {
         if errors.contains(.missingVoiceSource) {
             problems.append(VoiceInputSourceProblem(id: 0, message: "Select a voice input source before using voice input."))
         }
-        if errors.contains(.missingDefaultSource) {
-            problems.append(VoiceInputSourceProblem(id: 1, message: "Set a global default input source in App Rules before using voice input."))
-        }
         if errors.contains(where: { if case .voiceSourceUnavailable = $0 { true } else { false } }) {
             problems.append(VoiceInputSourceProblem(id: 2, message: "The configured voice input source is unavailable."))
         }
-        if errors.contains(where: { if case .defaultSourceUnavailable = $0 { true } else { false } }) {
-            problems.append(VoiceInputSourceProblem(id: 3, message: "The configured global default input source is unavailable."))
-        }
         return problems
-    }
-
-    private var restoreSourceName: String {
-        guard let id = state.config.defaultSourceID else { return state.loc("Not set") }
-        return state.availableSources.first { $0.id == id }?.localizedName
-            ?? "\(id.rawValue) — \(state.loc("Unavailable"))"
     }
 }
 

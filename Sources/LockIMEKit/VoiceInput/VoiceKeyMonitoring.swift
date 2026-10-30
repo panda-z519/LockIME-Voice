@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import OSLog
 
 /// What a consumed voice-key tap reports to the session.
 public enum VoiceKeyEvent: Equatable, Sendable {
@@ -8,9 +9,10 @@ public enum VoiceKeyEvent: Equatable, Sendable {
     /// The voice key came back up.
     case released
     /// The user pressed some other key while a voice session owned the input
-    /// source. The event is *not* consumed — the key still types — but it tells
-    /// the session to hand the input source back, so the user is typing again
-    /// instead of waiting for the safety timeout.
+    /// source. Any key ends voice input, so the key is *consumed*: passed on, it
+    /// would land in the voice input method mid-recognition and replace the
+    /// recognized text. The session then stops the input method and hands the
+    /// input source back.
     case otherKeyDown
 }
 
@@ -24,9 +26,8 @@ public protocol VoiceKeyMonitoring: AnyObject {
     func stop()
     /// Whether a key press that is *not* the voice key should be reported as
     /// `otherKeyDown`. Set while a voice session owns the input source: the tap
-    /// then reports typing so the session can hand the source back, instead of
-    /// stranding the user in the voice input method until the safety timeout.
-    /// The key itself is never consumed.
+    /// then reports (and consumes) the key so the session can end voice input,
+    /// instead of the key overwriting the recognized text.
     var interruptsOnTyping: Bool { get set }
 }
 
@@ -36,6 +37,8 @@ public protocol VoiceKeyMonitoring: AnyObject {
 ///
 /// Rules:
 /// * LockIME's own synthesized key is never touched, or it would loop.
+/// * A bare modifier voice key is owned only on **its own side**: left ⌘ never
+///   triggers a right-⌘ voice key, and vice versa.
 /// * A key-down is owned only when the key code **and the exact modifier set**
 ///   match — `⌃⌥V` must not swallow plain `V`, nor `⌃⌥⇧V` (a different shortcut).
 /// * Auto-repeat of an owned key is swallowed; a *fresh* key-down always starts a
@@ -79,16 +82,16 @@ public struct VoiceKeyMatcher: Sendable {
         isAutorepeat: Bool,
         isMarked: Bool,
         yield: () -> Bool,
-        interruptsOnTyping: Bool = false
+        interruptsOnTyping: Bool = false,
+        deviceFlags: UInt64? = nil
     ) -> Decision {
         // Our own synthesized key: let it through untouched, or LockIME would
         // treat its own output as a new press and loop.
         guard !isMarked else { return .pass }
 
         // Any key that is *not* the voice key going down while a session owns the
-        // input source is the user typing: report it (never consume it) so the
-        // session hands the source back instead of waiting out the safety
-        // timeout. Checked before the shape-specific branches below, because a
+        // input source ends voice input: report it, and consume it so it cannot
+        // overwrite the text the voice input method is still recognizing. Checked before the shape-specific branches below, because a
         // bare-modifier voice key (right ⌘, right ⌥) never reaches the ordinary
         // key path — putting this inside it made typing invisible for exactly
         // those, the most common voice keys of all.
@@ -97,18 +100,22 @@ public struct VoiceKeyMatcher: Sendable {
                 && keyCode == shortcut.keyCode
                 && modifiers == shortcut.modifiers
             if !isVoiceKeyDown {
-                return Decision(consume: false, event: .otherKeyDown)
+                return Decision(consume: true, event: .otherKeyDown)
             }
         }
 
         if shortcut.isModifierKey {
-            // A bare modifier key arrives as flagsChanged; match on the modifier
-            // this shortcut stands for, not on the raw key code, so both the left
-            // and right variants macOS reports are recognized.
-            guard kind == .flagsChanged else { return .pass }
-            let changed = VoiceShortcut(keyCode: keyCode).modifierKey
-            guard !changed.isEmpty, changed == shortcut.modifierKey else { return .pass }
-            let isPressed = modifiers.contains(shortcut.modifierKey)
+            // A bare modifier key arrives as flagsChanged. Match the exact key
+            // (side included): the user recorded *left* ⌘ or *right* ⌘, and the
+            // other side is an ordinary modifier they type shortcuts with. The
+            // caller passes the side-canonicalized key code (the recorder's
+            // `canonicalModifierKeyCode`), so both agree on which key this is.
+            guard kind == .flagsChanged, keyCode == shortcut.keyCode else { return .pass }
+            // Whether *this side* is down. The device-independent flag stays set
+            // while the other side is held, so prefer the side's own device bit.
+            let isPressed = deviceFlags.map {
+                $0 & VoiceShortcut.deviceBit(forModifierKeyCode: shortcut.keyCode) != 0
+            } ?? modifiers.contains(shortcut.modifierKey)
             if isPressed, !isDown {
                 if yield() { return .pass }
                 isDown = true
@@ -260,6 +267,7 @@ public final class CGConsumingVoiceKeyMonitor: VoiceKeyMonitoring {
 /// until the run loop exits), and the one value the main thread writes,
 /// `yieldsKey`, is lock-protected.
 final class VoiceKeyTapContext: @unchecked Sendable {
+    private static let log = Logger(subsystem: LogSubsystem.current, category: "VoiceInput")
     private var matcher: VoiceKeyMatcher
     private var tap: CFMachPort?
     private var runLoop: CFRunLoop?
@@ -334,15 +342,28 @@ final class VoiceKeyTapContext: @unchecked Sendable {
         default:
             return false
         }
+        let rawKeyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
+        let deviceFlags = event.flags.rawValue
+        // Same side resolution as the recorder, so the key recorded as left ⌘ is
+        // the key matched as left ⌘.
+        let keyCode = kind == .flagsChanged
+            ? VoiceShortcut.canonicalModifierKeyCode(eventKeyCode: rawKeyCode, deviceFlagsRawValue: deviceFlags)
+            : rawKeyCode
         let decision = matcher.decide(
             kind: kind,
-            keyCode: UInt16(event.getIntegerValueField(.keyboardEventKeycode)),
+            keyCode: keyCode,
             modifiers: VoiceShortcut.Modifiers(event.flags),
             isAutorepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
             isMarked: ShortcutEventMarker.isMarked(event),
             yield: { yieldsKey },
-            interruptsOnTyping: interruptsOnTyping
+            interruptsOnTyping: interruptsOnTyping,
+            deviceFlags: deviceFlags
         )
+        if decision.event == .pressed {
+            Self.log.notice(
+                "Voice key pressed: keyCode=\(rawKeyCode) canonical=\(keyCode) deviceFlags=\(String(deviceFlags & 0xFFFF, radix: 16), privacy: .public)"
+            )
+        }
         if let voiceEvent = decision.event {
             deliver(voiceEvent)
         }

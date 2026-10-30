@@ -131,25 +131,49 @@ struct VoiceKeyMonitoringTests {
         #expect(!matcher.isDown)
     }
 
-    @Test("a bare modifier voice key matches either side")
-    func bareModifierMatchesBothSides() {
-        // macOS reports left/right as different key codes (58/61), both of which
-        // stand for Option.
+    @Test("a bare modifier voice key matches only its own side")
+    func bareModifierMatchesItsOwnSideOnly() {
+        // macOS reports left/right as different key codes (58/61). The user
+        // recorded one of them; the other is an ordinary modifier they type
+        // shortcuts with, and taking it as the voice key was the reported bug.
         let rightOption = VoiceShortcut(keyCode: 61, modifiers: [.option])
         #expect(rightOption.isModifierKey)
-        #expect(run(rightOption, [.flags(58, [.option]), .flags(58, [])]) == [pressed, released])
+        #expect(run(rightOption, [.flags(61, [.option]), .flags(61, [])]) == [pressed, released])
+        #expect(run(rightOption, [.flags(58, [.option]), .flags(58, [])]) == [.pass, .pass])
         #expect(run(rightOption, [.flags(59, [.control])]) == [.pass])
+
+        let leftCommand = VoiceShortcut(keyCode: 55, modifiers: [.command])
+        #expect(run(leftCommand, [.flags(54, [.command]), .flags(54, [])]) == [.pass, .pass])
+        #expect(run(leftCommand, [.flags(55, [.command]), .flags(55, [])]) == [pressed, released])
     }
 
-/// A session that owns the input source must not strand the user in the voice
-/// input method: typing has to hand the source back. The tap is the only thing
-/// that sees those keystrokes, so it reports them — without ever consuming them.
+    @Test("releasing the voice side is seen even while the other side is held")
+    func ownSideReleaseUsesDeviceBits() {
+        // Left ⌘ is the voice key; right ⌘ goes down meanwhile and stays down.
+        // The device-independent ⌘ flag never clears, so only the side's own
+        // device bit tells that left ⌘ came back up.
+        var matcher = VoiceKeyMatcher(shortcut: VoiceShortcut(keyCode: 55, modifiers: [.command]))
+        func flags(_ key: UInt16, _ device: UInt64) -> VoiceKeyMatcher.Decision {
+            matcher.decide(
+                kind: .flagsChanged, keyCode: key, modifiers: [.command],
+                isAutorepeat: false, isMarked: false, yield: { false },
+                deviceFlags: device
+            )
+        }
+        #expect(flags(55, 0x08) == pressed)
+        #expect(flags(54, 0x18) == .pass)
+        #expect(flags(55, 0x10) == released)
+    }
+
+/// While a session owns the input source, any other key ends voice input. The
+/// tap is the only thing that sees those keystrokes, so it reports them — and
+/// consumes them, or they would overwrite the text still being recognized.
 @Suite("Typing interrupts a voice session")
 struct VoiceTypingInterruptTests {
     private let voiceKey = VoiceShortcut(keyCode: 49, modifiers: [.option])
 
-    @Test("typing during a session is reported but still types")
-    func typingIsReportedAndPasses() {
+    @Test("a key pressed during a session is reported and consumed")
+    func typingIsReportedAndConsumed() {
         var matcher = VoiceKeyMatcher(shortcut: voiceKey)
         let decision = matcher.decide(
             kind: .keyDown, keyCode: 0, modifiers: [],
@@ -157,8 +181,9 @@ struct VoiceTypingInterruptTests {
             yield: { false }, interruptsOnTyping: true
         )
         #expect(decision.event == .otherKeyDown)
-        // Consuming it would eat the character the user typed to get back.
-        #expect(!decision.consume)
+        // Passed on, it would land in the voice input method mid-recognition
+        // and replace the recognized text.
+        #expect(decision.consume)
     }
 
     @Test("the same letter without the voice modifiers counts as typing")
@@ -170,7 +195,7 @@ struct VoiceTypingInterruptTests {
             yield: { false }, interruptsOnTyping: true
         )
         #expect(decision.event == .otherKeyDown)
-        #expect(!decision.consume)
+        #expect(decision.consume)
     }
 
     @Test("a bare-modifier voice key still sees typing")
@@ -187,7 +212,7 @@ struct VoiceTypingInterruptTests {
             yield: { false }, interruptsOnTyping: true
         )
         #expect(decision.event == .otherKeyDown)
-        #expect(!decision.consume)
+        #expect(decision.consume)
     }
 
     @Test("the voice key itself is never reported as typing")

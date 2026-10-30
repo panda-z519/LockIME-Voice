@@ -58,8 +58,14 @@ public final class CGShortcutEventSender: ShortcutEventSending {
     /// `CGEvent.post` has no return value: without the grant it silently does
     /// nothing, so the caller would report a running session that never reached
     /// the input method. Checked up front so the failure is reportable.
+    ///
+    /// `AXIsProcessTrusted()`, not `CGPreflightPostEventAccess()`: the latter's
+    /// answer is cached in-process, so a "denied" read at launch (before the
+    /// user granted Accessibility) kept failing every press even after
+    /// WindowServer had started allowing our events. Accessibility is the grant
+    /// posting actually rides on, and it is queried live on every call.
     private static func ensureCanPostEvents() throws {
-        guard CGPreflightPostEventAccess() else {
+        guard AXIsProcessTrusted() else {
             throw ShortcutEventSenderError.postingUnavailable
         }
     }

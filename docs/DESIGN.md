@@ -240,11 +240,28 @@ the grant watcher.
   **off**) gates everything source-related: off means the key is mirrored
   (down on press, up on release) and LockIME keeps no session, so it works for
   tap-to-toggle and hold-to-talk input methods alike and never drifts from the
-  input method's own recording state; on reveals the voice-source picker, the
-  restore-source row and the restore timeout, and makes `VoiceInputCoordinator`
-  take a `LockController` temporary override per session (press to start,
-  press again to end, source restored after `restoreDelay`; the safety timeout
-  only restores the source and never sends a key). Modifier/key display comes
+  input method's own recording state; on reveals the voice-source picker and
+  the restore timeout, and makes `VoiceInputCoordinator` take a
+  `LockController` temporary override per session. The source handed back is
+  the one **current at the press** (the global default is only the fallback
+  when that is unknown, so no default rule is required); a press while already
+  on the voice source just mirrors the key, and a press during the restore
+  delay inherits the pending hand-back. The session also mirrors the key, so
+  one key serves both kinds of input method without a setting: once the voice
+  source is confirmed (deadline 1.5 s, cold third-party IMEs included) a still-
+  held key gets only its key-down echoed, an already-released one a full tap; a
+  release before `holdThreshold` (0.5 s) is a tap and the session ends on the
+  next press, a longer hold is hold-to-talk and its release ends the session.
+  Either way the source is restored after `restoreDelay`. Any other key during
+  a session ends it exactly like the voice key (held echo lifted, or the voice
+  key tapped, then `restoreDelay`) and is **consumed**: passed on, it landed in
+  the voice input method mid-recognition and replaced the recognized text. The
+  safety timeout only restores the source (lifting a held echo) and never
+  sends a toggle. A bare-modifier voice key matches **its own side only** (left
+  ⌘ never triggers a right-⌘ key): the tap side-canonicalizes the key code like
+  the recorder and reads release from the side's device bit. Posting is gated on the live `AXIsProcessTrusted()`, never on
+  `CGPreflightPostEventAccess()`, whose in-process cache keeps a launch-time
+  "denied" after the grant. Modifier/key display comes
   from `VoiceShortcut.displayText`, which also renders the Fn/🌐 key. The tap
   needs the **Accessibility** grant, which also covers posting the echo.
 - **Permissions:** the single home for the optional Accessibility grant

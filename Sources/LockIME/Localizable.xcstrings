@@ -12378,58 +12378,6 @@
         }
       }
     },
-    "Restore input source": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eingabequelle wiederherstellen"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurar fuente de entrada"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurer la source de saisie"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元する入力ソース"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurar fonte de entrada"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Восстановить источник ввода"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复输入法"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢復輸入法"
-          }
-        }
-      }
-    },
     "Automatic restore timeout": {
       "localizations": {
         "de": {
@@ -13522,110 +13470,6 @@
         }
       }
     },
-    "Set a global default input source in App Rules before using voice input.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Legen Sie in den App-Regeln eine globale Standard-Eingabequelle fest, bevor Sie die Spracheingabe verwenden."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Configura una fuente de entrada predeterminada global en Reglas de apps antes de usar la entrada de voz."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Définissez une source de saisie par défaut globale dans les règles d’apps avant d’utiliser la saisie vocale."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音声入力を使う前に、アプリルールでグローバルデフォルト入力ソースを設定してください。"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Defina uma fonte de entrada padrão global em Regras de apps antes de usar a entrada por voz."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Перед использованием голосового ввода задайте глобальный источник ввода по умолчанию в правилах приложений."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用语音输入前，请先在「应用规则」中设置全局默认输入法。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用語音輸入前，請先在「應用程式規則」中設定全域預設輸入法。"
-          }
-        }
-      }
-    },
-    "The configured global default input source is unavailable.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die konfigurierte globale Standard-Eingabequelle ist nicht verfügbar."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La fuente de entrada predeterminada global configurada no está disponible."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La source de saisie par défaut globale configurée est indisponible."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定済みのグローバルデフォルト入力ソースは利用できません。"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A fonte de entrada padrão global configurada não está disponível."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Настроенный глобальный источник ввода по умолчанию недоступен."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已配置的全局默认输入法不可用。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已設定的全域預設輸入法無法使用。"
-          }
-        }
-      }
-    },
     "The configured voice input source is unavailable.": {
       "localizations": {
         "de": {
@@ -13726,58 +13570,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "無法使用"
-          }
-        }
-      }
-    },
-    "Not set": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht festgelegt"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin configurar"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Non défini"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未設定"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Não definido"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Не задано"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未设置"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未設定"
           }
         }
       }
@@ -14146,58 +13938,6 @@
         }
       }
     },
-    "The voice input source is already the global default, so no switch is needed and its shortcut is sent directly.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "语音输入法已经是全局默认输入法，无需切换，直接发送它的快捷键即可。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "語音輸入法已經是全域預設輸入法，無需切換，直接送出它的快捷鍵即可。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音声入力用の入力ソースはすでにグローバル既定なので切り替えは不要で、そのショートカットを直接送信します。"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La source de saisie vocale est déjà la source par défaut globale : aucun changement n'est nécessaire, son raccourci est envoyé directement."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die Spracheingabe-Quelle ist bereits die globale Standardquelle; ein Wechsel ist unnötig, ihr Kurzbefehl wird direkt gesendet."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La fuente de entrada por voz ya es la predeterminada global, así que no hace falta cambiar y su atajo se envía directamente."
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A fonte de entrada por voz já é a padrão global, então não é preciso trocar e o atalho dela é enviado diretamente."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Источник голосового ввода уже является глобальным по умолчанию, поэтому переключение не нужно — его комбинация отправляется напрямую."
-          }
-        }
-      }
-    },
     "Input method voice shortcut": {
       "localizations": {
         "de": {
@@ -14510,58 +14250,6 @@
         }
       }
     },
-    "Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and restores your global default afterwards.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "只有当语音输入法不是你日常使用的输入法时才需要打开：LockIME 会切到它，结束后再恢复你的全局默认输入法。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "只有當語音輸入法不是你日常使用的輸入法時才需要開啟：LockIME 會切到它，結束後再還原你的全域預設輸入法。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音声入力用の入力メソッドが普段使うものではない場合だけオンにしてください。LockIME がそこへ切り替え、終了後にグローバル既定の入力ソースへ戻します。"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "À activer uniquement si la méthode de saisie vocale n'est pas celle que vous utilisez au quotidien : LockIME y bascule puis rétablit votre source par défaut."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nur einschalten, wenn die Spracheingabe-Methode nicht Ihre alltägliche ist: LockIME wechselt dorthin und stellt danach Ihre globale Standardquelle wieder her."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actívalo solo si el método de entrada por voz no es el que usas a diario: LockIME cambiará a él y luego restaurará tu fuente predeterminada global."
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ative apenas se o método de entrada por voz não for o que você usa no dia a dia: o LockIME troca para ele e depois restaura a sua fonte padrão global."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Включайте только если голосовой метод ввода — не тот, которым вы обычно печатаете: LockIME переключится на него, а затем вернёт ваш глобальный источник ввода."
-          }
-        }
-      }
-    },
     "The upper shortcut is LockIME's own trigger; the lower one is the shortcut configured inside the selected input method. Set that one in the input method first, and never bind both to the same combination.": {
       "localizations": {
         "zh-Hans": {
@@ -14714,58 +14402,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Работает везде. Предпочитайте комбинацию с Command или Control. Комбинация голосового ввода должна отличаться от заданной внутри метода ввода."
-          }
-        }
-      }
-    },
-    "After voice input ends, LockIME restores the global default input source from App Rules. Set that default rule before turning this on.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nach Ende der Spracheingabe stellt LockIME die globale Standard-Eingabequelle aus den App-Regeln wieder her. Legen Sie diese Standardregel fest, bevor Sie den Workflow aktivieren."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuando termina la entrada de voz, LockIME restaura la fuente de entrada predeterminada global de Reglas de apps. Configura esa regla predeterminada antes de activar el flujo."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "À la fin de la saisie vocale, LockIME restaure la source de saisie par défaut globale définie dans les règles d’apps. Définissez cette règle par défaut avant d’activer le workflow."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音声入力が終了すると、LockIME はアプリルールのグローバルデフォルト入力ソースを復元します。ワークフローを有効にする前に、そのデフォルトルールを設定してください。"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quando a entrada por voz termina, o LockIME restaura a fonte de entrada padrão global das Regras de apps. Defina essa regra padrão antes de ativar o fluxo."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "После завершения голосового ввода LockIME восстанавливает глобальный источник ввода по умолчанию из правил приложений. Настройте это правило по умолчанию перед включением сценария."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "语音输入结束后，LockIME 会恢复「应用规则」里的全局默认输入法。打开本开关前，请先在那里设置默认规则。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "語音輸入結束後，LockIME 會還原「App Rules」裡的全域預設輸入法。開啟本開關前，請先在那裡設定預設規則。"
           }
         }
       }
@@ -14978,54 +14614,210 @@
         }
       }
     },
-    "Typing while voice input is active ends the session and returns you to your text input source.": {
+    "Tap the shortcut to start and tap it again to stop, or hold it while you speak and release to stop.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "语音输入进行中开始打字会结束本次语音，并切回你的文字输入法"
+            "value": "按一下快捷键开始、再按一下结束；或者按住快捷键说话，松开即结束"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "語音輸入進行中開始打字會結束本次語音，並切回你的文字輸入法"
+            "value": "按一下快捷鍵開始、再按一下結束；或者按住快捷鍵說話，放開即結束"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "音声入力中に文字を打つと音声入力を終了し、通常の入力ソースに戻ります"
+            "value": "ショートカットを一度押すと開始、もう一度押すと終了します。押したまま話し、離すと終了することもできます"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Taper du texte pendant la saisie vocale termine la session et vous rend votre source de saisie"
+            "value": "Appuyez une fois sur le raccourci pour commencer et encore une fois pour arrêter, ou maintenez-le pendant que vous parlez et relâchez-le pour arrêter"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippen während der Spracheingabe beendet die Sitzung und schaltet auf Ihre Texteingabe zurück"
+            "value": "Tippen Sie einmal auf das Kürzel, um zu starten, und erneut, um zu stoppen – oder halten Sie es beim Sprechen gedrückt und lassen Sie es zum Beenden los"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Escribir durante la entrada de voz termina la sesión y te devuelve a tu fuente de texto"
+            "value": "Pulsa el atajo una vez para empezar y otra vez para terminar, o mantenlo pulsado mientras hablas y suéltalo para terminar"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Digitar durante a entrada por voz encerra a sessão e devolve a sua fonte de texto"
+            "value": "Toque no atalho uma vez para começar e de novo para parar, ou mantenha-o pressionado enquanto fala e solte para parar"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Если начать печатать во время голосового ввода, сеанс завершится и вернётся ваша раскладка для текста"
+            "value": "Нажмите сочетание один раз, чтобы начать, и ещё раз, чтобы закончить, или удерживайте его во время речи и отпустите, чтобы закончить"
+          }
+        }
+      }
+    },
+    "After voice input ends, LockIME switches back to the input source you were using when you pressed the shortcut.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入结束后，LockIME 会切回你按下快捷键时正在用的输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入結束後，LockIME 會切回你按下快捷鍵時正在用的輸入法"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力が終わると、LockIME はショートカットを押したときに使っていた入力ソースに戻します"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À la fin de la saisie vocale, LockIME revient à la source de saisie que vous utilisiez au moment d'appuyer sur le raccourci"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach der Spracheingabe schaltet LockIME zurück auf die Eingabequelle, die Sie beim Drücken des Kürzels verwendet haben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al terminar la entrada de voz, LockIME vuelve a la fuente de entrada que usabas al pulsar el atajo"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando a entrada por voz termina, o LockIME volta para a fonte de entrada que você usava ao pressionar o atalho"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "После голосового ввода LockIME вернёт источник ввода, который был активен, когда вы нажали сочетание"
+          }
+        }
+      }
+    },
+    "Turn this on only when the voice input method is not the one you normally type in: LockIME then switches to it and switches back to your input source afterwards.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有当语音输入法不是你平时打字用的输入法时才需要开启：LockIME 会先切到语音输入法，结束后再切回你原来的输入法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有當語音輸入法不是你平時打字用的輸入法時才需要開啟：LockIME 會先切到語音輸入法，結束後再切回你原來的輸入法"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力メソッドが普段の文字入力用と異なる場合にのみオンにしてください。LockIME がそれに切り替え、終了後に元の入力ソースへ戻します"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez cette option uniquement si la méthode de saisie vocale n'est pas celle avec laquelle vous tapez d'habitude : LockIME bascule alors dessus, puis revient ensuite à votre source de saisie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schalten Sie dies nur ein, wenn die Spracheingabemethode nicht die ist, mit der Sie normalerweise tippen: LockIME wechselt dann zu ihr und anschließend zurück zu Ihrer Eingabequelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actívalo solo si el método de entrada de voz no es el que usas normalmente para escribir: LockIME cambia a él y después vuelve a tu fuente de entrada"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ative somente se o método de entrada por voz não for o que você costuma usar para digitar: o LockIME muda para ele e depois volta para a sua fonte de entrada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включайте, только если метод голосового ввода — не тот, которым вы обычно печатаете: LockIME переключится на него, а затем вернёт ваш источник ввода"
+          }
+        }
+      }
+    },
+    "Pressing any other key while voice input is active ends it, like pressing the shortcut again: the recognized text is kept and that key is not typed.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入进行中按任意其他键会结束语音，效果同再按一次快捷键：已识别的文字会保留，这个键本身不会打出来"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語音輸入進行中按任意其他鍵會結束語音，效果同再按一次快捷鍵：已辨識的文字會保留，這個鍵本身不會打出來"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音声入力中にほかのキーを押すと、ショートカットをもう一度押したときと同じく音声入力を終了します。認識済みの文字は残り、押したキーは入力されません"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyer sur une autre touche pendant la saisie vocale la termine, comme un nouvel appui sur le raccourci : le texte reconnu est conservé et cette touche n'est pas saisie"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Druck auf eine andere Taste während der Spracheingabe beendet sie wie ein erneuter Druck auf das Kürzel: Der erkannte Text bleibt erhalten, die Taste selbst wird nicht getippt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulsar cualquier otra tecla durante la entrada de voz la termina, igual que volver a pulsar el atajo: el texto reconocido se conserva y esa tecla no se escribe"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pressionar qualquer outra tecla durante a entrada por voz a encerra, como pressionar o atalho de novo: o texto reconhecido é mantido e essa tecla não é digitada"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажатие любой другой клавиши во время голосового ввода завершает его, как повторное нажатие сочетания: распознанный текст сохраняется, а сама клавиша не печатается"
           }
         }
       }

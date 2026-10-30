@@ -40,8 +40,15 @@ public final class VoiceInputCoordinator {
 
     private static let log = Logger(subsystem: LogSubsystem.current, category: "VoiceInput")
     /// How long to wait for the system to confirm the switch into the voice
-    /// input source before declaring the session failed.
-    private static let sourceSelectionDeadline: TimeInterval = 0.5
+    /// input source before declaring the session failed. Generous because a
+    /// third-party input method that is not running yet is launched by the
+    /// switch, and 0.5 s was not always enough for that cold start.
+    private static let sourceSelectionDeadline: TimeInterval = 1.5
+    /// A switching-session press held at least this long is "hold to talk": its
+    /// release ends the session. A shorter press is a tap: the session stays
+    /// active until the next press. This is what lets one key serve both kinds
+    /// of input method without a setting.
+    static let holdThreshold: TimeInterval = 0.5
 
     private let overrideEngine: any VoiceInputSourceOverriding
     private let sender: any ShortcutEventSending
@@ -70,6 +77,12 @@ public final class VoiceInputCoordinator {
     /// user presses and up when they release. This is the key still held down,
     /// so a release (or a teardown) can lift exactly what was pressed.
     private var echoedKeyDown: VoiceShortcut?
+    /// When the press that started a switching session went down, while that
+    /// key is still physically held; nil once it is released. Decides, at
+    /// activation, whether to echo a held key-down or a complete tap, and at
+    /// release whether the press was a tap or hold-to-talk.
+    private var sessionPressStartedAt: TimeInterval?
+    private let now: @MainActor () -> TimeInterval
     /// The voice key the session echoes back to the input method. In the
     /// single-shortcut model this is the key LockIME consumed, so it is known
     /// for the whole session and does not depend on a separately recorded value.
@@ -93,13 +106,15 @@ public final class VoiceInputCoordinator {
         sender: any ShortcutEventSending,
         fallbackRestoreSourceID: @escaping @MainActor () -> InputSourceID? = { nil },
         timeoutScheduler: any VoiceTimeoutScheduling = TaskVoiceTimeoutScheduler(),
-        sourceActivationDelay: TimeInterval = 0
+        sourceActivationDelay: TimeInterval = 0,
+        now: @escaping @MainActor () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     ) {
         self.overrideEngine = overrideEngine
         self.sender = sender
         self.fallbackRestoreSourceID = fallbackRestoreSourceID
         self.timeoutScheduler = timeoutScheduler
         self.sourceActivationDelay = sourceActivationDelay
+        self.now = now
     }
 
     /// A press of the voice key, which LockIME consumed so the input method never
@@ -128,12 +143,17 @@ public final class VoiceInputCoordinator {
         }
         switch state {
         case .idle, .failed, .endingVoice, .restoringDefaultInput:
+            // A press during the restore delay interrupts a hand-back that has not
+            // happened yet: the source is still the voice one, so the new session
+            // must inherit the old session's target instead of snapshotting it.
+            let pendingRestoreSourceID = state.isInProgress ? self.restoreSourceID : nil
             // A stale/abandoned session (a failure, an interrupted restore) is
             // cleared first so the next press always starts from a clean slate.
             cleanupOverride()
             try start(
                 config: config,
                 restoreSourceID: restoreSourceID,
+                pendingRestoreSourceID: pendingRestoreSourceID,
                 installedSources: installedSources
             )
         case .preparingVoice:
@@ -147,21 +167,45 @@ public final class VoiceInputCoordinator {
         }
     }
 
-    /// The voice key came back up: lift the mirrored key in shortcut-only mode.
-    /// A switching session ends on the next press instead, so it ignores this.
-    public func handleWorkflowShortcutReleased() {
+    /// The voice key came back up. Shortcut-only mode lifts the mirrored key. A
+    /// switching session mirrors the key too, so it works for both kinds of
+    /// input method:
+    ///  * released before the voice source was ready — activation sends a
+    ///    complete tap instead of a held key-down;
+    ///  * a short press (a tap) — the key is lifted and the session stays active
+    ///    until the next press, for input methods that toggle recording;
+    ///  * a press held for `holdThreshold` or longer — hold to talk: the key is
+    ///    lifted, which stops the input method, and the session ends.
+    public func handleWorkflowShortcutReleased() throws {
+        guard let pressedAt = sessionPressStartedAt else {
+            releaseEchoedKey()
+            return
+        }
+        sessionPressStartedAt = nil
+        guard state == .voiceActive, echoedKeyDown != nil else { return }
         releaseEchoedKey()
+        guard now() - pressedAt >= Self.holdThreshold else { return }
+        Self.log.notice("Voice session ended: hold-to-talk key released")
+        try end(sendEndShortcut: false)
     }
 
-    /// The user started typing while a session owned the input source: hand the
-    /// source back immediately so the keystrokes land in the text input they
-    /// expect. Sends no key — a blind toggle would *restart* recording whenever
-    /// the input method had already stopped by itself, and when it never started
-    /// at all (no microphone, denied mic permission) there is nothing to stop.
+    /// The user pressed another key while a session owned the input source: any
+    /// key ends voice input, exactly like pressing the voice key again. The key
+    /// itself was consumed by the tap, so it cannot overwrite the recognized
+    /// text; the input method is stopped (the held echo lifted for hold to talk,
+    /// the voice key tapped otherwise) so it commits that text, and the source
+    /// is handed back after `restoreDelay`. Handing the source back at once
+    /// without stopping is what used to lose the recognized text.
     public func handleTypingInterrupt() throws {
         guard state == .voiceActive, ownsInputSource else { return }
-        Self.log.notice("Voice session ended: the user started typing")
-        try restoreDefault(reason: .typingInterrupted)
+        Self.log.notice("Voice session ended: another key was pressed")
+        sessionPressStartedAt = nil
+        if echoedKeyDown != nil {
+            releaseEchoedKey()
+            try end(sendEndShortcut: false, reason: .typingInterrupted)
+        } else {
+            try end(sendEndShortcut: true, reason: .typingInterrupted)
+        }
     }
 
     /// The safety timeout of a switching session: hand the input source back so
@@ -179,11 +223,20 @@ public final class VoiceInputCoordinator {
     ///    being the global default) — echo the voice shortcut straight away and
     ///    keep no session: the input source is never touched, so there is nothing
     ///    to restore, time out, or keep in step with the input method.
+    ///
+    /// The source handed back afterwards is the one the user was typing in when
+    /// they pressed the key, not a fixed default: `restoreSourceID` (the global
+    /// default) is only the fallback for when the current source is unknown.
     private func start(
         config: VoiceInputConfiguration,
-        restoreSourceID: InputSourceID?,
+        restoreSourceID fallbackSourceID: InputSourceID?,
+        pendingRestoreSourceID: InputSourceID?,
         installedSources: [InputSource]
     ) throws {
+        let currentSourceID = overrideEngine.currentInputSourceID().flatMap { id in
+            installedSources.contains { $0.id == id } ? id : nil
+        }
+        let restoreSourceID = pendingRestoreSourceID ?? currentSourceID ?? fallbackSourceID
         // The key to echo is the one the user pressed (LockIME consumed it), so a
         // separate recording is no longer required — only a resolved value.
         guard let voiceShortcut = voiceShortcutProvider?() ?? config.voiceShortcut else {
@@ -225,6 +278,7 @@ public final class VoiceInputCoordinator {
         sessionShortcut = voiceShortcut
         sessionBehavior = config.behavior
         sessionRestoreDelay = config.restoreDelay.interval
+        sessionPressStartedAt = now()
         state = .preparingVoice
         didScheduleVoiceShortcut = false
         token = overrideEngine.beginTemporaryInputSourceOverride { [weak self] sourceID in
@@ -304,11 +358,20 @@ public final class VoiceInputCoordinator {
               !didSendVoiceShortcut
         else { return }
         didSendVoiceShortcut = true
+        // Still held: echo only the key-down, so a hold-to-talk input method keeps
+        // recording until the user lets go (`handleWorkflowShortcutReleased`).
+        // Already released: the press was a tap, so echo a complete one.
+        let isHeld = sessionPressStartedAt != nil
         do {
             Self.log.notice(
-                "Sending voice shortcut: keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue)"
+                "Sending voice shortcut: keyCode=\(voiceShortcut.keyCode) modifiers=\(voiceShortcut.modifiers.rawValue) held=\(isHeld)"
             )
-            try sender.sendTap(voiceShortcut)
+            if isHeld {
+                try sender.sendKeyDown(voiceShortcut)
+                echoedKeyDown = voiceShortcut
+            } else {
+                try sender.sendTap(voiceShortcut)
+            }
             state = .voiceActive
             armRestoreTimeout(config: config, generation: generation)
         } catch {
@@ -316,7 +379,7 @@ public final class VoiceInputCoordinator {
         }
     }
 
-    private func end(sendEndShortcut: Bool) throws {
+    private func end(sendEndShortcut: Bool, reason: RestoreReason = .workflowShortcut) throws {
         state = .endingVoice
         if sendEndShortcut {
             guard let sessionShortcut else {
@@ -339,7 +402,7 @@ public final class VoiceInputCoordinator {
         // source changes under it. The override stays in place meanwhile, so the
         // lock engine doesn't snap the source back early either.
         guard ownsInputSource, sessionRestoreDelay > 0 else {
-            try restoreDefault(reason: .workflowShortcut)
+            try restoreDefault(reason: reason)
             return
         }
         state = .restoringDefaultInput
@@ -349,7 +412,7 @@ public final class VoiceInputCoordinator {
                   self.generation == currentGeneration,
                   self.state == .restoringDefaultInput
             else { return }
-            try? self.restoreDefault(reason: .workflowShortcut)
+            try? self.restoreDefault(reason: reason)
         }
     }
 
@@ -357,6 +420,9 @@ public final class VoiceInputCoordinator {
     /// nothing was taken over, so there is no restore — the user's input source
     /// is left exactly where it was.
     private func restoreDefault(reason: RestoreReason) throws {
+        // A hold-to-talk key still echoed down (the safety timeout or typing
+        // ended the session mid-hold) must not be left pressed in the input method.
+        releaseEchoedKey()
         guard ownsInputSource else {
             cleanupOverride()
             state = .idle
@@ -404,6 +470,7 @@ public final class VoiceInputCoordinator {
         sessionShortcut = nil
         sessionBehavior = nil
         sessionRestoreDelay = 0
+        sessionPressStartedAt = nil
         if hadSession {
             onSessionCleanup?()
         }
@@ -429,7 +496,15 @@ public final class VoiceInputCoordinator {
         do {
             try sender.sendKeyUp(echoed)
         } catch {
-            state = .failed(Self.failure(for: error))
+            let failure = Self.failure(for: error)
+            // Inside a switching session the session's own flow (end, restore)
+            // decides the state; a lost key-up must not reroute the press that is
+            // ending it into a fresh start.
+            guard ownsInputSource else {
+                state = .failed(failure)
+                return
+            }
+            Self.log.error("Voice key release not sent: \(String(describing: failure), privacy: .public)")
         }
     }
 

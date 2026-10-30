@@ -931,8 +931,9 @@ final class AppState {
                 case .pressed:
                     self?.handleVoiceInputWorkflowToggled()
                 case .released:
-                    // Shortcut-only mode mirrors the key: lift the echo now.
-                    self?.voiceInputCoordinator?.handleWorkflowShortcutReleased()
+                    // The echo mirrors the key: lift it now. A switching session
+                    // held long enough (hold to talk) also ends here.
+                    self?.handleVoiceInputWorkflowReleased()
                 case .otherKeyDown:
                     // Typing during a session: give the input source back at once.
                     self?.handleTypingWhileVoiceActive()
@@ -960,7 +961,20 @@ final class AppState {
         }
     }
 
-    /// A voice-key press: start a session, or end the running one.
+    /// The voice key came back up.
+    private func handleVoiceInputWorkflowReleased() {
+        guard let voiceInputCoordinator else { return }
+        do {
+            try voiceInputCoordinator.handleWorkflowShortcutReleased()
+        } catch {
+            voiceInputRuntimeError = error as? VoiceInputCoordinatorError
+            Self.log.error("Voice input workflow release failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    /// A voice-key press: start a session, or end the running one. The global
+    /// default is passed only as the fallback restore target: the session hands
+    /// back the source that was current when the key was pressed.
     private func handleVoiceInputWorkflowToggled() {
         guard let voiceInputCoordinator else { return }
         Self.log.notice("Voice workflow trigger pressed")

@@ -82,7 +82,7 @@ public struct VoiceShortcut: Codable, Sendable, Equatable, Hashable {
         return bits
     }
 
-    private static func deviceBit(forModifierKeyCode keyCode: UInt16) -> UInt64 {
+    static func deviceBit(forModifierKeyCode keyCode: UInt16) -> UInt64 {
         switch keyCode {
         case 59: 0x0000_0001  // left ⌃
         case 62: 0x0000_2000  // right ⌃
