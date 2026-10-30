@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.9` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
+> **LockIME Voice 原始碼分支。** 這個 GPL-3.0 二開版本加入可設定的語音輸入工作流程。`v0.1.10` 提供 ad-hoc 簽名的預覽安裝包，但不提供 Developer ID 簽名、公證、Sparkle 更新或 Homebrew 安裝。
 
 一款 macOS 選單列應用程式，用於**鎖定你的鍵盤輸入法**。每當你（或其他應用程式）切換輸入法時，LockIME 會立即切回被鎖定的那個——可以是全域的、依最前方應用程式區分的，或者（在可選的增強模式下）依瀏覽器 URL 區分的。
 
@@ -44,9 +44,10 @@
 
 - **語音輸入法可設定**——不寫死任何輸入法，可選擇豆包、微信或其他已安裝輸入法。
 - **一個快速鍵，由 LockIME 接管**——錄入你在輸入法裡使用的同一個語音快速鍵。LockIME 會吃掉這個按鍵，讓輸入法收不到實際按下（這正是 macOS 不再提示快速鍵衝突的原因），再把同一個鍵送回去以開始與結束錄音。支援左右修飾鍵與多鍵組合。
-- **再按一次或直接打字即可結束**——再次按下語音快速鍵會結束錄音；開始打字同樣會結束，並把輸入法切回你的文字輸入法，不會讓你卡在語音輸入法裡。
+- **按一下或按住都行**——按一下開始、再按一下結束，或者按住說話、放開結束，LockIME 會自己區分。語音中按任意其他鍵也會結束語音，這個鍵會被吞掉，不會覆蓋已辨識的文字。
+- **只認錄入的那一側**——單獨修飾鍵（如右 ⌘）作語音鍵時只有錄入的那一側會觸發，另一側照常當修飾鍵用。
 - **暫時接管輸入法**——語音期間暫停普通鎖定規則，避免剛切到語音輸入法就被切回預設輸入法。
-- **恢復全域預設輸入法**——恢復目標直接取自 **App Rules** 的全域預設規則，不再重複設定「日常輸入法」。
+- **切回原來的輸入法**——結束後切回你按下快速鍵時正在用的輸入法；**App Rules** 的全域預設只作備援，不再要求先設預設規則。
 - **連續使用更可靠**——加入輸入法確認、過期工作取消、安全逾時、合成事件過濾與工作階段快速鍵快照。
 - **選單更清楚**——全域預設輸入法排在最前，並以圖釘取代勾選標記。
 
@@ -56,14 +57,14 @@
 
 下載與你的 Mac 相符的安裝包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-x86_64.dmg)
 
 開啟前請先校驗下載檔案。每個 Release 都會發布 `SHA256SUMS.txt`，因此校驗和始終與該 tag 建置出的產物一致（DMG 不是可重現建置，所以本檔案裡不寫死雜湊）：
 
 ```sh
-gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.10 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.10-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

@@ -14,7 +14,7 @@
 </div>
 
 > **LockIME Voice source fork.** This GPL-3.0 derivative adds the configurable
-> voice-input workflow. `v0.1.9` provides ad-hoc-signed preview installers, but
+> voice-input workflow. `v0.1.10` provides ad-hoc-signed preview installers, but
 > Developer ID signing, notarization, Sparkle updates, and Homebrew distribution
 > are not available.
 
@@ -55,14 +55,17 @@ Compared with upstream LockIME, this fork adds and changes the following:
   press (which is what stops macOS reporting a shortcut conflict), then sends it
   back to start and stop recording. Left/right modifiers and multi-key
   combinations are supported.
-- **Press again, or just start typing, to end** — pressing the voice key again
-  stops recording; so does typing, which also hands the input source straight
-  back to your text layout, so a voice input method that never starts cannot
-  strand you on it.
+- **Tap or hold** — tap the voice key to start and tap it again to stop, or
+  hold it while you speak and release to stop; LockIME tells the two apart by
+  itself. Pressing any other key also ends voice input: that key is swallowed,
+  so it cannot overwrite the recognized text.
+- **Exact side** — a bare modifier voice key such as right ⌘ triggers only on
+  the side you recorded; the other side stays an ordinary modifier.
 - **Rule-safe temporary override** — normal LockIME enforcement pauses while
   voice input owns the source, preventing an immediate switch back to default.
-- **Default-source restore** — the restore target comes from the global default
-  in **App Rules**; there is no duplicate "daily input source" setting.
+- **Back to where you were** — afterwards LockIME switches back to the input
+  source you were using when you pressed the key; the global default in **App
+  Rules** is only a fallback, so no default rule is required.
 - **Reliable repeated use** — source confirmation, stale-task cancellation,
   safety timeout, synthetic-event filtering, and session shortcut snapshots
   prevent missed or self-cancelled activations.
@@ -75,16 +78,16 @@ Compared with upstream LockIME, this fork adds and changes the following:
 
 Download the installer matching your Mac:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-x86_64.dmg)
 
 Verify your download before opening it. Each Release publishes a
 `SHA256SUMS.txt`, so the checksum always matches the artifact built for that tag
 (the DMG is not byte-reproducible, so no checksum belongs in this file):
 
 ```sh
-gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.10 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.10-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

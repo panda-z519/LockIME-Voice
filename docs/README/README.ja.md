@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。`v0.1.9` は ad-hoc 署名のプレビューインストーラーを提供しますが、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布はありません。
+> **LockIME Voice ソースフォーク。** この GPL-3.0 派生版は、設定可能な音声入力ワークフローを追加します。`v0.1.10` は ad-hoc 署名のプレビューインストーラーを提供しますが、Developer ID 署名、公証、Sparkle 更新、Homebrew 配布はありません。
 
 **キーボードの入力ソースをロックする** macOS メニューバーアプリ。あなた（または他のアプリ）が入力メソッドを切り替えるたびに、LockIME はロック中の入力ソースへ即座に切り戻します——グローバルに、最前面のアプリごとに、あるいは（オプションの拡張モードでは）ブラウザの URL ごとに。
 
@@ -40,7 +40,7 @@
 
 ## Changes in LockIME Voice
 
-Upstream と比べ、このフォークは設定可能な音声入力ソース、入力メソッドと同じ音声ショートカットを LockIME が引き継ぐ構成（キーを消費するため競合しない）、音声期間中だけ入力を引き継ぐ一時的な入力ソース切り替え（既定はオフ）、**App Rules** のグローバル既定値への復元、タイムアウトによる繰り返し利用の安定化、既定ソースを先頭に表示するピン表示を追加します。
+Upstream と比べ、このフォークは設定可能な音声入力ソース、入力メソッドと同じ音声ショートカットを LockIME が引き継ぐ構成（キーを消費するため競合しない）、音声期間中だけ入力を引き継ぐ一時的な入力ソース切り替え（既定はオフ）、押したときに使っていた入力ソースへの復帰（**App Rules** のグローバル既定値は予備）、音声キーの「押して離す」と「押し続ける」の両対応、認識済みの文字を上書きせずほかのキーで終了、タイムアウトによる繰り返し利用の安定化、既定ソースを先頭に表示するピン表示を追加します。
 
 ![LockIME Voice 音声入力設定](../images/settings-voice-input-zh-CN.png)
 
@@ -48,14 +48,14 @@ Upstream と比べ、このフォークは設定可能な音声入力ソース�
 
 Mac に合うインストーラーをダウンロードします：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-x86_64.dmg)
 
 開く前にダウンロードしたファイルを検証してください。各 Release は `SHA256SUMS.txt` を公開するため、チェックサムはその tag でビルドされた成果物と常に一致します（DMG は再現可能ビルドではないので、このファイルにハッシュを書きません）：
 
 ```sh
-gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.10 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.10-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

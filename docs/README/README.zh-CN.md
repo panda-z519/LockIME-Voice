@@ -13,7 +13,7 @@
 
 </div>
 
-> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.9` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
+> **LockIME Voice 源码分支。** 这个 GPL-3.0 二开版本增加了可配置的语音输入工作流。`v0.1.10` 提供 ad-hoc 签名的预览安装包，但不提供 Developer ID 签名、公证、Sparkle 更新或 Homebrew 安装。
 
 一款 macOS 菜单栏应用，用于**锁定你的键盘输入源**。每当你（或其他应用）切换输入法时，LockIME 会立即切回被锁定的那个——可以是全局的、按前台应用区分的，或者（在可选的增强模式下）按浏览器 URL 区分的。
 
@@ -44,9 +44,10 @@
 
 - **语音输入法可配置**——不写死任何输入法，可选择豆包、微信或其他已安装输入法。
 - **一个快捷键，由 LockIME 接管**——录入你在输入法里使用的同一个语音快捷键。LockIME 会吃掉这个按键，让输入法收不到物理按下（这正是 macOS 不再提示快捷键冲突的原因），再把同一个键发回去以开始和结束录音。支持左右修饰键和多键组合。
-- **再按一次或直接打字即可结束**——再次按下语音快捷键会结束录音；开始打字同样会结束，并把输入源切回你的文字输入法，不会把你困在语音输入法里。
+- **按一下或按住都行**——按一下开始、再按一下结束，或者按住说话、松开结束，LockIME 会自己区分。语音中按任意其他键也会结束语音，这个键会被吞掉，不会覆盖已识别的文字。
+- **只认录入的那一侧**——单独修饰键（如右 ⌘）作语音键时只有录入的那一侧会触发，另一侧照常当修饰键用。
 - **临时接管输入法**——语音期间暂停普通锁定规则，避免刚切到语音输入法就被切回默认输入法。
-- **恢复全局默认输入法**——恢复目标直接取自 **App Rules** 的全局默认规则，不再重复设置“日常输入法”。
+- **切回原来的输入法**——结束后切回你按下快捷键时正在用的输入法；**App Rules** 的全局默认只作兜底，不再要求先设默认规则。
 - **连续使用更可靠**——增加输入法确认、过期任务取消、安全超时、合成事件过滤和会话快捷键快照。
 - **菜单更清晰**——全局默认输入法排在最前，并用图钉代替对勾标记。
 
@@ -56,14 +57,14 @@
 
 下载与你的 Mac 匹配的安装包：
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-x86_64.dmg)
 
 打开前请先校验下载文件。每个 Release 都会发布 `SHA256SUMS.txt`，因此校验和始终与该 tag 构建出的产物一致（DMG 不是可复现构建，所以本文件里不写死哈希）：
 
 ```sh
-gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.10 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.10-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 

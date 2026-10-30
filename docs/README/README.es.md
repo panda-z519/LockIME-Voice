@@ -13,7 +13,7 @@
 
 </div>
 
-> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.9` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
+> **Fork de código fuente LockIME Voice.** Este derivado GPL-3.0 añade el flujo de entrada por voz configurable. `v0.1.10` ofrece instaladores preliminares con firma ad-hoc, pero no firma Developer ID, notarización, Sparkle ni Homebrew.
 
 Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada de teclado**. Cada vez que tú (u otra aplicación) cambias el método de entrada, LockIME vuelve inmediatamente al bloqueado — globalmente, por aplicación en primer plano, o (con el modo mejorado opcional) por URL del navegador.
 
@@ -40,7 +40,7 @@ Una aplicación de barra de menús para macOS que **bloquea tu fuente de entrada
 
 ## Changes in LockIME Voice
 
-Frente al proyecto upstream, este fork añade una fuente de voz configurable, un único atajo de voz que LockIME asume (consume la tecla, así que no hay conflicto), un cambio temporal de fuente de entrada durante la voz que es opcional y está desactivado por defecto, restauración del valor global de **App Rules**, sesiones repetibles con timeout y la fuente predeterminada primero con un icono de chincheta.
+Frente al proyecto upstream, este fork añade una fuente de voz configurable, un único atajo de voz que LockIME asume (consume la tecla, así que no hay conflicto), un cambio temporal de fuente de entrada durante la voz que es opcional y está desactivado por defecto, vuelta a la fuente que usabas al pulsar (el valor global de **App Rules** solo como respaldo), pulsar o mantener la tecla de voz, fin con cualquier otra tecla sin sobrescribir el texto reconocido, sesiones repetibles con timeout y la fuente predeterminada primero con un icono de chincheta.
 
 ![Ajustes de entrada por voz de LockIME Voice](../images/settings-voice-input-zh-CN.png)
 
@@ -48,16 +48,16 @@ Frente al proyecto upstream, este fork añade una fuente de voz configurable, un
 
 Descarga el instalador correspondiente:
 
-- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-arm64.dmg)
-- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.9/LockIME-Voice-0.1.9-x86_64.dmg)
+- [Apple silicon (arm64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-arm64.dmg)
+- [Intel (x86_64)](https://github.com/panda-z519/LockIME-Voice/releases/download/v0.1.10/LockIME-Voice-0.1.10-x86_64.dmg)
 
 Verifica la descarga antes de abrirla. Cada release publica un `SHA256SUMS.txt`,
 así que la suma de comprobación siempre coincide con el artefacto compilado para
 ese tag (el DMG no es reproducible, por eso aquí no se fija ninguna):
 
 ```sh
-gh release download v0.1.9 --repo panda-z519/LockIME-Voice \
-  --pattern 'LockIME-Voice-0.1.9-*.dmg' --pattern SHA256SUMS.txt
+gh release download v0.1.10 --repo panda-z519/LockIME-Voice \
+  --pattern 'LockIME-Voice-0.1.10-*.dmg' --pattern SHA256SUMS.txt
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
